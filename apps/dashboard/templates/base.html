@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>{% block title %}EsSalud G{% endblock title %}</title>
+    <link rel="icon" href='/static/img/favicon.png' type="image/x-icon">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-progressbar-3.3.4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pnotify.css' %}">
+    <link rel="stylesheet" href="{% static 'css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sweetalert.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footable.core.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style_footable.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block styles %}
+    <style>
+        .ui-pnotify-title { font-size: 15px !important; }
+    </style>
+    {% endblock styles %}
+</head>
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="#" class="site_title"><i class="fa fa-google"></i> <span>EsSalud</span></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile clearfix">
+                    <div class="profile_pic">
+                        {% if request.user.id_person.sex == 'M' %}
+                            <img src="{% static 'img/doctor_.png' %}" alt="user" class="img-circle profile_img">
+                        {% else %}
+                            <img src="{% static 'img/nurse_.png' %}" alt="user" class="img-circle profile_img">
+                        {% endif %}
+                    </div>
+                    <div class="profile_info"> <span>Bienvenid@,</span><h2>{{ request.user.id_person.names }}</h2></div>
+                </div>
+                <!-- /menu profile quick info -->
+                <br />
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                    <!-- <h3>{{ request.user.id_red.type }} - {{ request.user.id_red }}</h3> -->
+                    <ul class="nav side-menu">
+                        <li><a><i class="fa fa-bar-chart-o"></i> Tableros <span class="fa fa-chevron-down"></span></a>
+                            <ul class="nav child_menu">
+                                <li><a href="{% url 'boards:index_cov' %}">Tablero Cobertura</a></li>
+                            </ul>
+                        </li>
+                        <li><a><i class="fa fa-desktop"></i> Paquete <span class="fa fa-chevron-down"></span></a>
+                            <ul class="nav child_menu">
+                                <li><a href="{% url 'packages:boys' %}">Niño Seguimiento</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                <!-- /sidebar menu -->
+                <!-- /menu footer buttons -->
+                <div class="sidebar-footer hidden-small">
+                    <a data-toggle="tooltip" data-placement="top" title="Settings">
+                    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                    <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Lock">
+                    <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                    <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <!-- /menu footer buttons -->
+                </div>
+            </div>
+
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <div class="nav toggle">
+                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                    </div>
+                    <nav class="nav navbar-nav">
+                        <ul class="navbar-right">
+                            <li class="nav-item" style="padding-left: 15px;">
+                                <a href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+
+            <div class="right_col" role="main">
+                {% block content %}
+                {% endblock content %}
+            </div>
+            <!-- /page content -->
+
+            <!-- footer content -->
+            <footer>
+                <div class="pull-right"> Genesis V.2.0 </div>
+                <div class="clearfix"></div>
+            </footer>
+            <!-- /footer content -->
+        </div>
+    </div>
+
+    <script src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/axios.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/select2.full.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/custom.min.js' %}"></script>
+    <script src="{% static 'js/Chart.min.js' %}"></script>
+    <script src="{% static 'js/date.js' %}"></script>
+    <script src="{% static 'js/bootstrap-progressbar.min.js' %}"></script>
+    <script src="{% static 'js/jquery.easypiechart.min.js' %}"></script>
+    <script src="{% static 'js/pnotify.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/gauge.min.js' %}"></script>
+    <script src="{% static 'js/footable.all.min.js' %}"></script>
+    <script src="{% static 'js/footable-init.js' %}"></script>
+    <script src="{% static 'js/hammer.min.js' %}"></script>
+    <script>
+        Vue.directive('select2', {
+            inserted: function (elem, fieldName) {
+                $(elem).select2();
+            },
+            componentUpdated:function(el, binding) {
+                Vue.nextTick(function () {
+                    let options = binding.value || {};
+                    // set up select2
+                    $(el).select2(Object.assign({}, {
+                    // Default options
+                    }, options))
+                    .on("select2:select select2:unselect", (e) => {
+                        el.dispatchEvent(new Event('change', { target: e.target }));
+                    });
+                });
+            },
+        });
+    </script>
+
+    {% block scripts %}
+    {% endblock scripts %}
+</body>
+</html>

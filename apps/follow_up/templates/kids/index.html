@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Essalud G
+{% endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}">
+
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appFollow">
+    <div class="page-title">
+        <div class="title_left">
+            <h4>Búsqueda de Pacientes</h4>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-5 text-end">
+            <div class="card">
+                <div class="card-body p-1 bg-dark">
+                    <form method="GET" @submit.prevent="formSearch">
+                        <div class="d-flex">
+                            <div class="col-md-4 mt-1">
+                                <select class="form-control-sm w-100" name="type" id="type" aria-label="Default select example">
+                                    <option value="1">Niño</option>
+                                    <option value="2">Gestante</option>
+                                    <option value="3">Paciente</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2 mt-1">
+                                <input class="form-control-sm w-100" type="text" name="doc" id="doc" placeholder="Ingrese su dni..." maxlength="8" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                            </div>
+                            <div class="col-md-2 p-0">
+                                <button class="btn btn-primary btn-sm m-1" id="btn_buscar" type="submit"><i class="mdi mdi-magnify"></i> Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="info_head"></div>
+        </div>
+    </div>
+    <div class="design_boy" v-show="consol_users">
+        <section class="timeline">
+            <div class="arrows">
+                <button class="arrow arrow__prev disabled" disabled>
+                    <span class="fa fa-chevron-circle-left font-30" disabled></span>
+                </button>
+                <button class="arrow arrow__next">
+                    <span class="fa fa-chevron-circle-right font-30"></span>
+                </button>
+            </div>
+            <ol>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #7f9edc 0%, #95b4dc 35%, #ceddfa 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>0 Meses</time>
+                            <div><b>1° Cntrl:</b>
+                                <span v-if="dat_person.ctrl1rn != null"> [[ dat_person.ctrl1rn ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>2° Cntrl:</b>
+                                <span v-if="dat_person.ctrl2rn != null"> [[ dat_person.ctrl2rn ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>3° Cntrl:</b>
+                                <span v-if="dat_person.ctrl3rn != null"> [[ dat_person.ctrl3rn ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>4° Cntrl:</b>
+                                <span v-if="dat_person.ctrl4rn != null"> [[ dat_person.ctrl4rn ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center pl-0">
+                            <img src="{% static 'img/timeline/crib-toy.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #9ab486 0%, #c8deb7 35%, #e1efd6 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>1 - 2 Meses</time>
+                            <div><b>1° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred1 != null"> [[ dat_person.cred1 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>2° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred2 != null"> [[ dat_person.cred2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Antineumo:</b>
+                                <span v-if="dat_person.neumo2 != null"> [[ dat_person.neumo2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Rotavirus:</b>
+                                <span v-if="dat_person.rota2 != null"> [[ dat_person.rota2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Antipolio:</b>
+                                <span v-if="dat_person.polio2 != null"> [[ dat_person.polio2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Pentavalente:</b>
+                                <span v-if="dat_person.penta2 != null"> [[ dat_person.penta2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/stroller.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #f2eb91 0%, #ece6a0 35%, #fefaca 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>3 - 4 Meses</time>
+                            <div><b>3° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred3 != null"> [[ dat_person.cred3 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>4° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred4 != null"> [[ dat_person.cred4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Antineumo 2:</b>
+                                <span v-if="dat_person.neumo4 != null"> [[ dat_person.neumo4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Rotavirus 2:</b>
+                                <span v-if="dat_person.rota4 != null"> [[ dat_person.rota4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Antipolio 2:</b>
+                                <span v-if="dat_person.polio4 != null"> [[ dat_person.polio4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Pentavalente 2:</b>
+                                <span v-if="dat_person.penta4 != null"> [[ dat_person.penta4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 4 Meses:</b>
+                                <span v-if="dat_person.suple4 != null"> [[ dat_person.suple4 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <img src="{% static 'img/timeline/donation.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #e294a2 0%, #f6aab7 35%, #ffcfd8 100%);">
+                       <div class="col-md-7 pr-0">
+                            <time>5 Meses</time>
+                            <div><b>5° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred5 != null"> [[ dat_person.cred5 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 5 Meses:</b>
+                                <span v-if="dat_person.suple5 != null"> [[ dat_person.suple5 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                       </div>
+                       <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/shampoo.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #bc9b9b 0%, #d5b8b8 35%, #e2d2d2 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>6 Meses</time>
+                            <div><b>6° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred6 != null"> [[ dat_person.cred6 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 6 Meses:</b>
+                                <span v-if="dat_person.suple6 != null"> [[ dat_person.suple6 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Antipolio 3:</b>
+                                <span v-if="dat_person.polio6 != null"> [[ dat_person.polio6 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Pentavalente 3:</b>
+                                <span v-if="dat_person.penta6 != null"> [[ dat_person.penta6 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/crawl.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #9dcdcd 0%, #c6e1e1 35%, #e6f9f9 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>7 Meses</time>
+                            <div><b>7° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred7 != null"> [[ dat_person.cred7 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 7 Meses:</b>
+                                <span v-if="dat_person.suple7 != null"> [[ dat_person.suple7 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/xylophone.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #99849e 0%, #c7b6cb 35%, #dfd1e2 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>8 Meses</time>
+                            <div><b>8° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred8 != null"> [[ dat_person.cred8 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 8 Meses:</b>
+                                <span v-if="dat_person.suple8 != null"> [[ dat_person.suple8 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/bottle.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #976788 0%, #bb93af 35%, #dfb8d3 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>9 Meses</time>
+                            <div><b>9° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred9 != null"> [[ dat_person.cred9 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 9 Meses:</b>
+                                <span v-if="dat_person.suple9 != null"> [[ dat_person.suple9 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/playtime.png' %}" alt="" width="85">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #bb9c81 0%, #e3bc9a 35%, #eacdb4 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>10 Meses</time>
+                            <div><b>10° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred10 != null"> [[ dat_person.cred10 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 10 Meses:</b>
+                                <span v-if="dat_person.suple10 != null"> [[ dat_person.suple10 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/girl.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #c57657 0%, #efb7a2 35%, #fbd0bf 100%);">
+                        <div class="col-md-7 pr-0">
+                            <time>11 Meses</time>
+                            <div><b>11° Cntrl Mes:</b>
+                                <span v-if="dat_person.cred11 != null"> [[ dat_person.cred11 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Suple 11 Meses:</b>
+                                <span v-if="dat_person.suple11 != null"> [[ dat_person.suple11 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/fork.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li></li>
+            </ol>
+        </section>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'vue/kids.js' %}"></script>
+<script src="{% static 'js/kids.js' %}"></script>
+
+{% endblock scripts %}

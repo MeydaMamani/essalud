@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Genesis - Usuarios
+{% endblock title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appPerson">
+    <div class="page-title">
+        <div class="title_left">
+            <h4>Gestión de Usuarios</h4>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="x_panel">
+        <div class="x_content">
+            <label class="col-sm-1 col-form-label">Documento:</label>
+            <div class="col-sm-3">
+                <form @submit.prevent='searchPerson'>
+                    <div class="input-group">
+                        <input type="text" pattern="[0-9]{8}" class="form-control" v-model="doc">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="x_panel" v-if='addperson'>
+        <div class="x_title">
+            <h2>Datos Personales</h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <form @submit.prevent="sendPerson" class="form-material form-horizontal">
+                {% csrf_token %}
+                <div class="form-body">
+                    <input type='hidden' v-model="form.pk" id='pk' name="pk">
+                    <div hidden> {{ form.eid }} </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left  m-t-10 col-md-6">Tipo de Documento:</label>
+                                <div class="col-md-6">
+                                    {{ form.typedoc }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">N° Documento:</label>
+                                <div class="col-md-6">
+                                    {{ form.pdoc }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Apellido Paterno:</label>
+                                <div class="col-md-6">
+                                    {{ form.last_name0}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Apellido Materno:</label>
+                                <div class="col-md-6">
+                                    {{ form.last_name1}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left  m-t-10 col-md-6">Nombres:</label>
+                                <div class="col-md-6">
+                                    {{ form.names }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Fecha de Nacimiento:</label>
+                                <div class="col-md-6">
+                                    {{ form.birthday}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Sexo:</label>
+                                <div class="col-md-6">
+                                    {{ form.sex }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Celular:</label>
+                                <div class="col-md-6">
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Email:</label>
+                                <div class="col-md-6">
+                                    {{ form.pmail }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label text-left m-t-10 col-md-6">Institución:</label>
+                                <div class="col-md-6">
+                                    {{ form.institution }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actionBar">
+                    <button type="button" v-if='edit' @click="edit = false ; addperson = false ; listperson = true" class="btn btn-sm btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-sm btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="" v-if='listperson'>
+        <div class="row">
+            <div class="col-md-4 col-sm-4 profile_details">
+                <div class="well profile_view">
+                    <div class="col-sm-12">
+                        <div class="left col-sm-8">
+                            <h4 class="card-title m-t-10">[[ person.last_name0 ]] [[ person.last_name1 ]], [[ person.names ]]</h4>
+                            <p><strong>DNI: </strong> [[ person.pdoc ]]</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fa fa-phone"></i> [[ person.phone ]] </li>
+                                <li><i class="fa fa-calendar"></i> [[ person.birthday ]] </li>
+                                <li><i class="fa fa-building"></i> [[ person.pmail ]] </li>
+                            </ul>
+                        </div>
+                        <div class="right col-sm-4 text-center">
+                            <img v-if="person.sex == 'F'" src="{% static 'img/nurse_.png' %}" width="100" alt="user" class="img-circle img-fluid">
+                            <img v-else src="{% static 'img/doctor_.png' %}" width="100" alt="user" class="img-circle img-fluid">
+                            <div class="p-0 col-sm-12 mt-5 text-right">
+                                <button type="button" @click='editPerson(person)' class="btn btn-round btn-info btn-sm"> <i class="fa fa-pencil"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-xlg-9 col-md-7">
+                <div class="card">
+                    <ul class="nav nav-tabs profile-tab" role="tablist">
+                        <li class="nav-item" v-if='existuser'> <a class="nav-link active" data-toggle="tab" href="#pass" role="tab"> <i class='fa fa-key'></i> Contraseña</a> </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="pass" role="tabpanel">
+                            <div class="card-body">
+                                <form class="form-horizontal form-material" @submit.prevent="sendPass">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pid" id="pid" :value='[[person.pk]]' required>
+                                    <div class="col-md-12 mb-2">
+                                        <label for="">Nueva contraseña</label>
+                                        <input type="password" v-model="formPass.password" id='password' name='password' class="form-control form-control-line">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="">Repita nueva contraseña</label>
+                                        <input type="password" v-model="formPass.password_r" id='password_r' name='password_r' class="form-control form-control-line">
+                                    </div>
+                                    <div class="col-md-12 mt-3">
+                                        <button type='submit' class="btn btn-sm btn-success"><span class="fa fa-save"></span> Guardar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'js/vue/person.js' %}"></script>
+<script>
+	// var eid =  {{ eid }};
+</script>
+
+{% endblock scripts %}

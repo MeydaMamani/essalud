@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Anemia Niño - G
+{% endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}">
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appAnemia">
+    <div class="page-title">
+        <div class="col-md-11">
+            <b class="mb-2 font-20">Seguimiento de Niños y Niñas con Dx Anemia</b>
+        </div>
+        <div class="col-md-1 text-right p-0 mb-1">
+            <button type="button" @click="PrintExcel()" name="exportarCSV" class="btn btn-outline-success btn-sm"> <span class="fa fa-print"></span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-12 mb-3">
+        <div class="col-md-6 p-0">
+            <form method="GET" @submit.prevent="formAnemia" class="form-horizontal">
+                <div class="col-sm-4 pt-1 pl-0">
+                    <select class="form-control-sm w-100" name="red" id="red" @change="listDistritos">
+                        <option value="TODOS">- Seleccione Red -</option>
+                        {% for prov in provincia %}
+                            <option value="{{ prov.codigo }}">{{ prov.nombre }}</option>
+                        {% endfor %}
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 pt-1 pl-0">
+                    <select class="form-control-sm w-100" name="dist" id="dist" @change="listEstablecimientos">
+                        <option value="TODOS">- Seleccione Distrito -</option>
+                        <option v-for="item in listDistricts" :value="item.pk">[[ item.fields.nombre ]]</option>
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 pt-1 pl-0">
+                    <select class="form-control-sm w-100" name="eess" id="eess">
+                        <option value="TODOS">- Seleccione Establecimiento -</option>
+                        <option v-for="item in listEess" :value="item.pk">[[ item.fields.nombre ]]</option>
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 pt-2 pl-0">
+                    <select class="form-control-sm w-100" name="anio" id="anio">
+                        <option value="0" selected>Seleccione Año</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 pt-2 pl-0">
+                    <select class="form-control-sm w-100" name="mes" id="mes">
+                        <option value="0" selected>Seleccione Mes</option>
+                    </select>
+                </div>
+                <div class="col-sm-3 pt-2 pl-0 pr-0">
+                    <select class="form-control-sm w-100" name="tipo" id="tipo">
+                        <option value="0" selected>Seleccione Edad</option>
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="justify-content-center col-md-1 d-flex">
+                    <button class="btn btn-primary btn-sm m-2" type="submit"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 p-0">
+            <div class="col-md-4 pr-0">
+                <div class="x_panel p-1">
+                    <div class="text-center align-items-center mb-2 mt-2">
+                        <div class="row justify-content-center">
+                            <img class="col-md-5 pr-0" :src="'/static/img/PASCO.png'"  alt="Imagen mapa DAC">
+                            <h5 class="mb-2 mt-2 col-md-6 p-0 avance_dac text-dark">
+                                20%
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pr-0">
+                <div class="x_panel p-1">
+                    <div class="text-center align-items-center mb-2 mt-2">
+                        <div class="row justify-content-center">
+                            <img class="col-md-5 pr-0" :src="'/static/img/PASCO.png'"  alt="Imagen mapa DAC">
+                            <h5 class="mb-2 mt-2 col-md-6 p-0 avance_dac text-dark">
+                                20%
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pr-0">
+                <div class="x_panel p-1">
+                    <div class="text-center align-items-center mb-2 mt-2">
+                        <div class="row justify-content-center">
+                            <img class="col-md-5 pr-0" :src="'/static/img/PASCO.png'"  alt="Imagen mapa DAC">
+                            <h5 class="mb-2 mt-2 col-md-6 p-0 avance_dac text-dark">
+                                20%
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="x_panel p-2">
+            <div class="table-responsive nominalTable" id="tableNominal">
+                <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                    <thead>
+                        <tr class="font-10 text-center">
+                            <th class="align-middle p-1">#</th>
+                            <th class="align-middle p-1">Provincia</th>
+                            <th class="align-middle p-1">Distrito</th>
+                            <th class="align-middle p-1">Establecimiento</th>
+                            <th class="align-middle p-1">Documento</th>
+                            <th class="align-middle p-1">Apellidos y Nombres</th>
+                            <th class="align-middle p-1">Fecha Nacido</th>
+                            <th class="align-middle p-1" style="background: #c6deef !important;">Dosaje1</th>
+                            <th class="align-middle p-1" style="background: #c6deef !important;">Resultado1</th>
+                            <th class="align-middle p-1" style="background: #F7C3FA !important;">Dosaje2</th>
+                            <th class="align-middle p-1" style="background: #F7C3FA !important;">Resultado2</th>
+                            <th class="align-middle p-1" style="background: #B3F5C2 !important;">Dx Anemia1</th>
+                            <th class="align-middle p-1" style="background: #B3F5C2 !important;">Dx Anemia2</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 6</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 7</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 8</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 9</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 10</th>
+                            <th class="align-middle p-1" style="background: #f0f0af !important;">Nutrición 11</th>
+                        </tr>
+                    </thead>
+                    <div class="float-right col-md-3 p-0">
+                        <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                            <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                            <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <tbody>
+                        <!-- <tr class="text-center font-9" v-for="item, key in lists[3]">
+                            <td class="align-middle p-1">[[ key+1 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.provincia ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.distrito ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.establecimiento ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.documento ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.ctrl1rn ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.ctrl2rn ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.ctrl3rn ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.ctrl4rn ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.cred1 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.cred2 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.neumo2 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.rota2 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.polio2 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.penta2 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.cred3 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.cred4 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.suple4 ]]</td>
+                        </tr> -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <div class="">
+                                    <ul class="pagination"></ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'vue/anemia.js' %}"></script>
+
+{% endblock scripts %}

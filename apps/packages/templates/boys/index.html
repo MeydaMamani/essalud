@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Paquete Niño - G
+{% endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}">
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appKidsFollow">
+    <div class="page-title">
+        <div class="col-md-11">
+            <h6 class="mb-2 font-weight-bold">MC-02: Niñas y niños menores de 12 meses de edad, que reciben el paquete integrado de servicios - <span class="nameMonthYear text-dark"></span></h6>
+        </div>
+        <div class="col-md-1 text-right p-0 mb-1">
+            <button type="button" @click="PrintExcel()" name="exportarCSV" class="btn btn-outline-success btn-sm"> <span class="fa fa-print"></span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="">
+        <div class="col-md-5 p-0">
+            <div class="tile_count mt-1 mb-0">
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-user"></i> Total</span>
+                    <div class="count">[[ total ]]</div>
+                </div>
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-clock-o"></i> Cumplen</span>
+                    <div class="count green">[[ cumple ]]</div>
+                </div>
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-user"></i> No Cumplen</span>
+                    <div class="count red">[[ nocumple ]]</div>
+                </div>
+            </div>
+            <div class="col-md-4 pl-0" v-for="data, key in lists[1]">
+                <div class="x_panel p-1">
+                    <div class="text-center align-items-center mb-2 mt-1">
+                        <div class="row justify-content-center">
+                            <img class="col-md-5 pr-0" :src="'/static/img/' + data.provincia + '.png'"  alt="Imagen mapa DAC">
+                            <h5 class="mb-2 mt-2 col-md-6 p-0 avance_dac text-dark">
+                                [[ parseFloat(data.avance).toFixed(1) ]]%
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 p-0">
+            <div class="col-md-8">
+                <div class="x_panel p-2">
+                    <div class="table-responsive" id="tableResum">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="font-10 text-center" style="background: #e0eff5;">
+                                    <th class="align-middle p-1">#</th>
+                                    <th class="align-middle p-1">Distrito</th>
+                                    <th class="align-middle p-1">Den</th>
+                                    <th class="align-middle p-1">Num</th>
+                                    <th class="align-middle p-1">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center font-9" v-for="item, key in lists[2]">
+                                    <td class="align-middle p-1">[[ key+1 ]]</td>
+                                    <td class="align-middle text-left p-1">[[ item.distrito ]]</td>
+                                    <td class="align-middle p-1">[[ item.den ]]</td>
+                                    <td class="align-middle p-1">[[ item.num ]]</td>
+                                    <td class="align-middle p-1 text-success d-flex" v-if="item.den == item.num"><div id="circleSuccess"></div>100%</td>
+                                    <td class="align-middle p-1 text-success d-flex" v-else-if="item.avance > 59"><div id="circleSuccess"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                    <td class="align-middle p-1 text-danger d-flex" v-else-if="item.avance <= 49"><div id="circleDanger"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                    <td class="align-middle p-1 text-warning d-flex" v-else-if="item.avance > 49 && item.avance <= 59"><div id="circleWarning"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pl-0">
+                <div class=" p-2 text-center border border-secondary" style="box-shadow: 5px 10px 8px #888888;">
+                    <h5 class="text-dark mb-0">Avance</h5>
+                    <span class="chart" data-percent="0"><span class="percent"></span></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 p-0">
+            <div class="x_panel p-2">
+                <form method="POST" @submit.prevent="sendFormat">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="red" id="red" @change="listDistritos">
+                            <option value="TODOS" selected>- Seleccione Red -</option>
+                            {% for prov in provincia %}
+                                <option value="{{ prov.codigo }}">{{ prov.nombre }}</option>
+                            {% endfor %}
+                            <option value="TODOS">TODOS</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="dist" id="dist">
+                            <option value="TODOS" selected>- Seleccione Distrito -</option>
+                            <option v-for="item in listDistricts" :value="item.pk">[[ item.fields.nombre ]]</option>
+                            <option value="TODOS">TODOS</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="anio" id="anio">
+                            <option value="0">- Seleccione Anio -</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9 pr-0">
+                            <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes">
+                                <option value="0">- Seleccione Mes -</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 pl-1">
+                            <button class="btn btn-info btn-block btn-sm buscar" type="submit"><i class="fa fa-search"></i> </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Provincia</th>
+                                <th class="align-middle p-1">Distrito</th>
+                                <th class="align-middle p-1">Establecimiento</th>
+                                <th class="align-middle p-1">Documento</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1" style="background: #F7C3FA !important;">1er Cntrl</th>
+                                <th class="align-middle p-1" style="background: #F7C3FA !important;">2do Cntrl</th>
+                                <th class="align-middle p-1" style="background: #F7C3FA !important;">3er Cntrl</th>
+                                <th class="align-middle p-1" style="background: #F7C3FA !important;">4to Cntrl</th>
+                                <th class="align-middle p-1" style="background: #B3F5C2 !important;">Ctrls Rn</th>
+                                <th class="align-middle p-1">Cred1</th>
+                                <th class="align-middle p-1">Cred2</th>
+                                <th class="align-middle p-1" style="background: #FCE4D6 !important;">Antineumo 2M</th>
+                                <th class="align-middle p-1" style="background: #E2EFDA !important;">Rotavirus 2M</th>
+                                <th class="align-middle p-1" style="background: #F5F3CB !important;">Antipolio 2M</th>
+                                <th class="align-middle p-1" style="background: #DDEBF7 !important;">Penta.2M</th>
+                                <th class="align-middle p-1">Cred3</th>
+                                <th class="align-middle p-1">Cred4</th>
+                                <th class="align-middle p-1" style="background: white !important;">Suple 4</th>
+                                <th class="align-middle p-1" style="background: #FCE4D6 !important;">Antineumo. 4M</th>
+                                <th class="align-middle p-1" style="background: #E2EFDA !important;">Rotavirus 4M</th>
+                                <th class="align-middle p-1" style="background: #DDEBF7 !important;">Penta. 4M</th>
+                                <th class="align-middle p-1" style="background: #F5F3CB !important;">Antipolio 4M</th>
+                                <th class="align-middle p-1">Cred5</th>
+                                <th class="align-middle p-1" style="background: white !important;">Suple 5</th>
+                                <th class="align-middle p-1">Cred6</th>
+                                <th class="align-middle p-1">Tamizaje</th>
+                                <th class="align-middle p-1">Dx Anemia</th>
+                                <th class="align-middle p-1" style="background: white !important;">Suple 6</th>
+                                <th class="align-middle p-1" style="background: #F5F3CB !important;">Antipolio 6M</th>
+                                <th class="align-middle p-1" style="background: #DDEBF7 !important;">Penta. 6M</th>
+                                <th class="align-middle p-1">Cred7</th>
+                                <th class="align-middle p-1" style="background: white; !important">Suple 7</th>
+                                <th class="align-middle p-1">Cred8</th>
+                                <th class="align-middle p-1" style="background: white; !important">Suple 8</th>
+                                <th class="align-middle p-1">Cred9</th>
+                                <th class="align-middle p-1" style="background: white; !important">Suple 9</th>
+                                <th class="align-middle p-1">Cred10</th>
+                                <th class="align-middle p-1" style="background: white; !important">Suple 10</th>
+                                <th class="align-middle p-1">Cred11</th>
+                                <th class="align-middle p-1" style="background: white; !important">Suple 11</th>
+                                <th class="align-middle p-1" style="background: white; !important">Eval Oral</th>
+                                <th class="align-middle p-1" style="background: white; !important">Cumple</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists[3]">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.provincia ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.distrito ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.establecimiento ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ctrl1rn ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ctrl2rn ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ctrl3rn ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ctrl4rn ]]</td>
+                                <td class="align-middle p-0">
+                                    <template v-if="item.fields.cumplern == '1'"><i class="fa fa-check text-success"></i></template>
+                                    <template v-else><i class="fa fa-remove text-danger"></i></template>
+                                </td>
+                                <td class="align-middle p-1">[[ item.fields.cred1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.rota2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.polio2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred3 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.rota4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.polio4 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred5 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple5 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred6 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.tmz ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.dxAnemia ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple6 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.polio6 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta6 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred7 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple7 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred8 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple8 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred9 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple9 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred10 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple10 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.cred11 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.suple11 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eval_oral ]]</td>
+                                <td class="align-middle p-0">
+                                    <template v-if="item.fields.mide == '1'"><i class="fa fa-check text-success"></i></template>
+                                    <template v-else><i class="fa fa-remove text-danger"></i></template>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static 'js/vue/kidsfollow.js' %}"></script>
+<script src="{% static 'js/js/kidsfollow.js' %}"></script>
+
+{% endblock scripts %}

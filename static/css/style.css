@@ -1,0 +1,111 @@
+.font-9{
+    font-size: 9px;
+}
+
+.font-10{
+    font-size: 10px;
+}
+
+.font-13{
+    font-size: 13px;
+}
+
+.font-15{
+    font-size: 15px;
+}
+
+.font-18{
+    font-size: 18px;
+}
+
+.font-20{
+    font-size: 20px;
+}
+
+.font-23{
+    font-size: 23px;
+}
+
+.font-30{
+    font-size: 30px;
+}
+
+.font-35{
+    font-size: 35px;
+}
+
+#tableNominal, #tableNominalNoCumple{
+    height: 400px;
+    overflow: auto;
+}
+
+#tableNominal thead tr th {
+    position: sticky;
+    top: -1px;
+    z-index: 10;
+    background: #B6CCE1 !important;
+}
+
+#tableResum{
+    height: 150px;
+    overflow: auto;
+}
+
+#tableResum thead tr th {
+    position: sticky;
+    top: -1px;
+    z-index: 10;
+    background: #f6f6fb !important;
+}
+
+#tableNominalNoCumple thead tr th {
+    position: sticky;
+    top: -1px;
+    z-index: 10;
+    background: #cc9595 !important;
+}
+
+#circleDanger {
+    background: #ef5350;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+
+#circleWarning{
+    background: #ffb22b;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+
+#circleSuccess{
+    background: #198754;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+
+.footable>tfoot .pagination{
+    float: none;
+    justify-content: center !important;
+}
+
+div#info {
+    position: absolute;
+    overflow: hidden;
+    width: -webkit-fill-available;
+    height: 100%;
+    background-color: #5e5f99b0;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+div#all:hover div#info {
+    opacity: 1;
+    padding: 0px !important;
+}
+
