@@ -43,7 +43,7 @@
     position: sticky;
     top: -1px;
     z-index: 10;
-    background: #B6CCE1 !important;
+    background: #C7D2F0 !important;
 }
 
 #tableResum{
@@ -109,3 +109,6 @@ div#all:hover div#info {
     padding: 0px !important;
 }
 
+.box-shadow-4{
+    box-shadow: 4px 5px #e2dbdb;
+}

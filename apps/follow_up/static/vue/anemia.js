@@ -6,10 +6,14 @@ new Vue({
         list: [],
         listDistricts: [],
         listEess: [],
+        listNomAnemia: [],
+        listTotProv: [],
+        listeessDx: [],
+        mes: 0,
+        anio: 0,
     },
     created:function(){
         this.listYears();
-        // this.formVaccine();
     },
     methods:{
         listYears: function(){
@@ -22,44 +26,54 @@ new Vue({
 
         listDistritos(e) {
             var id = e.target.value;
-            console.log(id);
             axios.get('filterDist/', { params: { id: id } })
             .then(respuesta => {
                 this.listDistricts = respuesta.data
-                console.log(this.listDistricts);
             });
         },
 
         listEstablecimientos(e) {
             var id = e.target.value;
-            console.log(id);
             axios.get('filterEess/', { params: { id: id } })
             .then(respuesta => {
                 this.listEess = respuesta.data
-                console.log(this.listEess);
             });
         },
 
-        // formVaccine: function(){
-        //     let red = $("#red").val();
-        //     let dist = $("#dist").val();
-        //     let mes = $("#mes").val();
-        //     mes == 0 ? this.mes = new Date().getMonth() + 1 : this.mes = mes;
-        //     var nameMonth = new Date(this.mes.toString()).toLocaleString('default', { month: 'long' });
-        //     $('#nameMonthMenor1Anio').text(nameMonth.toUpperCase()+' '+new Date().getFullYear());
+        formAnemia: function(e) {
+            var self = this
+            self.anio == 0 ? self.anio = new Date().getFullYear() : self.anio = self.anio;
+            self.mes == 0 ? self.mes = new Date().getMonth() + 1 : self.mes = self.mes;
+            var nameMonth = new Date(self.mes.toString()).toLocaleString('default', { month: 'long' });
+            $('#nameMonth').text(nameMonth.toUpperCase()+' '+self.anio);
 
-        //     axios.get('list/', { params: { red: red, dist: dist, month: this.mes } })
-        //     .then(respuesta => {
-        //         this.list = respuesta.data[0];
-        //     });
-        // },
+            var csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
+            var formData = new FormData(e.target)
+            formData.set('anio', self.anio);
+            formData.set('mes', self.mes);
 
-        // PrintExcelRn: function(){
-        //     let red = $("#red").val();
-        //     let dist = $("#dist").val();
-        //     // let mes = $("#mes").val();
-        //     url_ = window.location.origin + window.location.pathname + 'printNominal/?red='+red+'&dist='+dist+'&mes='+this.mes;
-        //     window.open(url_, '_parent');
-        // }
+            axios({
+                headers: { 'X-CSRFToken': csrfmiddlewaretoken, 'Content-Type': 'multipart/form-data' },
+                method: 'POST',
+                url: 'searchAnemia/',
+                data: formData
+            }).then(response => {
+                self.listTotProv = response.data[0];
+                self.listNomAnemia = response.data[1];
+                self.listeessDx = response.data[2];
+
+            }).catch(e => {
+                this.errors.push(e)
+            })
+        },
+
+        PrintExcelRn: function(){
+            let red = $("#red").val();
+            let dist = $("#dist").val();
+            let eess = $("#eess").val();
+            let tipo = $("#tipo").val();
+            url_ = window.location.origin + window.location.pathname + 'printNominal/?red='+red+'&dist='+dist+'&eess='+eess+'&tipo='+tipo+'&anio='+this.anio+'&mes='+this.mes;
+            window.open(url_, '_parent');
+        }
     }
 })

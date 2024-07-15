@@ -39,20 +39,19 @@ new Vue({
             var formData = new FormData(e.target)
 
             if(this.anio == 0 && this.mes == 0){
-                console.log('aqui estoy');
-                this.year = new Date().getFullYear();
-                this.month = 1;
+                this.anio = new Date().getFullYear();
+                this.mes = 1;
                 let red = $("#red").val();
                 (red != "TODOS") ? formData.set('red', red) : formData.set('red', 'TODOS');
-                formData.set('anio', this.year);
-                formData.set('mes', this.month);
+                formData.set('anio', this.anio);
+                formData.set('mes', this.mes);
             }
             else{
-                this.month = $("#mes").val();
+                this.mes = $("#mes").val();
             }
 
-            var nameMonth = new Date(this.month.toString()).toLocaleString('default', { month: 'long' });
-            $('.nameMonthYear').text(nameMonth.toUpperCase()+' '+this.year);
+            var nameMonth = new Date(this.mes.toString()).toLocaleString('default', { month: 'long' });
+            $('.nameMonthYear').text(nameMonth.toUpperCase()+' '+this.anio);
 
             axios({
                 headers: { 'X-CSRFToken': csrfmiddlewaretoken, 'Content-Type': 'multipart/form-data' },
@@ -79,9 +78,7 @@ new Vue({
         PrintExcel() {
             let red = $("#red").val();
             let dist = $("#dist").val();
-            let anio = $("#anio").val();
-            console.log(this.mes);
-            url_ = window.location.origin + window.location.pathname + '/printExcel/?red='+red+'&dist='+dist+'&anio='+anio+'&mes='+this.mes;
+            url_ = window.location.origin + window.location.pathname + '/printExcel/?red='+red+'&dist='+dist+'&anio='+this.anio+'&mes='+this.mes;
             window.open(url_, '_parent');
         },
     },

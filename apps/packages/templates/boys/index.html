@@ -93,22 +93,22 @@
                     {% csrf_token %}
                     <div class="mb-2">
                         <select class="form-control-sm w-100" name="red" id="red" @change="listDistritos">
-                            <option value="TODOS" selected>- Seleccione Red -</option>
+                            <option value="TODOS">- Seleccione Red -</option>
                             {% for prov in provincia %}
                                 <option value="{{ prov.codigo }}">{{ prov.nombre }}</option>
                             {% endfor %}
-                            <option value="TODOS">TODOS</option>
+                            <option value="TODOS" selected>TODOS</option>
                         </select>
                     </div>
                     <div class="mb-2">
                         <select class="form-control-sm w-100" name="dist" id="dist">
-                            <option value="TODOS" selected>- Seleccione Distrito -</option>
+                            <option value="TODOS">- Seleccione Distrito -</option>
                             <option v-for="item in listDistricts" :value="item.pk">[[ item.fields.nombre ]]</option>
-                            <option value="TODOS">TODOS</option>
+                            <option value="TODOS" selected>TODOS</option>
                         </select>
                     </div>
                     <div class="mb-2">
-                        <select class="form-control-sm w-100" name="anio" id="anio">
+                        <select class="form-control-sm w-100" name="anio" id="anio" v-model="anio">
                             <option value="0">- Seleccione Anio -</option>
                         </select>
                     </div>
