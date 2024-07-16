@@ -9,6 +9,5 @@ app_name="boards"
 urlpatterns = [
     path('coverage/', login_required(views.CoverageView.as_view()), name='index_cov'),
     path('coverage/list/', views.ListCoverage.as_view(), name='list_rn'),
-    path('coverage/filterDist/', views.DistrictView.as_view(), name='filter_dist'),
     path('coverage/printNominal/', views.PrintNominal.as_view(), name='print_nom'),
 ]

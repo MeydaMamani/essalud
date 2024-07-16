@@ -6,38 +6,30 @@
 {% endblock title %}
 
 {% block styles %}
-<!-- <link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}"> -->
-<link rel="stylesheet" href="{% static 'css/a.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}">
 {% endblock styles %}
 
 {% block content %}
 
-<div id="appCoverage" class="hola">
+<div id="appCoverage" class="cp">
     <div class="col-md-12 text-center mb-2">
         <b class="font-20" style="color: #11503b;"> TABLERO COBERTURAS - ENERO A <span id="nameMonthMenor1Anio"></span></b>
     </div>
-    <div class="col-md-8 offset-md-2">
+    <div class="col-md-6 offset-md-3">
         <div class="border border-primary mb-2 p-0 pt-1">
             <div class="d-flex mb-1">
                 <div class="col-md-11 p-0">
-                    <form method="GET" @submit.prevent="formVaccine" class="form-horizontal">
-                        <div class="col-sm-4 pt-1 pr-0">
-                            <select class="form-control-sm w-100" name="red" id="red" @change="listDistritos">
+                    <form method="GET" @submit.prevent="formVaccine">
+                        <div class="col-sm-7 pt-1 pr-0">
+                            <select class="form-control-sm w-100" name="eess" id="eess">
                                 <option value="TODOS">- Seleccione Red -</option>
-                                {% for prov in provincia %}
-                                    <option value="{{ prov.codigo }}">{{ prov.nombre }}</option>
+                                {% for eess in establecimiento %}
+                                    <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
                                 {% endfor %}
                                 <option value="TODOS" selected>TODOS</option>
                             </select>
                         </div>
                         <div class="col-sm-4 pt-1 pr-0">
-                            <select class="form-control-sm w-100" name="dist" id="dist">
-                                <option value="TODOS">- Seleccione Distrito -</option>
-                                <option v-for="item in listDistricts" :value="item.pk">[[ item.fields.nombre ]]</option>
-                                <option value="TODOS" selected>TODOS</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3 pt-1 pr-0">
                             <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes">
                                 <option value="0" selected>Seleccione Mes</option>
                             </select>
@@ -47,7 +39,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1 p-0">
                     <button type="button" @click="PrintExcelRn" class="btn btn-success m-1 btn-sm"><i class="fa fa-print"></i></button>
                 </div>
             </div>
@@ -56,7 +48,7 @@
     <div class="col-md-8 offset-md-3">
         <ol>
             <!-- recien nacido -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="text-info font-weight-bold m-0">BCG:
                         <span class="text-dark" v-if="list.av_bcg != null">[[ parseFloat(list.av_bcg).toFixed(1) ]]%</span>
@@ -68,18 +60,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);">
                         <img src="{% static 'img/vaccine/newborn (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #5eeaf0 0%, #61ecf2 35%, #69f9ff 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #5eeaf0 0%, #61ecf2 35%, #69f9ff 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);">
                     <b class="text-white">Recién Nacido</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #0c9aa2 0%, #10B7BF 35%, #2fe3eb 100%);"></div>
                 </div>
             </li>
             <!-- 4 meses -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold" style="color: #ac446f;">Rota 2°:
                         <span class="text-dark" v-if="list.av_rota != null">[[ parseFloat(list.av_rota).toFixed(1) ]]%</span>
@@ -87,18 +79,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);">
                         <img src="{% static 'img/vaccine/baby (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #e87da9 0%, #e87da9 35%, #e87da9 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #e87da9 0%, #e87da9 35%, #e87da9 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);">
                         <b class="text-white">4 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #ac446f 0%, #BC4F7C 35%, #d75f91 100%);"></div>
                 </div>
             </li>
             <!-- 6 meses -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold m-0" style="color: #bf2124;">IPV 3°:
                         <span class="text-dark" v-if="list.av_apo != null">[[ parseFloat(list.av_apo).toFixed(1) ]]%</span>
@@ -110,18 +102,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);">
                         <img src="{% static 'img/vaccine/crawl (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #f0575a 0%, #f0575a 35%, #f0575a 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #f0575a 0%, #f0575a 35%, #f0575a 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);">
                         <b class="text-white">6 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #bf2124 0%, #D2292C 35%, #e53538 100%);"></div>
                 </div>
             </li>
             <!-- 7 meses -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold" style="color: #ee863c;">Influ 2°:
                         <span class="text-dark" v-if="list.av_infl2 != null">[[ parseFloat(list.av_infl2).toFixed(1) ]]%</span>
@@ -129,18 +121,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);">
                         <img src="{% static 'img/vaccine/bath (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #f8bb90 0%, #f8bb90 35%, #f8bb90 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #f8bb90 0%, #f8bb90 35%, #f8bb90 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);">
                         <b class="text-dark">7 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #ee863c 0%, #FF954B 35%, #f8ad79 100%);"></div>
                 </div>
             </li>
             <!-- 12 meses -->
-            <li class="lia lia12m">
+            <li class="body_li body_li12m">
                 <div class="text-right pb-3">
                     <p class="font-weight-bold m-0" style="color: #c28912;">Neumo3°:
                         <span class="text-dark" v-if="list.av_neumo3 != null">[[ parseFloat(list.av_neumo3).toFixed(1) ]]%</span>
@@ -156,27 +148,27 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);">
                         <img src="{% static 'img/vaccine/walk (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #f3c463 0%, #f3c463 35%, #f3c463 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #f3c463 0%, #f3c463 35%, #f3c463 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);">
                         <b class="text-white">12 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #c28912 0%, #D29517 35%, #efae29 100%);"></div>
                 </div>
             </li>
             <!-- gestante -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);">
                         <img src="{% static 'img/vaccine/pregnant (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #e96ec1 0%, #e96ec1 35%, #e96ec1 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #e96ec1 0%, #e96ec1 35%, #e96ec1 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);">
                         <b class="text-white">Gestante</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #943174 0%, #A33880 35%, #c555a0 100%);"></div>
                 </div>
                 <div class="text-center pt-2">
                     <p class="font-weight-bold" style="color: #943174;">DPTA:
@@ -186,7 +178,7 @@
                 </div>
             </li>
             <!-- adolescente -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold m-0" style="color: #79418b;">Vph Mujeres:
                         <span class="text-dark" v-if="list.av_girl != null">[[ parseFloat(list.av_girl).toFixed(1) ]]%</span>
@@ -198,18 +190,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);">
                         <img src="{% static 'img/vaccine/girl (4) (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #c67bde 0%, #c67bde 35%, #c67bde 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #c67bde 0%, #c67bde 35%, #c67bde 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);">
                         <b class="text-white">Adoles. 9 &nbsp; a 13 Años</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #79418b 0%, #884D9B 35%, #a25cb8 100%);"></div>
                 </div>
             </li>
             <!-- 4 años -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold m-0" style="color: #16699f;">DPT 2°:
                         <span class="text-dark" v-if="list.av_dpt2 != null">[[ parseFloat(list.av_dpt2).toFixed(1) ]]%</span>
@@ -221,18 +213,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);">
                         <img src="{% static 'img/vaccine/girl (1) (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #57b5f2 0%, #57b5f2 35%, #57b5f2 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #57b5f2 0%, #57b5f2 35%, #57b5f2 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);">
                         <b class="text-white">4 años</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #16699f 0%, #2284C5 35%, #359ce0 100%);"></div>
                 </div>
             </li>
             <!-- 18 meses -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-3">
                     <p class="font-weight-bold" style="color: #483292;">SPR 2°:
                         <span class="text-dark" v-if="list.av_spr2 != null">[[ parseFloat(list.av_spr2).toFixed(1) ]]%</span>
@@ -240,18 +232,18 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);">
                         <img src="{% static 'img/vaccine/baby-boy (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #8d70e9 0%, #8d70e9 35%, #8d70e9 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #8d70e9 0%, #8d70e9 35%, #8d70e9 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);">
                         <b class="text-white">18 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #483292 0%, #553DA3 35%, #7b5ed7 100%);"></div>
                 </div>
             </li>
             <!-- 15 meses -->
-            <li class="lia">
+            <li class="body_li">
                 <div class="text-center pb-2">
                     <p class="font-weight-bold m-0" style="color: #89a115;">AMA:
                         <span class="text-dark" v-if="list.av_ama != null">[[ parseFloat(list.av_ama).toFixed(1) ]]%</span>
@@ -263,27 +255,27 @@
                     </p>
                 </div>
                 <div class="cube">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);">
                         <img src="{% static 'img/vaccine/doll (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #c9e449 0%, #c9e449 35%, #c9e449 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #c9e449 0%, #c9e449 35%, #c9e449 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);">
                         <b class="text-white">15 Meses</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #89a115 0%, #94AD1B 35%, #b5d22b 100%);"></div>
                 </div>
             </li>
             <!-- adulto mayor -->
-            <li class="lia liaadult">
+            <li class="body_li body_liadult">
                 <div class="cube col-md-6">
-                    <div class="s1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);">
+                    <div class="c1 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);">
                         <img src="{% static 'img/vaccine/grandparents (1) (1).png' %}" alt=""></div>
-                    <div class="s2" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
-                    <div class="s3" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
-                    <div class="s4" style="background: linear-gradient(300deg, #5fe5bb 0%, #5fe5bb 35%, #5fe5bb 100%);"></div>
-                    <div class="s5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);">
+                    <div class="c2" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
+                    <div class="c3" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
+                    <div class="c4" style="background: linear-gradient(300deg, #5fe5bb 0%, #5fe5bb 35%, #5fe5bb 100%);"></div>
+                    <div class="c5 d-flex text-center align-items-center justify-content-center" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);">
                         <b class="text-white">Adulto Mayor</b></div>
-                    <div class="s6" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
+                    <div class="c6" style="background: linear-gradient(300deg, #29906f 0%, #35A380 35%, #49c39c 100%);"></div>
                 </div>
                 <div class="text-center col-md-6 pb-3 textAdult">
                     <p class="font-weight-bold m-0" style="color: #29906f;">Influ:
@@ -299,6 +291,7 @@
         </ol>
     </div>
 </div>
+
 {% endblock content %}
 
 {% block scripts %}

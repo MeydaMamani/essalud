@@ -7,6 +7,8 @@ class metaCoverage(models.Model):
     cod_dist = models.CharField(max_length=10, blank=True, null=True)
     provincia = models.CharField(max_length=150, blank=True, null=True)
     distrito = models.CharField(max_length=150, blank=True, null=True)
+    cod_eess = models.CharField(max_length=10, blank=True, null=True)
+    establecimiento = models.CharField(max_length=255, blank=True, null=True)
     rn = models.IntegerField(blank=False, null=False)
     less_1year = models.IntegerField(blank=False, null=False)
     one_year = models.IntegerField(blank=False, null=False)
@@ -20,8 +22,8 @@ class metaCoverage(models.Model):
     boy9_13 = models.IntegerField(blank=False, null=False)
 
     def natural_key(self):
-        return self.pk, self.anio, self.cod_prov, self.cod_dist, self.provincia, self.distrito, self.rn,\
-               self.less_1year, self.one_year, self.two_year, self.three_year, self.four_year, self.pregnant,\
+        return self.pk, self.anio, self.cod_prov, self.cod_dist, self.provincia, self.distrito, self.cod_eess, self.establecimiento,\
+               self.rn, self.less_1year, self.one_year, self.two_year, self.three_year, self.four_year, self.pregnant,\
                self.adult30, self.adult60, self.girl9_13, self.boy9_13
 
     def __str__(self):
