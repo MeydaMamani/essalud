@@ -25,14 +25,6 @@ new Vue({
             for(var i = 1; i<=12; i++)selectMonth.options.add(new Option(new Date(i.toString()).toLocaleString('default', { month: 'long' }).toUpperCase(),i));
         },
 
-        listDistritos(e) {
-            var id = e.target.value;
-            axios.get('boys/filterDist/', { params: { id: id } })
-            .then(respuesta => {
-                this.listDistricts = respuesta.data
-            });
-        },
-
         sendFormat: function (e) {
             var self = this
             var csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
@@ -41,8 +33,6 @@ new Vue({
             if(this.anio == 0 && this.mes == 0){
                 this.anio = new Date().getFullYear();
                 this.mes = 1;
-                let red = $("#red").val();
-                (red != "TODOS") ? formData.set('red', red) : formData.set('red', 'TODOS');
                 formData.set('anio', this.anio);
                 formData.set('mes', this.mes);
             }
@@ -76,9 +66,8 @@ new Vue({
         },
 
         PrintExcel() {
-            let red = $("#red").val();
-            let dist = $("#dist").val();
-            url_ = window.location.origin + window.location.pathname + '/printExcel/?red='+red+'&dist='+dist+'&anio='+this.anio+'&mes='+this.mes;
+            let eess = $("#eess").val();
+            url_ = window.location.origin + window.location.pathname + '/printExcel/?eess='+eess+'&anio='+this.anio+'&mes='+this.mes;
             window.open(url_, '_parent');
         },
     },

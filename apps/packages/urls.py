@@ -8,7 +8,7 @@ app_name='packages'
 
 urlpatterns = [
     path('boys', login_required(FollowKidsView.as_view()), name='boys'),
-    path('boys/api/', ListKidsFollow.as_view(), name='crud_red'),
-    path('boys/printExcel/', views.ReportPackChildExcel.as_view(), name='printexcel_attendance'),
-    path('boys/filterDist/', views.DistrictView.as_view(), name='filter_dist'),
+    path('boys/api/', ListKidsFollow.as_view(), name='list_boys'),
+    path('boys/printExcel/', views.ReportPackChildExcel.as_view(), name='print_boys'),
+    path('pregnant', login_required(FollowPregnantView.as_view()), name='pregnant'),
 ]

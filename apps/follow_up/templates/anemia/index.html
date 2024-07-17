@@ -23,39 +23,25 @@
             <form method="POST" @submit.prevent="formAnemia">
                 {% csrf_token %}
                 <div class="col-sm-4 pt-1 pl-0">
-                    <select class="form-control-sm w-100" name="red" id="red" @change="listDistritos">
-                        <option value="TODOS">- Seleccione Red -</option>
-                        {% for prov in provincia %}
-                            <option value="{{ prov.codigo }}">{{ prov.nombre }}</option>
+                    <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
+                        <option value="TODOS">- Seleccione eess -</option>
+                        {% for eess in establecimiento %}
+                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
                         {% endfor %}
                         <option value="TODOS" selected>TODOS</option>
                     </select>
                 </div>
                 <div class="col-sm-4 pt-1 pl-0">
-                    <select class="form-control-sm w-100" name="dist" id="dist" @change="listEstablecimientos">
-                        <option value="TODOS">- Seleccione Distrito -</option>
-                        <option v-for="item in listDistricts" :value="item.pk">[[ item.fields.nombre ]]</option>
-                        <option value="TODOS" selected>TODOS</option>
-                    </select>
-                </div>
-                <div class="col-sm-4 pt-1 pl-0">
-                    <select class="form-control-sm w-100" name="eess" id="eess">
-                        <option value="TODOS">- Seleccione Establecimiento -</option>
-                        <option v-for="item in listEess" :value="item.pk">[[ item.fields.nombre ]]</option>
-                        <option value="TODOS" selected>TODOS</option>
-                    </select>
-                </div>
-                <div class="col-sm-4 pt-2 pl-0">
                     <select class="form-control-sm w-100" name="anio" id="anio" v-model="anio">
                         <option value="0" selected>Seleccione Año</option>
                     </select>
                 </div>
-                <div class="col-sm-4 pt-2 pl-0">
+                <div class="col-sm-4 pt-1 pl-0">
                     <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes">
                         <option value="0" selected>Seleccione Mes</option>
                     </select>
                 </div>
-                <div class="col-sm-3 pt-2 pl-0 pr-0">
+                <div class="col-sm-4 pt-2 pl-0">
                     <select class="form-control-sm w-100" name="tipo" id="tipo">
                         <option value="0">Seleccione Edad</option>
                         <option value="MENOR1">MENOR 1 AÑO</option>
@@ -64,8 +50,8 @@
                         <option value="TODOS" selected>TODOS</option>
                     </select>
                 </div>
-                <div class="justify-content-center col-md-1 d-flex">
-                    <button class="btn btn-primary btn-sm m-2" id="search" type="submit"><i class="fa fa-search"></i></button>
+                <div class="col-md-4 pt-2 pl-0">
+                    <button class="btn btn-primary btn-block btn-sm" id="search" type="submit"><i class="fa fa-search"></i> Buscar</button>
                 </div>
             </form>
         </div>
@@ -73,7 +59,7 @@
             <button class="btn btn-sm btn-outline-success font-13" @click="PrintExcelRn"> Descargar</button>
             <button class="btn btn-sm btn-outline-danger font-13" data-toggle="modal" data-target=".ModalInformacion"> Resumen</button>
         </div>
-        <div class="col-md-5 mt-2">
+        <div class="col-md-5 mt-1">
             <div class="col-md-4 pr-0" v-for="data, key in listTotProv">
                 <div class="x_panel p-1 box-shadow-4">
                     <div class="text-center align-items-center mb-2 mt-2">
@@ -95,9 +81,7 @@
                     <thead>
                         <tr class="font-10 text-center">
                             <th class="align-middle p-1">#</th>
-                            <th class="align-middle p-1">Provincia</th>
-                            <th class="align-middle p-1">Distrito</th>
-                            <th class="align-middle p-1">Establecimiento</th>
+                            <th class="align-middle p-1">Centro Asistencial</th>
                             <th class="align-middle p-1">Documento</th>
                             <th class="align-middle p-1">Apellidos y Nombres</th>
                             <th class="align-middle p-1">Fecha Nacido</th>
@@ -124,8 +108,6 @@
                     <tbody>
                         <tr class="text-center font-9" v-for="item, key in listNomAnemia">
                             <td class="align-middle p-1">[[ key+1 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.provincia ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.distrito ]]</td>
                             <td class="align-middle p-1">[[ item.fields.establecimiento ]]</td>
                             <td class="align-middle p-1">[[ item.fields.documento ]]</td>
                             <td class="align-middle p-1">[[ item.fields.ape_nombres ]]</td>
@@ -159,7 +141,7 @@
     </div>
     <!-- modal de resumen -->
     <div class="modal fade ModalInformacion" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>

@@ -24,22 +24,6 @@ new Vue({
             for(var i = 1; i<=12; i++)selectMonth.options.add(new Option(new Date(i.toString()).toLocaleString('default', { month: 'long' }).toUpperCase(),i));
         },
 
-        listDistritos(e) {
-            var id = e.target.value;
-            axios.get('filterDist/', { params: { id: id } })
-            .then(respuesta => {
-                this.listDistricts = respuesta.data
-            });
-        },
-
-        listEstablecimientos(e) {
-            var id = e.target.value;
-            axios.get('filterEess/', { params: { id: id } })
-            .then(respuesta => {
-                this.listEess = respuesta.data
-            });
-        },
-
         formAnemia: function(e) {
             var self = this
             self.anio == 0 ? self.anio = new Date().getFullYear() : self.anio = self.anio;
@@ -68,11 +52,9 @@ new Vue({
         },
 
         PrintExcelRn: function(){
-            let red = $("#red").val();
-            let dist = $("#dist").val();
             let eess = $("#eess").val();
             let tipo = $("#tipo").val();
-            url_ = window.location.origin + window.location.pathname + 'printNominal/?red='+red+'&dist='+dist+'&eess='+eess+'&tipo='+tipo+'&anio='+this.anio+'&mes='+this.mes;
+            url_ = window.location.origin + window.location.pathname + 'printNominal/?&eess='+eess+'&tipo='+tipo+'&anio='+this.anio+'&mes='+this.mes;
             window.open(url_, '_parent');
         }
     }
