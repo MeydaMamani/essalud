@@ -90,3 +90,49 @@ class PackChildFollow(models.Model):
     def __str__(self):
         return '%s %s, %s' % (self.provincia, self.distrito, self.establecimiento)
 
+
+class PregnantFollow(models.Model):
+    cod_prov = models.CharField(max_length=10, blank=True, null=True)
+    provincia = models.CharField(max_length=150, blank=True, null=True)
+    cod_dist = models.CharField(max_length=10, blank=True, null=True)
+    distrito = models.CharField(max_length=150, blank=True, null=True)
+    cod_eess = models.CharField(max_length=10, blank=True, null=True)
+    establecimiento = models.CharField(max_length=250, blank=True, null=True)
+    autogenerado = models.CharField(max_length=60, blank=True, null=True)
+    documento = models.CharField(max_length=15, blank=True, null=True)
+    ape_nombres= models.CharField(max_length=200, blank=True, null=True)
+    visit1 = models.DateField(blank=True, null=True)
+    visit2 = models.DateField(blank=True, null=True)
+    visit3 = models.DateField(blank=True, null=True)
+    bacteruria = models.DateField(blank=True, null=True)
+    sifilis = models.DateField(blank=True, null=True)
+    tmz = models.DateField(blank=True, null=True)
+    vih = models.DateField(blank=True, null=True)
+    perf_obst = models.DateField(blank=True, null=True)
+    ctrl1 = models.DateField(blank=True, null=True)
+    ctrl2 = models.DateField(blank=True, null=True)
+    ctrl3 = models.DateField(blank=True, null=True)
+    ctrl4 = models.DateField(blank=True, null=True)
+    ctrl5 = models.DateField(blank=True, null=True)
+    ctrl6 = models.DateField(blank=True, null=True)
+    ctrl7 = models.DateField(blank=True, null=True)
+    ctrl8 = models.DateField(blank=True, null=True)
+    ctrl9 = models.DateField(blank=True, null=True)
+    ctrl10 = models.DateField(blank=True, null=True)
+    ctrl11 = models.DateField(blank=True, null=True)
+    suple1 = models.DateField(blank=True, null=True)
+    suple2 = models.DateField(blank=True, null=True)
+    suple3 = models.DateField(blank=True, null=True)
+    suple4 = models.DateField(blank=True, null=True)
+    suple5 = models.DateField(blank=True, null=True)
+
+    def natural_key(self):
+        return self.pk, self.cod_prov, self.provincia, self.cod_dist, self.distrito, self.cod_eess, self.establecimiento,\
+               self.documento, self.ape_nombres, self.autogenerado, self.documento, self.ape_nombres, self.bacteruria,\
+               self.sifilis, self.tmz, self.vih, self.perf_obst, self.ctrl1, self.ctrl2, self.ctrl3, self.ctrl4, self.ctrl5,\
+               self.ctrl6, self.ctrl7, self.ctrl8, self.ctrl9, self.ctrl10, self.ctrl11, self.suple1, self.suple2, self.suple3,\
+               self.suple4, self.suple5, self.visit1, self.visit2, self.visit3
+
+    def __str__(self):
+        return '%s %s, %s' % (self.provincia, self.distrito, self.establecimiento)
+

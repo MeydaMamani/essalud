@@ -51,7 +51,7 @@
             </div>
         </div>
         <div class="col-md-5 p-0">
-            <div class="col-md-8">
+            <div class="col-md-8 pl-0">
                 <div class="x_panel p-2">
                     <div class="table-responsive" id="tableResum">
                         <table class="table table-hover">
@@ -68,9 +68,9 @@
                                 <tr class="text-center font-9" v-for="item, key in lists[2]">
                                     <td class="align-middle p-1">[[ key+1 ]]</td>
                                     <td class="align-middle text-left p-1">[[ item.establecimiento ]]</td>
-                                    <td class="align-middle p-1">[[ item.den ]]</td>
-                                    <td class="align-middle p-1">[[ item.num ]]</td>
-                                    <td class="align-middle p-1 text-success d-flex" v-if="item.den == item.num"><div id="circleSuccess"></div>100%</td>
+                                    <td class="align-middle p-1">[[ item.denominador ]]</td>
+                                    <td class="align-middle p-1">[[ item.numerador ]]</td>
+                                    <td class="align-middle p-1 text-success d-flex" v-if="item.denominador == item.numerador"><div id="circleSuccess"></div>100%</td>
                                     <td class="align-middle p-1 text-success d-flex" v-else-if="item.avance > 59"><div id="circleSuccess"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
                                     <td class="align-middle p-1 text-danger d-flex" v-else-if="item.avance <= 49"><div id="circleDanger"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
                                     <td class="align-middle p-1 text-warning d-flex" v-else-if="item.avance > 49 && item.avance <= 59"><div id="circleWarning"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
@@ -93,7 +93,6 @@
                     {% csrf_token %}
                     <div class="mb-2">
                         <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
-                            <option value="TODOS">- Seleccione eess -</option>
                             {% for eess in establecimiento %}
                                 <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
                             {% endfor %}

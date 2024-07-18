@@ -30,14 +30,13 @@ new Vue({
             var csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val();
             var formData = new FormData(e.target)
 
-            if(this.anio == 0 && this.mes == 0){
+            if(this.anio == 0){
                 this.anio = new Date().getFullYear();
-                this.mes = 1;
                 formData.set('anio', this.anio);
-                formData.set('mes', this.mes);
             }
-            else{
-                this.mes = $("#mes").val();
+            if(this.mes == 0){
+                this.mes = 1;
+                formData.set('mes', this.mes);
             }
 
             var nameMonth = new Date(this.mes.toString()).toLocaleString('default', { month: 'long' });

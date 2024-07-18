@@ -115,6 +115,7 @@ div#all:hover div#info {
 
 .select2-results__option[aria-selected]{
     font-size: 11px !important;
+    color: #5E5E5E;
 }
 
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple{

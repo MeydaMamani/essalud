@@ -21,8 +21,7 @@
                 <div class="col-md-11 p-0">
                     <form method="GET" @submit.prevent="formVaccine">
                         <div class="col-sm-7 pt-1 pr-0">
-                            <select class="form-control-sm w-100" name="eess" id="eess">
-                                <option value="TODOS">- Seleccione Red -</option>
+                            <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
                                 {% for eess in establecimiento %}
                                     <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
                                 {% endfor %}

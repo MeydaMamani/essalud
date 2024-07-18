@@ -6,163 +6,80 @@
 {% endblock title %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/styleVaccine.css' %}">
 <style>
-.card {
-  font-size: 20px;
-  font-family: myfont;
-  text-align: center;
-  color: black;
-  background-color: #eee;
-}
-.card.nightMode {
-  color: black;
-  background-color: #282828;
-}
-.mobile .card.night_mode {
-  color: black;
-  background-color: #282828;
-}
-
-.post-it {
-  position: relative;
-  width: fit-content;
-  width: 200px; /*delete this*/
-  height: 200px; /*delete this*/
-  border-top-left-radius: 50px;
-  background-color: #fefabc;
-  padding: 25px;
-  box-shadow: 0 8px 10px -7px black;
-  border-bottom-right-radius: 60px 10px;
-  margin: 0 0 20px 20px;
-  transform: rotate(1deg);
-}
-.post-it::before {
-  margin: -1px;
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-left: 45px solid #eee;
-  border-bottom: 45px solid transparent;
-  box-shadow: 3px 3px 2px #dbd581;
-}
-
-.nightMode .post-it {
-  position: relative;
-  width: fit-content;
-  border-top-left-radius: 50px;
-  background-color: #fefabc;
-  padding: 25px;
-  box-shadow: 0 8px 10px -7px black;
-  border-bottom-right-radius: 60px 10px;
-  margin: 0 0 20px 20px;
-  transform: rotate(1deg);
-}
-.nightMode .post-it::before {
-  margin: -1px;
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-left: 45px solid #282828;
-  border-bottom: 45px solid transparent;
-  box-shadow: 3px 3px 2px #dbd581;
-}
-
 .post-it2 {
-  position: relative;
-  width: fit-content;
-  border-top-right-radius: 50px;
-  background-color: #fdd7db;
-  padding: 25px;
-  box-shadow: 0 8px 10px -7px black;
-  border-bottom-left-radius: 60px 10px;
-  margin: 0 0 20px 20px;
-  transform: rotate(-1deg);
+    position: relative;
+    width: fit-content;
+    border-top-right-radius: 50px;
+    background-color: #F6D7FC;
+    padding: 25px;
+    box-shadow: 0 8px 10px -7px black;
+    border-bottom-left-radius: 60px 10px;
+    margin: 0 0 20px 20px;
+    transform: rotate(-1deg);
 }
 .post-it2::before {
-  margin: -1px;
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  border-right: 45px solid #F7F7F7;
-  border-bottom: 45px solid transparent;
-  box-shadow: -3px 3px 2px #e6a1a8;
+    margin: -1px;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-right: 45px solid #F7F7F7;
+    border-bottom: 45px solid transparent;
+    box-shadow: -3px 3px 2px #e6a1a8;
 }
-.nightMode .post-it2 {
-  position: relative;
-  width: fit-content;
-  border-top-right-radius: 50px;
-  background-color: #fdd7db;
-  padding: 25px;
-  box-shadow: 0 8px 10px -7px black;
-  border-bottom-left-radius: 60px 10px;
-  margin: 0 0 20px 20px;
-  transform: rotate(-1deg);
-}
-.nightMode .post-it2::before {
-  margin: -1px;
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  border-right: 45px solid #282828;
-  border-bottom: 45px solid transparent;
-  box-shadow: -3px 3px 2px #e6a1a8;
-}
-
 @font-face {
-  font-family: myfont;
-  src: url("_nunito.ttf");
+    font-family: myfont;
+    src: url("_nunito.ttf");
 }
-
 </style>
 {% endblock styles %}
 
 {% block content %}
 
-<div id="appPackChild">
+<div id="appPackPregnant">
     <div class="page-title">
-        <h6 class="mb-2">MC-02: Niñas y niños menores de 12 meses de edad, procedentes de los quintiles 1 y 2 de pobreza departamental que reciben el paquete integrado de servicios</h6>
+        <h6 class="mb-2 font-weight-bold">Seguimiento de gestantes que recibieron el paquete integrado de servicios</h6>
     </div>
     <div class="clearfix"></div>
-    <div class="col-md-7 offset-2">
+    <br><br>
+    <div class="col-md-7 offset-md-2">
         <div class="post-it2">
-            <h3 class="text-center m-0" style="color: #b93b8c;">Paquete Gestante</h3><br>
+            <h3 class="text-center m-0" style="color: #8c3bb9;">Paquete Gestante</h3><br>
             <form method="POST" @submit.prevent="PrintExcel" class="form-horizontal">
-                <div class="form-group col-md-6">
-                    <label class="text-dark">Seleccione Tipo:</label>
-                    <select class="form-control" name="type" id="type" aria-label="Default select example">
-                        <option value="advance">Avance</option>
-                        <option value="ial">Seg. Nominal IAL/IAR/ETR</option>
-                    </select>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="text-dark">Seleccione Tipo:</label>
+                        <select class="form-control" name="tipo" id="tipo" aria-label="Default select example">
+                            <option value="seguimiento">Seguimiento</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="text-dark">Seleccione Centro Asistencial:</label>
+                        <select class="form-control w-100" name="eess" id="eess" v-select2="''">
+                            {% for eess in establecimiento %}
+                                <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                            {% endfor %}
+                            <option value="TODOS" selected>TODOS</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group col-md-6">
-                    <label class="text-dark">Seleccione Establecimiento:</label>
-                    <select class="form-control" name="eess" id="eess" v-select2="''">
-                        <option value="TODOS">- Seleccione eess -</option>
-                        {% for eess in establecimiento %}
-                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
-                        {% endfor %}
-                        <option value="TODOS" selected>TODOS</option>
-                    </select>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="text-dark">Seleccione Año:</label>
+                        <select class="form-control" name="anio" id="anio" aria-label="Default select example">
+                            <option value="0">Seleccione año</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="text-dark">Seleccione Mes:</label>
+                        <select class="form-control w-100" name="mes" id="mes" v-select2="''">
+                            <option value="0">Seleccione Mes</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group col-md-6">
-                    <label class="text-dark">Seleccione Año:</label>
-                    <select class="form-control" name="year" id="year" aria-label="Default select example">
-                        <option value="0">Seleccione año</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label class="text-dark">Seleccione Mes:</label>
-                    <select class="form-control" name="month" id="month" aria-label="Default select example">
-                        <option value="0">Seleccione Mes</option>
-                    </select>
-                </div>
-                <div class="col-md-12 text-center mt-2">
-                    <button class="btn btn-outline-danger btn-sm" type="submit"><i class="fa fa-download"></i> Descargar Excel</button>
+                <div class="col-md-12 text-center mt-4">
+                    <button class="btn btn-outline-dark btn-sm" id="btnSend" type="button"><i class="fa fa-download"></i> Descargar Excel</button>
                 </div>
             </form>
         </div>
@@ -172,6 +89,7 @@
 
 {% block scripts %}
 
-<script src="{% static 'js/vue/kidsfollow.js' %}"></script>
+<script src="{% static 'js/vue/pregnantfollow.js' %}"></script>
+<script src="{% static 'js/js/pregnantfollow.js' %}"></script>
 
 {% endblock scripts %}

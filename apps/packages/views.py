@@ -10,7 +10,7 @@ from django.db.models.functions import Cast, Round
 import json
 from datetime import date, datetime
 
-from .models import PackChildFollow
+from .models import PackChildFollow, PregnantFollow
 from apps.main.models import Provincia, Distrito, Establecimiento
 
 # library excel
@@ -42,18 +42,12 @@ class ListKidsFollow(View):
             total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').aggregate(total=Sum('den'))['total']
             cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').aggregate(cumplen=Sum('num'))['cumplen']
             dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
-
-            # dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(den=Count('id'),
-            #         numerador=Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())),
-            #         avance=(ExpressionWrapper( Cast(Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())), FloatField()) /
-            #         Cast(Count('*'), FloatField()) * 100, output_field=FloatField()))).order_by('-avance', '-den', '-numerador')
-            dataProv = ''
-            dataDist = ''
-
-            # dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(den=Count('id'),
-            #         num=Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())),
-            #         avance=(ExpressionWrapper( Cast(Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())), FloatField()) /
-            #         Cast(Count('*'), FloatField()) * 100, output_field=FloatField()))).order_by('-avance', '-den', '-num')
+            dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
             dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').order_by('cod_eess')
             dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
 
@@ -61,16 +55,12 @@ class ListKidsFollow(View):
             total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Count('id'))['total']
             cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', num=1, cod_eess=request.POST['eess']).aggregate(cumplen=Count('id'))['cumplen']
             dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
-            # dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(den=Count('id'),
-            #         num=Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())),
-            #         avance=(ExpressionWrapper( Cast(Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())), FloatField()) /
-            #         Cast(Count('*'), FloatField()) * 100, output_field=FloatField()))).order_by('-avance', '-den', '-num')
-            # dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(den=Count('id'),
-            #         num=Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())),
-            #         avance=(ExpressionWrapper( Cast(Sum(Case(When(num=1, then=1), default=0, output_field=IntegerField())), FloatField()) /
-            #         Cast(Count('*'), FloatField()) * 100, output_field=FloatField()))).order_by('-avance', '-den', '-num')
-            dataProv = ''
-            dataDist = ''
+            dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('provincia').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('establecimiento').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
             dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).order_by('cod_eess')
             dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
 
@@ -81,7 +71,7 @@ class ListKidsFollow(View):
         return HttpResponse(json.dumps(json_data4), content_type='application/json')
 
 
-class ReportPackChildExcel(TemplateView):
+class ReportPackChild(View):
     def get(self, request, *args, **kwargs):
         wb = Workbook()
         ws = wb.active
@@ -573,3 +563,321 @@ class FollowPregnantView(TemplateView):
         context['establecimiento'] = Establecimiento.objects.all()
         return context
 
+
+class ReportPackPregnant(View):
+    def get(self, request, *args, **kwargs):
+        wb = Workbook()
+        ws = wb.active
+
+        locale.setlocale(locale.LC_TIME, 'es_ES')
+        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+
+        def set_border(self, ws, cell_range, types, colors):
+            thin = Side(border_style=types, color=colors)
+            for row in ws[cell_range]:
+                for cell in row:
+                    cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
+        set_border(self, ws, "A2:AB2", "medium", "57267C")
+        set_border(self, ws, "A4:AB4", "medium", "366092")
+        set_border(self, ws, "A6:AB6", "medium", "D9D9D9")
+
+        img = Image('static/img/logoPrint.png')
+        ws.add_image(img, 'A2')
+
+        ws.merge_cells('B2:AB2')
+        ws.row_dimensions[2].height = 23
+        ws.column_dimensions['A'].width = 7
+        ws.column_dimensions['B'].width = 35
+        ws.column_dimensions['C'].width = 10
+        ws.column_dimensions['D'].width = 35
+        ws.column_dimensions['E'].width = 11
+        ws.column_dimensions['F'].width = 11
+        ws.column_dimensions['G'].width = 11
+        ws.column_dimensions['H'].width = 11
+        ws.column_dimensions['I'].width = 11
+        ws.column_dimensions['J'].width = 11
+        ws.column_dimensions['K'].width = 11
+        ws.column_dimensions['L'].width = 11
+        ws.column_dimensions['M'].width = 11
+        ws.column_dimensions['N'].width = 11
+        ws.column_dimensions['O'].width = 11
+        ws.column_dimensions['P'].width = 11
+        ws.column_dimensions['Q'].width = 11
+        ws.column_dimensions['R'].width = 11
+        ws.column_dimensions['S'].width = 11
+        ws.column_dimensions['T'].width = 11
+        ws.column_dimensions['U'].width = 11
+        ws.column_dimensions['V'].width = 11
+        ws.column_dimensions['W'].width = 11
+        ws.column_dimensions['X'].width = 11
+        ws.column_dimensions['Y'].width = 11
+        ws.column_dimensions['Z'].width = 11
+        ws.column_dimensions['AA'].width = 11
+        ws.column_dimensions['AB'].width = 11
+
+        ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+        ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        ws['B2'] = 'ESSALUD: Seguimiento de gestantes que recibieron el paquete integrado de servicios -' + nameMonth.upper() + ' ' + request.GET['anio']
+
+        ws.merge_cells('A4:AB4')
+        ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+        ws['A4'] = 'CODIFICACION: '
+
+        ws.merge_cells('A6:AB6')
+        ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+        ws['A6'] = 'Fuente: EsSalud con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+        ws['A9'] = '#'
+        ws['A9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['A9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['A9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['A9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+
+        ws['B9'] = 'Centro Asistencial'
+        ws['B9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['B9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['B9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['B9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+
+        ws['C9'] = 'Documento'
+        ws['C9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['C9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['C9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['C9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+
+        ws['D9'] = 'Apellidos y Nombres'
+        ws['D9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['D9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['D9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['D9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+
+        ws.merge_cells('E8:G8')
+        ws['E8'] = 'VISITAS'
+        ws['E8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['E8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['E8'].fill = PatternFill(start_color='F4A2F8', end_color='F4A2F8', fill_type='solid')
+
+        ws['E9'] = 'Visita 1'
+        ws['E9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['E9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['E9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['E9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+
+        ws['F9'] = 'Visita 2'
+        ws['F9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['F9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['F9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['F9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+
+        ws['G9'] = 'Visita 3'
+        ws['G9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['G9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['G9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['G9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+
+        ws.merge_cells('H8:K8')
+        ws['H8'] = 'EXAMENES AUXILIARES'
+        ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['H8'].fill = PatternFill(start_color='EBE795', end_color='EBE795', fill_type='solid')
+
+        ws['H9'] = 'Bacteruria'
+        ws['H9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['H9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['H9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['H9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+
+        ws['I9'] = 'Sifilis'
+        ws['I9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['I9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['I9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['I9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+
+        ws['J9'] = 'Tamizaje'
+        ws['J9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['J9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['J9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['J9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+
+        ws['K9'] = 'VIH'
+        ws['K9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['K9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['K9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['K9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+
+        ws['L9'] = 'Perfil Obs.'
+        ws['L9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['L9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['L9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['L9'].fill = PatternFill(start_color='E6B8B7', end_color='E6B8B7', fill_type='solid')
+
+        ws.merge_cells('M8:W8')
+        ws['M8'] = 'CONTROLES'
+        ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['M8'].fill = PatternFill(start_color='AED0EC', end_color='AED0EC', fill_type='solid')
+
+        ws['M9'] = 'Ctrl 1'
+        ws['M9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['M9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['M9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['M9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['N9'] = 'Ctrl 2'
+        ws['N9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['N9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['N9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['N9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['O9'] = 'Ctrl 3'
+        ws['O9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['O9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['O9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['O9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['P9'] = 'Ctrl 4'
+        ws['P9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['P9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['P9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['P9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['Q9'] = 'Ctrl 5'
+        ws['Q9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['Q9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Q9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['Q9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['R9'] = 'Ctrl 6'
+        ws['R9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['R9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['R9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['R9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['S9'] = 'Ctrl 7'
+        ws['S9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['S9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['S9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['S9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['T9'] = 'Ctrl 8'
+        ws['T9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['T9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['T9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['T9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['U9'] = 'Ctrl 9'
+        ws['U9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['U9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['U9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['U9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['V9'] = 'Ctrl 10'
+        ws['V9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['V9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['V9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['V9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws['W9'] = 'Ctrl 11'
+        ws['W9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['W9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['W9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['W9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+
+        ws.merge_cells('X8:AB8')
+        ws['X8'] = 'SUPLEMENTACIONES'
+        ws['X8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['X8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['X8'].fill = PatternFill(start_color='B1D49C', end_color='B1D49C', fill_type='solid')
+
+        ws['X9'] = 'Suple 1'
+        ws['X9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['X9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['X9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['X9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+
+        ws['Y9'] = 'Suple 2'
+        ws['Y9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['Y9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Y9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['Y9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+
+        ws['Z9'] = 'Suple 3'
+        ws['Z9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['Z9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Z9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['Z9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+
+        ws['AA9'] = 'Suple 4'
+        ws['AA9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AA9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AA9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AA9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+
+        ws['AB9'] = 'Suple 5'
+        ws['AB9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AB9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AB9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AB9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+
+        if len(request.GET['mes']) == 1:
+            mes = '0'+request.GET['mes']
+        else:
+            mes = request.GET['mes']
+
+        if request.GET['tipo'] == 'seguimiento':
+            if request.GET['eess'] == 'TODOS':
+                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+            else:
+                dataNom = PregnantFollow.objects.filter(cod_eess=request.GET['eess'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+        cont = 10
+        cant = len(dataNom)
+        num=1
+        if cant > 0:
+            for paqGest in dataNom:
+                ws.cell(row=cont, column=1).value = num
+                ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=2).value = paqGest['fields']['establecimiento']
+                ws.cell(row=cont, column=3).value = paqGest['fields']['documento']
+                ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=4).value = paqGest['fields']['ape_nombres']
+                ws.cell(row=cont, column=5).value = paqGest['fields']['visit1']
+                ws.cell(row=cont, column=6).value = paqGest['fields']['visit2']
+                ws.cell(row=cont, column=7).value = paqGest['fields']['visit3']
+                ws.cell(row=cont, column=8).value = paqGest['fields']['bacteruria']
+                ws.cell(row=cont, column=9).value = paqGest['fields']['sifilis']
+                ws.cell(row=cont, column=10).value = paqGest['fields']['tmz']
+                ws.cell(row=cont, column=11).value = paqGest['fields']['vih']
+                ws.cell(row=cont, column=12).value = paqGest['fields']['perf_obst']
+                ws.cell(row=cont, column=13).value = paqGest['fields']['ctrl1']
+                ws.cell(row=cont, column=14).value = paqGest['fields']['ctrl2']
+                ws.cell(row=cont, column=15).value = paqGest['fields']['ctrl3']
+                ws.cell(row=cont, column=16).value = paqGest['fields']['ctrl4']
+                ws.cell(row=cont, column=17).value = paqGest['fields']['ctrl5']
+                ws.cell(row=cont, column=18).value = paqGest['fields']['ctrl6']
+                ws.cell(row=cont, column=19).value = paqGest['fields']['ctrl7']
+                ws.cell(row=cont, column=20).value = paqGest['fields']['ctrl8']
+                ws.cell(row=cont, column=21).value = paqGest['fields']['ctrl9']
+                ws.cell(row=cont, column=22).value = paqGest['fields']['ctrl10']
+                ws.cell(row=cont, column=23).value = paqGest['fields']['ctrl11']
+                ws.cell(row=cont, column=24).value = paqGest['fields']['suple1']
+                ws.cell(row=cont, column=25).value = paqGest['fields']['suple2']
+                ws.cell(row=cont, column=26).value = paqGest['fields']['suple3']
+                ws.cell(row=cont, column=27).value = paqGest['fields']['suple4']
+                ws.cell(row=cont, column=28).value = paqGest['fields']['suple5']
+
+                cont = cont+1
+                num = num+1
+
+        # sheet2 = wb.create_sheet('RESUMEN')
+        # sheet2['A1'] = 'SUSCRIPCION'
+        nombre_archivo = "DEIT_PASCO AVANCE PAQUETE GESTANTE.xlsx"
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={0}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        ws.title = 'NOMINAL PAQUETE GESTANTE'
+        wb.save(response)
+        return response
