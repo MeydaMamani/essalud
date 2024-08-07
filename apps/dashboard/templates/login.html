@@ -22,44 +22,42 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 p-0 d-flex justify-content-center align-items-center">
-                    <img src="{% static 'img/5197282-scaled-650x433-removebg-preview.png' %}" alt="Image" class="img-fluid">
+                    <img src="{% static 'img/fondo.png' %}" alt="fondo" class="img-fluid">
                 </div>
-                <div class="col-md-6 contents">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <div class="mb-4 text-center">
-                                <img src="{% static 'img/Logo_EsSalud.png' %}" width="300" alt="Home" />
-                                <h1 class="text-dark">Bienvenidos</h1>
-                            </div>
-                            <form class="form-horizontal form-material" method="POST">
-                                {% csrf_token %}
-                                <div class="form-group first mb-3">
-                                    {{ form.username }}
-                                </div>
-                                <div class='col-md-12'>
-                                    {{ form.username.errors }}
-                                </div>
-                                <div class="form-group last mb-4">
-                                    {{ form.password }}
-                                </div>
-                                <div class='col-md-12'>
-                                    {{ form.password.errors }}
-                                </div>
-                                <input type="submit" value="ACCEDER" class="btn btn-block btn-primary">
-                                <span class="d-block text-center my-3 text-muted">&mdash; Visite nuestras redes sociales &mdash;</span>
-                                <div class="social-login text-center">
-                                    <a href="#" class="facebook">
-                                        <span class="fa fa-facebook mr-3"></span>
-                                    </a>
-                                    <a href="#" class="twitter">
-                                        <span class="fa fa-twitter mr-3"></span>
-                                    </a>
-                                    <a href="#" class="google">
-                                        <span class="fa fa-google mr-3"></span>
-                                    </a>
-                                </div>
-                            </form>
+                <div class="col-md-6 contents d-flex justify-content-center">
+                    <div class="contForm">
+                        <div class="mb-4 text-center">
+                            <img src="{% static 'img/logoEssalud.png' %}" alt="Home"/>
+                            <h1 class="text-dark">Bienvenidos</h1>
                         </div>
+                        <form class="form-horizontal form-material" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group first mb-3">
+                                {{ form.username }}
+                            </div>
+                            <div class='col-md-12'>
+                                {{ form.username.errors }}
+                            </div>
+                            <div class="form-group last mb-4">
+                                {{ form.password }}
+                            </div>
+                            <div class='col-md-12'>
+                                {{ form.password.errors }}
+                            </div>
+                            <input type="submit" value="ACCEDER" class="btn btn-block btn-primary">
+                            <span class="d-block text-center my-3 text-muted">&mdash; Visite nuestras redes sociales &mdash;</span>
+                            <div class="social-login text-center">
+                                <a href="#" class="facebook">
+                                    <span class="fa fa-facebook mr-3"></span>
+                                </a>
+                                <a href="#" class="twitter">
+                                    <span class="fa fa-twitter mr-3"></span>
+                                </a>
+                                <a href="#" class="google">
+                                    <span class="fa fa-google mr-3"></span>
+                                </a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
