@@ -29,6 +29,9 @@ new Vue({
             axios.get('api/', { params: { anio: this.anio, mes: this.mes } })
             .then(respuesta => {
                 this.lists = respuesta.data;
+                setTimeout(function() {
+                    $('table').trigger('footable_redraw');
+                }, 100);
             });
         },
 
