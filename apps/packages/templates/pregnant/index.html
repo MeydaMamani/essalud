@@ -2,89 +2,210 @@
 {% load static  %}
 
 {% block title %}
-	Paquete Gestante - G
+	Paquete Niño - G
 {% endblock title %}
 
 {% block styles %}
-<style>
-.post-it2 {
-    position: relative;
-    width: fit-content;
-    border-top-right-radius: 50px;
-    background-color: #F6D7FC;
-    padding: 25px;
-    box-shadow: 0 8px 10px -7px black;
-    border-bottom-left-radius: 60px 10px;
-    margin: 0 0 20px 20px;
-    transform: rotate(-1deg);
-}
-.post-it2::before {
-    margin: -1px;
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    border-right: 45px solid #F7F7F7;
-    border-bottom: 45px solid transparent;
-    box-shadow: -3px 3px 2px #e6a1a8;
-}
-@font-face {
-    font-family: myfont;
-    src: url("_nunito.ttf");
-}
-</style>
+
 {% endblock styles %}
 
 {% block content %}
 
 <div id="appPackPregnant">
     <div class="page-title">
-        <h6 class="mb-2 font-weight-bold">Seguimiento de gestantes que recibieron el paquete integrado de servicios</h6>
+        <div class="col-md-11">
+            <h6 class="mb-2 font-weight-bold">Seguimiento de gestantes que recibieron el paquete integrado de servicios - <span class="nameMonthYear text-dark"></span></h6>
+        </div>
+        <div class="col-md-1 text-right p-0 mb-1">
+            <button type="button" @click="PrintExcel()" class="btn btn-outline-success btn-sm"> <span class="fa fa-print"></span></button>
+        </div>
     </div>
     <div class="clearfix"></div>
-    <br><br>
-    <div class="col-md-7 offset-md-2">
-        <div class="post-it2">
-            <h3 class="text-center m-0" style="color: #8c3bb9;">Paquete Gestante</h3><br>
-            <form method="POST" @submit.prevent="PrintExcel" class="form-horizontal">
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label class="text-dark">Seleccione Tipo:</label>
-                        <select class="form-control" name="tipo" id="tipo" aria-label="Default select example">
-                            <option value="seguimiento">Seguimiento</option>
-                        </select>
+    <div class="col-md-12 mb-2 p-0">
+        <div class="col-md-5 p-0">
+            <div class="tile_count mt-1 mb-0">
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-user"></i> Total</span>
+                    <div class="count">[[ total ]]</div>
+                </div>
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-clock-o"></i> Cumplen</span>
+                    <div class="count green">[[ cumple ]]</div>
+                </div>
+                <div class="col-md-4 col-sm-4 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-user"></i> No Cumplen</span>
+                    <div class="count red">[[ nocumple ]]</div>
+                </div>
+            </div>
+            <div class="col-md-4 pl-0" v-for="data, key in lists[1]">
+                <div class="x_panel p-1">
+                    <div class="text-center align-items-center mb-2 mt-1">
+                        <div class="row justify-content-center">
+                            <img class="col-md-5 pr-0" :src="'/static/img/' + data.provincia + '.png'"  alt="Imagen mapa DAC">
+                            <h5 class="mb-2 mt-2 col-md-6 p-0 avance_dac text-dark">
+                                [[ parseFloat(data.avance).toFixed(1) ]]%
+                            </h5>
+                        </div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label class="text-dark">Seleccione Centro Asistencial:</label>
-                        <select class="form-control w-100" name="eess" id="eess" v-select2="''">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 p-0">
+            <div class="col-md-8 pl-0">
+                <div class="x_panel p-2">
+                    <div class="table-responsive" id="tableResum">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="font-10 text-center" style="background: #e0eff5;">
+                                    <th class="align-middle p-1">#</th>
+                                    <th class="align-middle p-1">Centro Asis.</th>
+                                    <th class="align-middle p-1">Den</th>
+                                    <th class="align-middle p-1">Num</th>
+                                    <th class="align-middle p-1">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center font-9" v-for="item, key in lists[2]">
+                                    <td class="align-middle p-1">[[ key+1 ]]</td>
+                                    <td class="align-middle text-left p-1">[[ item.establecimiento ]]</td>
+                                    <td class="align-middle p-1">[[ item.denominador ]]</td>
+                                    <td class="align-middle p-1">[[ item.numerador ]]</td>
+                                    <td class="align-middle p-1 text-success d-flex" v-if="item.denominador == item.numerador"><div id="circleSuccess"></div>100%</td>
+                                    <td class="align-middle p-1 text-success d-flex" v-else-if="item.avance > 59"><div id="circleSuccess"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                    <td class="align-middle p-1 text-danger d-flex" v-else-if="item.avance <= 49"><div id="circleDanger"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                    <td class="align-middle p-1 text-warning d-flex" v-else-if="item.avance > 49 && item.avance <= 59"><div id="circleWarning"></div>[[ parseFloat(item.avance).toFixed(1) ]]%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pl-0">
+                <div class=" p-2 text-center border border-secondary" style="box-shadow: 5px 10px 8px #888888;">
+                    <h5 class="text-dark mb-0">Avance</h5>
+                    <span class="chart" data-percent="0"><span class="percent"></span></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 p-0">
+            <div class="x_panel p-2">
+                <form method="POST" @submit.prevent="sendFormat">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
                             {% for eess in establecimiento %}
                                 <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
                             {% endfor %}
                             <option value="TODOS" selected>TODOS</option>
                         </select>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label class="text-dark">Seleccione Año:</label>
-                        <select class="form-control" name="anio" id="anio" aria-label="Default select example">
-                            <option value="0">Seleccione año</option>
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="anio" id="anio" v-model="anio" v-select2="''">
+                            <option value="0">- Seleccione Anio -</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label class="text-dark">Seleccione Mes:</label>
-                        <select class="form-control w-100" name="mes" id="mes" v-select2="''">
-                            <option value="0">Seleccione Mes</option>
+                    <div class="mb-2">
+                        <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes" v-select2="''">
+                            <option value="0">- Seleccione Mes -</option>
                         </select>
                     </div>
+                    <button class="btn btn-info btn-block btn-sm buscar" type="submit"><i class="fa fa-search"></i> Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="x_panel p-2">
+        <div class="table-responsive nominalTable" id="tableNominal">
+            <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                <thead>
+                    <tr class="font-10 text-center">
+                        <th class="align-middle p-1">#</th>
+                        <th class="align-middle p-1">Centro Asistencial</th>
+                        <th class="align-middle p-1">Documento</th>
+                        <th class="align-middle p-1">Apelidos y Nombres</th>
+                        <th class="align-middle p-1" style="background: #F7C3FA !important;">Visita 1</th>
+                        <th class="align-middle p-1" style="background: #F7C3FA !important;">Visita 2</th>
+                        <th class="align-middle p-1" style="background: #F7C3FA !important;">Visita 3</th>
+                        <th class="align-middle p-1" style="background: #f5f3cb !important;">Bacteruria</th>
+                        <th class="align-middle p-1" style="background: #f5f3cb !important;">Sifilis</th>
+                        <th class="align-middle p-1" style="background: #f5f3cb !important;">Tamizaje</th>
+                        <th class="align-middle p-1" style="background: #f5f3cb !important;">VIH</th>
+                        <th class="align-middle p-1" style="background: #fce4d6 !important;">Perfil Obst.</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 1</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 2</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 3</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 4</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 5</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 6</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 7</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 8</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 9</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 10</th>
+                        <th class="align-middle p-1" style="background: #DDEBF7 !important;">Ctrl 11</th>
+                        <th class="align-middle p-1" style="background: #E2EFDA !important;">Suple 1</th>
+                        <th class="align-middle p-1" style="background: #E2EFDA !important;">Suple 2</th>
+                        <th class="align-middle p-1" style="background: #E2EFDA !important;">Suple 3</th>
+                        <th class="align-middle p-1" style="background: #E2EFDA !important">Suple 4</th>
+                        <th class="align-middle p-1" style="background: #E2EFDA !important">Suple 5</th>
+                        <th class="align-middle p-1" style="background: #B3F5C2 !important">Cumple</th>
+                    </tr>
+                </thead>
+                <div class="float-right col-md-3 p-0">
+                    <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                        <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                        <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                    </div>
                 </div>
-                <div class="col-md-12 text-center mt-4">
-                    <button class="btn btn-outline-dark btn-sm" id="btnSend" type="button"><i class="fa fa-download"></i> Descargar Excel</button>
-                </div>
-            </form>
+                <tbody>
+                    <tr class="text-center font-9" v-for="item, key in lists[3]">
+                        <td class="align-middle p-1">[[ key+1 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.establecimiento ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.documento ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ape_nombres ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.visit1 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.visit2 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.visit3 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.bacteruria ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.sifilis ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.tmz ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.vih ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.perf_obst ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl1 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl2 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl3 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl4 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl5 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl6 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl7 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl8 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl9 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl10 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.ctrl11 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.suple1 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.suple2 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.suple3 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.suple4 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.suple5 ]]</td>
+                        <td class="align-middle p-0">
+                            <template v-if="item.fields.num == '1'"><i class="fa fa-check text-success"></i></template>
+                            <template v-else><i class="fa fa-remove text-danger"></i></template>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            <div class="">
+                                <ul class="pagination"></ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 </div>
+
 {% endblock content %}
 
 {% block scripts %}

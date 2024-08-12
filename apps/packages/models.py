@@ -125,13 +125,15 @@ class PregnantFollow(models.Model):
     suple3 = models.DateField(blank=True, null=True)
     suple4 = models.DateField(blank=True, null=True)
     suple5 = models.DateField(blank=True, null=True)
+    den = models.IntegerField(blank=True, null=True)
+    num = models.IntegerField(blank=True, null=True)
 
     def natural_key(self):
         return self.pk, self.cod_prov, self.provincia, self.cod_dist, self.distrito, self.cod_eess, self.establecimiento,\
                self.documento, self.ape_nombres, self.autogenerado, self.documento, self.ape_nombres, self.bacteruria,\
                self.sifilis, self.tmz, self.vih, self.perf_obst, self.ctrl1, self.ctrl2, self.ctrl3, self.ctrl4, self.ctrl5,\
                self.ctrl6, self.ctrl7, self.ctrl8, self.ctrl9, self.ctrl10, self.ctrl11, self.suple1, self.suple2, self.suple3,\
-               self.suple4, self.suple5, self.visit1, self.visit2, self.visit3
+               self.suple4, self.suple5, self.visit1, self.visit2, self.visit3, self.den,self.num
 
     def __str__(self):
         return '%s %s, %s' % (self.provincia, self.distrito, self.establecimiento)

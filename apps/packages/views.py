@@ -71,7 +71,7 @@ class ListKidsFollow(View):
         return HttpResponse(json.dumps(json_data4), content_type='application/json')
 
 
-class ReportPackChild(View):
+class PrintPackChild(View):
     def get(self, request, *args, **kwargs):
         wb = Workbook()
         ws = wb.active
@@ -564,7 +564,59 @@ class FollowPregnantView(TemplateView):
         return context
 
 
-class ReportPackPregnant(View):
+class ListPregnantFollow(View):
+    http_method_names = ['get', 'post', 'put', 'delete']
+    def post(self,request,*args, **kwargs):
+        json_data4 = []
+        if len(request.POST['mes']) == 1:
+            mes = '0'+request.POST['mes']
+        else:
+            mes = request.POST['mes']
+
+        if request.POST['eess'] == 'TODOS':
+            total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').aggregate(total=Sum('den'))['total']
+            cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').aggregate(cumplen=Sum('num'))['cumplen']
+            if total==0 or total==None:
+                total=0
+            if cumplen==0 or cumplen==None:
+                cumplen=0
+
+            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+            dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').order_by('cod_eess')
+            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+        else:
+            total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Count('id'))['total']
+            cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', num=1, cod_eess=request.POST['eess']).aggregate(cumplen=Count('id'))['cumplen']
+            if total==0 or total==None:
+                total=0
+            if cumplen==0 or cumplen==None:
+                cumplen=0
+
+            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+            dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('provincia').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('establecimiento').annotate(denominador=Sum('den'),
+                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+            dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).order_by('cod_eess')
+            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+        json_data4.append(dataTotal)
+        json_data4.append(list(dataProv))
+        json_data4.append(list(dataDist))
+        json_data4.append(dataNom)
+        return HttpResponse(json.dumps(json_data4), content_type='application/json')
+
+
+class PrintPackPregnant(View):
     def get(self, request, *args, **kwargs):
         wb = Workbook()
         ws = wb.active
@@ -618,7 +670,7 @@ class ReportPackPregnant(View):
 
         ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
         ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-        ws['B2'] = 'ESSALUD: Seguimiento de gestantes que recibieron el paquete integrado de servicios -' + nameMonth.upper() + ' ' + request.GET['anio']
+        ws['B2'] = 'ESSALUD: Seguimiento de gestantes que recibieron el paquete integrado de servicios - ' + nameMonth.upper() + ' ' + request.GET['anio']
 
         ws.merge_cells('A4:AB4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
@@ -825,13 +877,12 @@ class ReportPackPregnant(View):
         else:
             mes = request.GET['mes']
 
-        if request.GET['tipo'] == 'seguimiento':
-            if request.GET['eess'] == 'TODOS':
-                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
-                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
-            else:
-                dataNom = PregnantFollow.objects.filter(cod_eess=request.GET['eess'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
-                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+        if request.GET['eess'] == 'TODOS':
+            dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+        else:
+            dataNom = PregnantFollow.objects.filter(cod_eess=request.GET['eess'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
 
         cont = 10
         cant = len(dataNom)

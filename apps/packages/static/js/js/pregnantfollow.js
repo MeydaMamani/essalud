@@ -1,26 +1,12 @@
-
-$("#btnSend").click(function(){
-    var anio = $("#anio").val();
-    var mes = $("#mes").val();
-
-    if (anio != 0 && mes != 0){
-        document.getElementById("btnSend").type = "submit";
-    }
-    else if(anio == 0){
-        new PNotify({
-            title: 'Error!',
-            text: 'Seleccione un Año',
-            type: 'error',
-            styling: 'fontawesome',
-            delay: 2000,
-        });
-    }else if(mes == 0){
-        new PNotify({
-            title: 'Error!',
-            text: 'Seleccione un Mes',
-            type: 'error',
-            styling: 'fontawesome',
-            delay: 2000,
-        });
-    }
+$('#demo-input-search').on('input', function(e) {
+    e.preventDefault();
+    addrow2.trigger('footable_filter', { filter: $(this).val() });
 });
+var addrow2 = $('#demo-foo-addrow');
+addrow2.footable().on('click', '.delete-row-btn', function() {
+    var footable = addrow.data('footable');
+    var row = $(this).parents('tr:first');
+    footable.removeRow(row);
+});
+
+$(".buscar").click();

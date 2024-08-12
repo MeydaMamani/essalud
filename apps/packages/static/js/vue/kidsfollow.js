@@ -3,7 +3,6 @@ new Vue({
     el:'#appKidsFollow',
     data:{
         lists: [],
-        form:{ fields:{} },
         errors: [],
         total: 0,
         cumple: 0,
@@ -11,7 +10,6 @@ new Vue({
         avan: 0,
         anio: 0,
         mes: 0,
-        listDistricts: [],
     },
     created:function(){
         this.listYears();
