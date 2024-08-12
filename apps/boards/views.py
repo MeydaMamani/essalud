@@ -156,7 +156,7 @@ class PrintNominal(TemplateView):
 
         ws.merge_cells('A6:AW6')
         ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
-        ws['A6'] = 'Fuente: BD HisMinsa con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+        ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
         ws.merge_cells('A8:A9')
         ws['A8'] = '#'
