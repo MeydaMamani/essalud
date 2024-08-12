@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView, View
+
 from django.http import JsonResponse, HttpResponse, QueryDict
 from django.core import serializers
 
@@ -14,22 +13,19 @@ from django.views.decorators.cache import never_cache
 from django.http import HttpResponseRedirect
 
 from datetime import date, datetime
-
 from django.db import connection
 import json
+import locale
 
 # library excel
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side, Color
 
-import locale
-import datetime
-
-from apps.person.models import Person
 User = get_user_model()
-
+from apps.person.models import Person
 from .forms import LoginForm
+
 
 # Create your views here.
 class HomeView(TemplateView):
@@ -411,12 +407,12 @@ class AttentionToday(View):
 
         a.execute("""select *
                     from ESSALUD.dbo.aten_hoy
-                    where Edad<=11 AND (CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                    where Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                     (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                     (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
                     (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
                     (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
-                    (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s')
+                    (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
                     drop table ESSALUD.dbo.ult_aten
                     drop table ESSALUD.dbo.aten_hoy""" % (request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
 
@@ -438,7 +434,7 @@ class PrintAttentionToday(View):
         ws = wb.active
 
         locale.setlocale(locale.LC_TIME, 'es_ES')
-        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+        nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         def set_border(self, ws, cell_range, types, colors):
             thin = Side(border_style=types, color=colors)
@@ -474,7 +470,7 @@ class PrintAttentionToday(View):
 
         ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='305496')
         ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-        ws['B2'] = 'ESSALUD: Seguimiento paquete niños -' + nameMonth.upper() +  ' ' + request.GET['anio']
+        ws['B2'] = 'ESSALUD: Seguimiento paquete niño -' + nameMonth.upper() +  ' ' + request.GET['anio']
 
         ws.merge_cells('A4:O4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='203764')
@@ -896,12 +892,12 @@ class PrintAttentionToday(View):
 
         a.execute("""select *
                     from ESSALUD.dbo.aten_hoy
-                    where (CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                    where Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                     (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                     (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
                     (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
                     (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
-                    (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s')
+                    (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
                     drop table ESSALUD.dbo.ult_aten
                     drop table ESSALUD.dbo.aten_hoy""" % (request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
 

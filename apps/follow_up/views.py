@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, View
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse, QueryDict
-from datetime import datetime
+from datetime import date, datetime
 import json
 import locale
 
@@ -85,7 +85,7 @@ class NominalAnemia(View):
 class PrintNomAnem(TemplateView):
     def get(self, request, *args, **kwargs):
         locale.setlocale(locale.LC_TIME, 'es_ES')
-        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+        nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         wb = Workbook()
         ws = wb.active
@@ -120,7 +120,7 @@ class PrintNomAnem(TemplateView):
 
         ws.merge_cells('A4:Q4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
-        ws['A4'] = 'CODIFICACION: HVB: 90744   -   BCG: 90585'
+        ws['A4'] = 'CODIFICACION: '
 
         ws.merge_cells('A6:Q6')
         ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
@@ -192,37 +192,37 @@ class PrintNomAnem(TemplateView):
         ws['K8'].fill = PatternFill(start_color='F0C7E6', end_color='F0C7E6', fill_type='solid')
         ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['L8'] = 'Nutrición 6'
+        ws['L8'] = 'Nutrición 1'
         ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['L8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['M8'] = 'Nutrición 7'
+        ws['M8'] = 'Nutrición 2'
         ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['M8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['N8'] = 'Nutrición 8'
+        ws['N8'] = 'Nutrición 3'
         ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['N8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['N8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['O8'] = 'Nutrición 9'
+        ws['O8'] = 'Nutrición 4'
         ws['O8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['O8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['O8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['O8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['P8'] = 'Nutrición 10'
+        ws['P8'] = 'Nutrición 5'
         ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['P8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['Q8'] = 'Nutrición 11'
+        ws['Q8'] = 'Nutrición 6'
         ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['Q8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
@@ -306,32 +306,50 @@ class PrintNomAnem(TemplateView):
 
                 ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=12).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion6'] == None else nom['fields']['nutricion6'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=12).value = nom['fields']['nutricion6']
 
                 ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=13).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion7'] == None else nom['fields']['nutricion7'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=13).value = nom['fields']['nutricion7']
 
                 ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=14).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion8'] == None else nom['fields']['nutricion8'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=14).value = nom['fields']['nutricion8']
 
                 ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=15).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion9'] == None else nom['fields']['nutricion9'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=15).value = nom['fields']['nutricion9']
 
                 ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=16).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=16).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion10'] == None else nom['fields']['nutricion10'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=16).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=16).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=16).value = nom['fields']['nutricion10']
 
                 ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
                 ws.cell(row=cont, column=17).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
-                ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9)
+                if 0 if nom['fields']['nutricion11'] == None else nom['fields']['nutricion11'] < nom['fields']['dx_anemia1']:
+                    ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9, color='FE0220')
+                else:
+                    ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=17).value = nom['fields']['nutricion11']
 
                 cont = cont+1

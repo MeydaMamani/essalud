@@ -45,13 +45,16 @@ new Vue({
                 self.listTotProv = response.data[0];
                 self.listNomAnemia = response.data[1];
                 self.listeessDx = response.data[2];
+                setTimeout(function() {
+                    $('table').trigger('footable_redraw');
+                }, 100);
 
             }).catch(e => {
                 this.errors.push(e)
             })
         },
 
-        PrintExcelRn: function(){
+        PrintExcel: function(){
             let eess = $("#eess").val();
             let tipo = $("#tipo").val();
             url_ = window.location.origin + window.location.pathname + 'printNominal/?&eess='+eess+'&tipo='+tipo+'&anio='+this.anio+'&mes='+this.mes;
