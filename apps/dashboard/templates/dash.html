@@ -18,14 +18,22 @@
     </div>
     <div class="clearfix"></div>
     <div class="col-md-12 mb-3">
-        <div class="col-md-6 p-0">
+        <div class="col-md-8 p-0">
             <form method="GET" @submit.prevent="formVaccine">
-                <div class="col-sm-4 pl-0">
+                <div class="col-sm-5 pl-0">
+                    <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
+                        {% for eess in establecimiento %}
+                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                        {% endfor %}
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="col-sm-3 pl-0">
                     <select class="form-control-sm w-100" name="anio" id="anio" v-model="anio">
                         <option value="0" selected>Seleccione Año</option>
                     </select>
                 </div>
-                <div class="col-sm-4 pl-0">
+                <div class="col-sm-3 pl-0">
                     <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes">
                         <option value="0" selected>Seleccione Mes</option>
                     </select>
@@ -35,7 +43,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-6 text-right p-0">
+        <div class="col-md-4 text-right p-0">
             <button type="button" @click="PrintExcel" class="btn btn-success btn-sm"><i class="fa fa-download"></i></button>
         </div>
     </div>

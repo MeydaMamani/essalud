@@ -21,12 +21,13 @@ new Vue({
         },
 
         formVaccine: function(){
+            let eess = $("#eess").val();
             let anio = $("#anio").val();
             let mes = $("#mes").val();
             anio == 0 ? this.anio = new Date().getFullYear() : this.anio = anio;
             mes == 0 ? this.mes = new Date().getMonth() + 1 : this.mes = mes;
 
-            axios.get('api/', { params: { anio: this.anio, mes: this.mes } })
+            axios.get('api/', { params: { eess: eess, anio: this.anio, mes: this.mes } })
             .then(respuesta => {
                 this.lists = respuesta.data;
                 setTimeout(function() {
@@ -36,7 +37,8 @@ new Vue({
         },
 
         PrintExcel: function(){
-            url_ = window.location.origin + window.location.pathname + 'print/?anio='+this.anio+'&mes='+this.mes;
+            let eess = $("#eess").val();
+            url_ = window.location.origin + window.location.pathname + 'print/?eess='+eess+'&anio='+this.anio+'&mes='+this.mes;
             window.open(url_, '_parent');
         }
     }
