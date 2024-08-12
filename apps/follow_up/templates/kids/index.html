@@ -19,41 +19,38 @@
         </div>
     </div>
     <div class="clearfix"></div>
-    <div class="row">
-        <div class="col-md-5 text-end">
-            <div class="card">
-                <div class="card-body p-1 bg-dark">
-                    <form method="GET" @submit.prevent="formSearch">
-                        <div class="d-flex">
-                            <div class="col-md-4 mt-1">
-                                <select class="form-control-sm w-100" name="type" id="type" aria-label="Default select example">
-                                    <option value="1">Niño</option>
-                                    <option value="2">Gestante</option>
-                                    <option value="3">Paciente</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-2 mt-1">
-                                <input class="form-control-sm w-100" type="text" name="doc" id="doc" placeholder="Ingrese su dni..." maxlength="8" onkeypress="return event.charCode>=48 && event.charCode<=57">
-                            </div>
-                            <div class="col-md-2 p-0">
-                                <button class="btn btn-primary btn-sm m-1" id="btn_buscar" type="submit"><i class="mdi mdi-magnify"></i> Buscar</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="d-flex">
+        <div class="col-md-5 p-0">
+            <div class="x_panel bg-dark pl-2 pt-1 pb-1">
+                <form class="form-inline" method="GET" @submit.prevent="formSearch">
+                    <div class="col-md-4 pl-0">
+                        <select class="form-control-sm w-100" name="type" id="type" aria-label="Default select example">
+                            <option value="1">Niño</option>
+                            <option value="2">Gestante</option>
+                            <option value="3">Inmunización</option>
+                            <option value="4">Niño Anemia</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 pl-0">
+                        <input class="form-control-sm w-100" type="text" name="doc" id="doc" placeholder="Ingrese su dni..." maxlength="8" onkeypress="return event.charCode>=48 && event.charCode<=57">
+                    </div>
+                    <div class="col-md-2 p-0">
+                        <button class="btn btn-primary btn-sm mt-1" id="btn_buscar" type="submit"> Buscar</button>
+                    </div>
+                </form>
             </div>
         </div>
         <div class="col-md-7">
             <div class="info_head"></div>
         </div>
     </div>
-    <div class="design_boy" v-show="consol_users">
-        <section class="timeline">
-            <div class="arrows">
-                <button class="arrow arrow__prev disabled" disabled>
+    <div v-show="viewLinePqt">
+        <section class="timeline" id="timelin">
+            <div class="arrows" id="arrows">
+                <button id="arrow" class="arrow arrow__prev disabled" disabled>
                     <span class="fa fa-chevron-circle-left font-30" disabled></span>
                 </button>
-                <button class="arrow arrow__next">
+                <button id="arrow" class="arrow arrow__next">
                     <span class="fa fa-chevron-circle-right font-30"></span>
                 </button>
             </div>
@@ -63,19 +60,19 @@
                         <div class="col-md-7 pr-0">
                             <time>0 Meses</time>
                             <div><b>1° Cntrl:</b>
-                                <span v-if="dat_person.ctrl1rn != null"> [[ dat_person.ctrl1rn ]] </span>
+                                <span v-if="dat_pqt.ctrl1rn != null"> [[ dat_pqt.ctrl1rn ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>2° Cntrl:</b>
-                                <span v-if="dat_person.ctrl2rn != null"> [[ dat_person.ctrl2rn ]] </span>
+                                <span v-if="dat_pqt.ctrl2rn != null"> [[ dat_pqt.ctrl2rn ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>3° Cntrl:</b>
-                                <span v-if="dat_person.ctrl3rn != null"> [[ dat_person.ctrl3rn ]] </span>
+                                <span v-if="dat_pqt.ctrl3rn != null"> [[ dat_pqt.ctrl3rn ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>4° Cntrl:</b>
-                                <span v-if="dat_person.ctrl4rn != null"> [[ dat_person.ctrl4rn ]] </span>
+                                <span v-if="dat_pqt.ctrl4rn != null"> [[ dat_pqt.ctrl4rn ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -89,27 +86,27 @@
                         <div class="col-md-7 pr-0">
                             <time>1 - 2 Meses</time>
                             <div><b>1° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred1 != null"> [[ dat_person.cred1 ]] </span>
+                                <span v-if="dat_pqt.cred1 != null"> [[ dat_pqt.cred1 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>2° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred2 != null"> [[ dat_person.cred2 ]] </span>
+                                <span v-if="dat_pqt.cred2 != null"> [[ dat_pqt.cred2 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Antineumo:</b>
-                                <span v-if="dat_person.neumo2 != null"> [[ dat_person.neumo2 ]] </span>
+                                <span v-if="dat_pqt.neumo2 != null"> [[ dat_pqt.neumo2 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Rotavirus:</b>
-                                <span v-if="dat_person.rota2 != null"> [[ dat_person.rota2 ]] </span>
+                                <span v-if="dat_pqt.rota2 != null"> [[ dat_pqt.rota2 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Antipolio:</b>
-                                <span v-if="dat_person.polio2 != null"> [[ dat_person.polio2 ]] </span>
+                                <span v-if="dat_pqt.polio2 != null"> [[ dat_pqt.polio2 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Pentavalente:</b>
-                                <span v-if="dat_person.penta2 != null"> [[ dat_person.penta2 ]] </span>
+                                <span v-if="dat_pqt.penta2 != null"> [[ dat_pqt.penta2 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -120,38 +117,38 @@
                 </li>
                 <li>
                     <div class="timelineText d-flex justify-content-center align-items-center" style="background: linear-gradient(90deg, #f2eb91 0%, #ece6a0 35%, #fefaca 100%);">
-                        <div class="col-md-7 pr-0">
+                        <div class="col-md-8 pr-0">
                             <time>3 - 4 Meses</time>
                             <div><b>3° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred3 != null"> [[ dat_person.cred3 ]] </span>
+                                <span v-if="dat_pqt.cred3 != null"> [[ dat_pqt.cred3 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>4° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred4 != null"> [[ dat_person.cred4 ]] </span>
+                                <span v-if="dat_pqt.cred4 != null"> [[ dat_pqt.cred4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Antineumo 2:</b>
-                                <span v-if="dat_person.neumo4 != null"> [[ dat_person.neumo4 ]] </span>
+                                <span v-if="dat_pqt.neumo4 != null"> [[ dat_pqt.neumo4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Rotavirus 2:</b>
-                                <span v-if="dat_person.rota4 != null"> [[ dat_person.rota4 ]] </span>
+                                <span v-if="dat_pqt.rota4 != null"> [[ dat_pqt.rota4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Antipolio 2:</b>
-                                <span v-if="dat_person.polio4 != null"> [[ dat_person.polio4 ]] </span>
+                                <span v-if="dat_pqt.polio4 != null"> [[ dat_pqt.polio4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Pentavalente 2:</b>
-                                <span v-if="dat_person.penta4 != null"> [[ dat_person.penta4 ]] </span>
+                                <span v-if="dat_pqt.penta4 != null"> [[ dat_pqt.penta4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 4 Meses:</b>
-                                <span v-if="dat_person.suple4 != null"> [[ dat_person.suple4 ]] </span>
+                                <span v-if="dat_pqt.suple4 != null"> [[ dat_pqt.suple4 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4 p-0">
                             <img src="{% static 'img/timeline/donation.png' %}" alt="">
                         </div>
                     </div>
@@ -161,11 +158,11 @@
                        <div class="col-md-7 pr-0">
                             <time>5 Meses</time>
                             <div><b>5° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred5 != null"> [[ dat_person.cred5 ]] </span>
+                                <span v-if="dat_pqt.cred5 != null"> [[ dat_pqt.cred5 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 5 Meses:</b>
-                                <span v-if="dat_person.suple5 != null"> [[ dat_person.suple5 ]] </span>
+                                <span v-if="dat_pqt.suple5 != null"> [[ dat_pqt.suple5 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                        </div>
@@ -179,19 +176,19 @@
                         <div class="col-md-7 pr-0">
                             <time>6 Meses</time>
                             <div><b>6° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred6 != null"> [[ dat_person.cred6 ]] </span>
+                                <span v-if="dat_pqt.cred6 != null"> [[ dat_pqt.cred6 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 6 Meses:</b>
-                                <span v-if="dat_person.suple6 != null"> [[ dat_person.suple6 ]] </span>
+                                <span v-if="dat_pqt.suple6 != null"> [[ dat_pqt.suple6 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Antipolio 3:</b>
-                                <span v-if="dat_person.polio6 != null"> [[ dat_person.polio6 ]] </span>
+                                <span v-if="dat_pqt.polio6 != null"> [[ dat_pqt.polio6 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Pentavalente 3:</b>
-                                <span v-if="dat_person.penta6 != null"> [[ dat_person.penta6 ]] </span>
+                                <span v-if="dat_pqt.penta6 != null"> [[ dat_pqt.penta6 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -205,11 +202,11 @@
                         <div class="col-md-7 pr-0">
                             <time>7 Meses</time>
                             <div><b>7° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred7 != null"> [[ dat_person.cred7 ]] </span>
+                                <span v-if="dat_pqt.cred7 != null"> [[ dat_pqt.cred7 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 7 Meses:</b>
-                                <span v-if="dat_person.suple7 != null"> [[ dat_person.suple7 ]] </span>
+                                <span v-if="dat_pqt.suple7 != null"> [[ dat_pqt.suple7 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -223,11 +220,11 @@
                         <div class="col-md-7 pr-0">
                             <time>8 Meses</time>
                             <div><b>8° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred8 != null"> [[ dat_person.cred8 ]] </span>
+                                <span v-if="dat_pqt.cred8 != null"> [[ dat_pqt.cred8 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 8 Meses:</b>
-                                <span v-if="dat_person.suple8 != null"> [[ dat_person.suple8 ]] </span>
+                                <span v-if="dat_pqt.suple8 != null"> [[ dat_pqt.suple8 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -241,11 +238,11 @@
                         <div class="col-md-7 pr-0">
                             <time>9 Meses</time>
                             <div><b>9° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred9 != null"> [[ dat_person.cred9 ]] </span>
+                                <span v-if="dat_pqt.cred9 != null"> [[ dat_pqt.cred9 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 9 Meses:</b>
-                                <span v-if="dat_person.suple9 != null"> [[ dat_person.suple9 ]] </span>
+                                <span v-if="dat_pqt.suple9 != null"> [[ dat_pqt.suple9 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -259,11 +256,11 @@
                         <div class="col-md-7 pr-0">
                             <time>10 Meses</time>
                             <div><b>10° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred10 != null"> [[ dat_person.cred10 ]] </span>
+                                <span v-if="dat_pqt.cred10 != null"> [[ dat_pqt.cred10 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 10 Meses:</b>
-                                <span v-if="dat_person.suple10 != null"> [[ dat_person.suple10 ]] </span>
+                                <span v-if="dat_pqt.suple10 != null"> [[ dat_pqt.suple10 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
@@ -277,16 +274,131 @@
                         <div class="col-md-7 pr-0">
                             <time>11 Meses</time>
                             <div><b>11° Cntrl Mes:</b>
-                                <span v-if="dat_person.cred11 != null"> [[ dat_person.cred11 ]] </span>
+                                <span v-if="dat_pqt.cred11 != null"> [[ dat_pqt.cred11 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                             <div><b>Suple 11 Meses:</b>
-                                <span v-if="dat_person.suple11 != null"> [[ dat_person.suple11 ]] </span>
+                                <span v-if="dat_pqt.suple11 != null"> [[ dat_pqt.suple11 ]] </span>
                                 <span v-else class="text-danger">Pendiente</span>
                             </div>
                         </div>
                         <div class="col-md-5 text-center">
                             <img src="{% static 'img/timeline/fork.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li></li>
+            </ol>
+        </section>
+    </div>
+    <div v-show="viewLineAnemia">
+        <section class="timeline2" id="timelin">
+            <div class="arrows2" id="arrows">
+                <button id="arrow" class="arrow2 arrow__prev2 disabled" disabled>
+                    <span class="fa fa-chevron-circle-left font-30" disabled></span>
+                </button>
+                <button id="arrow" class="arrow2 arrow__next2">
+                    <span class="fa fa-chevron-circle-right font-30"></span>
+                </button>
+            </div>
+            <ol>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #D0D5EA;">
+                        <div class="col-md-7 pr-0">
+                            <time>6 Meses</time>
+                            <div><b>Dosaje:</b>
+                                <span v-if="dat_anemia.dosaje1 != null"> [[ dat_anemia.dosaje1 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Resultado:</b>
+                                <span v-if="dat_anemia.result1 != null"> [[ dat_anemia.result1 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Dx Anemia:</b>
+                                <span v-if="dat_anemia.dx_anemia1 != null"> [[ dat_anemia.dx_anemia1 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion6 != null"> [[ dat_anemia.nutricion6 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center p-0">
+                            <img src="{% static 'img/timeline/baby_6m.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #C6C7E2;">
+                        <div class="col-md-7 pr-0">
+                            <time>7 Meses</time>
+                            <div><b>Dx Anemia:</b>
+                                <span v-if="dat_anemia.dx_anemia2 != null"> [[ dat_anemia.dx_anemia2 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion7 != null"> [[ dat_anemia.nutricion7 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/baby_7m.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #B8DAED;">
+                        <div class="col-md-7 pr-0">
+                            <time>8 Meses</time>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion8 != null"> [[ dat_anemia.nutricion8 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <img src="{% static 'img/timeline/baby_8m.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #BCC6E0;">
+                       <div class="col-md-7 pr-0">
+                            <time>9 Meses</time>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion9 != null"> [[ dat_anemia.nutricion9 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                       </div>
+                       <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/baby_9m.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #9EACCC;">
+                        <div class="col-md-7 pr-0">
+                            <time>10 Meses</time>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion10 != null"> [[ dat_anemia.nutricion10 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/baby_10m.png' %}" alt="">
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="timelineText d-flex justify-content-center align-items-center" style="background: #ceb2d7;">
+                        <div class="col-md-7 pr-0">
+                            <time>11 Meses</time>
+                            <div><b>Serv. Nutrición:</b>
+                                <span v-if="dat_anemia.nutricion11 != null"> [[ dat_anemia.nutricion11 ]] </span>
+                                <span v-else class="text-danger">Pendiente</span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center">
+                            <img src="{% static 'img/timeline/baby_11m.png' %}" alt="">
                         </div>
                     </div>
                 </li>

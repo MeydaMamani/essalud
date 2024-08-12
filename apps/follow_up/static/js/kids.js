@@ -115,3 +115,121 @@
 	  	});
 	}
 })();
+
+(function() {
+	// VARIABLES
+	const timeline2 = document.querySelector(".timeline2 ol"),
+		elH2 = document.querySelectorAll(".timeline2 li > div"),
+		arrows2 = document.querySelectorAll(".timeline2 .arrows2 .arrow2"),
+		arrowPrev2 = document.querySelector(".timeline2 .arrows2 .arrow__prev2"),
+		arrowNext2 = document.querySelector(".timeline2 .arrows2 .arrow__next2"),
+		firstItem2 = document.querySelector(".timeline2 li:first-child"),
+		lastItem2 = document.querySelector(".timeline2 li:last-child"),
+		xScrolling2 = 280,
+		disabledClass2 = "disabled";
+
+	// START
+	window.addEventListener("load", init);
+
+	function init() {
+	  setEqualHeights(elH2);
+	  animateTl(xScrolling2, arrows2, timeline2);
+	  setSwipeFn(timeline2, arrowPrev2, arrowNext2);
+	  setKeyboardFn(arrowPrev2, arrowNext2);
+	}
+
+	// SET EQUAL HEIGHTS
+	function setEqualHeights(el) {
+		let counter = 0;
+		for (let i = 0; i < el.length; i++) {
+			const singleHeight = el[i].offsetHeight;
+
+			if (counter < singleHeight) {
+			counter = singleHeight;
+			}
+		}
+
+		for (let i = 0; i < el.length; i++) {
+			// el[i].style.height = `${counter}px`;
+		}
+	}
+
+	function isElementInViewport(el) {
+		const rect = el.getBoundingClientRect();
+		return (
+			rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+		);
+	}
+
+	// SET STATE OF PREV/NEXT ARROWS
+	function setBtnState(el, flag = true) {
+		if (flag) {
+			el.classList.add(disabledClass2);
+		} else {
+			if (el.classList.contains(disabledClass2)) {
+			el.classList.remove(disabledClass2);
+			}
+			el.disabled = false;
+		}
+	}
+
+	// ANIMATE TIMELINE
+	function animateTl(scrolling, el, tl) {
+	  	let counter = 0;
+	  	for (let i = 0; i < el.length; i++) {
+			el[i].addEventListener("click", function() {
+			if (!arrowPrev2.disabled) {
+				arrowPrev2.disabled = true;
+			}
+			if (!arrowNext2.disabled) {
+				arrowNext2.disabled = true;
+			}
+			const sign = (this.classList.contains("arrow__prev2")) ? "" : "-";
+			if (counter === 0) {
+				tl.style.transform = `translateX(-${scrolling}px)`;
+			} else {
+				const tlStyle = getComputedStyle(tl);
+				// add more browser prefixes if needed here
+				const tlTransform = tlStyle.getPropertyValue("-webkit-transform") || tlStyle.getPropertyValue("transform");
+				const values = parseInt(tlTransform.split(",")[4]) + parseInt(`${sign}${scrolling}`);
+				tl.style.transform = `translateX(${values}px)`;
+			}
+
+			setTimeout(() => {
+				isElementInViewport(firstItem2) ? setBtnState(arrowPrev2) : setBtnState(arrowPrev2, false);
+				isElementInViewport(lastItem2) ? setBtnState(arrowNext2) : setBtnState(arrowNext2, false);
+			}, 1100);
+
+		  counter++;
+			});
+	  	}
+	}
+
+	// ADD SWIPE SUPPORT FOR TOUCH DEVICES
+	function setSwipeFn(tl, prev, next) {
+		const hammer = new Hammer(tl);
+		hammer.on("swipeleft", () => next.click());
+		hammer.on("swiperight", () => prev.click());
+	}
+
+	// ADD BASIC KEYBOARD FUNCTIONALITY
+	function setKeyboardFn(prev, next) {
+	  	document.addEventListener("keydown", (e) => {
+		if ((e.which === 37) || (e.which === 39)) {
+			const timelineOfTop = timeline2.offsetTop;
+			const y = window.pageYOffset;
+			if (timelineOfTop !== y) {
+				window.scrollTo(0, timelineOfTop);
+			}
+			if (e.which === 37) {
+				prev.click();
+			} else if (e.which === 39) {
+				next.click();
+			}
+		}
+	  	});
+	}
+})();

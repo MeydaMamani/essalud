@@ -55,7 +55,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-1 text-center mt-1">
+        <div class="col-md-1 text-center mt-1 pl-0">
             <button class="btn btn-sm btn-outline-success font-13" @click="PrintExcelRn"> Descargar</button>
             <button class="btn btn-sm btn-outline-danger font-13" data-toggle="modal" data-target=".ModalInformacion"> Resumen</button>
         </div>
@@ -91,12 +91,12 @@
                             <th class="align-middle p-1" style="background: #f0e6c7 !important;">Resultado2</th>
                             <th class="align-middle p-1" style="background: #f0c7e6ad !important;">Dx Anemia1</th>
                             <th class="align-middle p-1" style="background: #f0c7e6ad !important;">Dx Anemia2</th>
+                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 1</th>
+                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 2</th>
+                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 3</th>
+                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 4</th>
+                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 5</th>
                             <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 6</th>
-                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 7</th>
-                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 8</th>
-                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 9</th>
-                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 10</th>
-                            <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 11</th>
                         </tr>
                     </thead>
                     <div class="float-right col-md-3 p-0">
@@ -118,12 +118,30 @@
                             <td class="align-middle p-1">[[ item.fields.result2 ]]</td>
                             <td class="align-middle p-1">[[ item.fields.dx_anemia1 ]]</td>
                             <td class="align-middle p-1">[[ item.fields.dx_anemia2 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion6 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion7 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion8 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion9 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion10 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.nutricion11 ]]</td>
+                            <template v-if="item.fields.nutricion6 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion6 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion6 ]]</td></template>
+                            <template v-if="item.fields.nutricion7 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion7 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion7 ]]</td></template>
+                            <template v-if="item.fields.nutricion8 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion8 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion8 ]]</td></template>
+                            <template v-if="item.fields.nutricion9 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion9 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion9 ]]</td></template>
+                            <template v-if="item.fields.nutricion10 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion10 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion10 ]]</td></template>
+                            <template v-if="item.fields.nutricion11 < item.fields.dx_anemia1">
+                                <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion11 ]]</td>
+                            </template>
+                            <template v-else><td class="align-middle p-1">[[ item.fields.nutricion11 ]]</td></template>
                         </tr>
                     </tbody>
                     <tfoot>
@@ -149,9 +167,9 @@
                         <li class="nav-item">
                             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#dxAnemia" role="tab" aria-controls="home" aria-selected="true">Dx Anemia</a>
                         </li>
-                        <!-- <li class="nav-item">
+                        <li class="nav-item">
                             <a class="nav-link" id="profile-tab" data-toggle="tab" href="#entHierro" role="tab" aria-controls="profile" aria-selected="false">Entrega de Hierro</a>
-                        </li> -->
+                        </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="dxAnemia" role="tabpanel" aria-labelledby="home-tab">

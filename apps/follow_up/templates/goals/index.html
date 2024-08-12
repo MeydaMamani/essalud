@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Paquete Gestante - G
+{% endblock title %}
+
+{% block styles %}
+<style>
+    .post-it2 {
+        position: relative;
+        width: fit-content;
+        border-top-right-radius: 50px;
+        background-color: #d7e0fc;
+        padding: 25px;
+        box-shadow: 0 8px 10px -7px black;
+        border-bottom-left-radius: 60px 10px;
+        margin: 0 0 20px 20px;
+        transform: rotate(-1deg);
+    }
+    .post-it2::before {
+        margin: -1px;
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-right: 45px solid #F7F7F7;
+        border-bottom: 45px solid transparent;
+        box-shadow: -3px 3px 2px #a1ade6;
+    }
+    @font-face {
+        font-family: myfont;
+        src: url("_nunito.ttf");
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appGoalsPrior">
+    <div class="page-title">
+        <h5 class="mb-2 font-weight-bold">Seguimiento de Metas Priorizadas</h5>
+    </div>
+    <div class="clearfix"></div>
+    <br><br>
+    <div class="col-md-4 offset-md-4">
+        <div class="post-it2">
+            <h3 class="text-center mt-3 mb-0" style="color: #3b3eb9;"><b>Metas Priorizadas</b></h3><br>
+            <form method="POST" @submit.prevent="PrintExcel" class="form-horizontal">
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label class="text-dark">Seleccione Centro Asistencial:</label>
+                        <select class="form-control w-100" name="eess" id="eess" v-select2="''">
+                            {% for eess in establecimiento %}
+                                <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="text-dark">Seleccione Año:</label>
+                        <select class="form-control" name="anio" id="anio" v-select2="''">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12 text-center mt-4">
+                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-download"></i> Descargar Excel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static 'vue/goals.js' %}"></script>
+
+{% endblock scripts %}
