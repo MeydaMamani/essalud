@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap-progressbar-3.3.4.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/pnotify.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dropify.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/sweetalert.css' %}">
     <link rel="stylesheet" href="{% static 'css/footable.core.css' %}">
@@ -31,7 +32,7 @@
             <div class="col-md-3 left_col">
                 <div class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="#" class="site_title"><i class="fa fa-google"></i> <span>EsSalud</span></a>
+                    <a href="{% url 'dashboard:dash' %}" class="site_title"><i class="fa fa-google"></i> <span>EsSalud</span></a>
                 </div>
 
                 <div class="clearfix"></div>
@@ -40,9 +41,9 @@
                 <div class="profile clearfix">
                     <div class="profile_pic">
                         {% if request.user.id_person.sex == 'M' %}
-                            <img src="{% static 'img/doctor_.png' %}" alt="user" class="img-circle profile_img">
+                            <img src="{% static 'img/doctor.png' %}" alt="user" class="img-circle profile_img">
                         {% else %}
-                            <img src="{% static 'img/nurse_.png' %}" alt="user" class="img-circle profile_img">
+                            <img src="{% static 'img/nurse.png' %}" alt="user" class="img-circle profile_img">
                         {% endif %}
                     </div>
                     <div class="profile_info"> <span>Bienvenid@,</span><h2>{{ request.user.id_person.names }}</h2></div>
@@ -138,6 +139,7 @@
     <script src="{% static 'js/jquery.easypiechart.min.js' %}"></script>
     <script src="{% static 'js/pnotify.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/dropify.min.js' %}"></script>
     <script src="{% static 'js/gauge.min.js' %}"></script>
     <script src="{% static 'js/footable.all.min.js' %}"></script>
     <script src="{% static 'js/footable-init.js' %}"></script>
