@@ -7,6 +7,240 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/styleLineTime.css' %}">
+<style>
+    .hr-line {
+    border-top: 1px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+        linear-gradient(90deg, White, DimGrey, White) border-box;
+    }
+
+    h4 {
+    color: #454646 !important;
+    }
+
+    p.intro {
+    font-size: 24px;
+    text-align: center;
+    }
+
+    .container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    max-width: 1450px !important;
+    container-type: inline-size;
+    container-name: timeline;
+    }
+
+    .main-timeline:before {
+    content: "";
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: #c6c6c6;
+    margin: 0 auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    }
+
+    p.year {
+    display: block;
+    font-weight: 800 !important;
+    font-size: 30px;
+    color: #232323;
+    margin: 0px 30px;
+    }
+
+    p.description {
+    font-weight: 200;
+    font-size: 15px;
+    }
+
+    .order_1 {
+    order: 3;
+    }
+
+    .order_2 {
+    order: 2;
+    left: 10px;
+    }
+
+    .order_3 {
+    order: 1;
+    }
+
+    .main-timeline .icon {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    right: 8px;
+    }
+
+    .main-timeline .icon:before,
+    .main-timeline .icon:after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+    }
+
+    .main-timeline .icon:before {
+    background: #fff;
+    border: 2px solid #232323;
+    left: -3px;
+    }
+
+    .main-timeline .icon:after {
+    border: 2px solid #c6c6c6;
+    left: 3px;
+    }
+
+    .main-timeline .date-content {
+    width: 50%;
+    position: relative;
+    }
+
+    .main-timeline .date-content:before {
+    content: "";
+    width: 50%;
+    height: 2px;
+    background: #c6c6c6;
+    margin: auto 0;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    bottom: 0;
+    }
+
+    .main-timeline .order_1:before {
+    content: "";
+    width: 50%;
+    height: 2px;
+    background: #c6c6c6;
+    position: absolute;
+    padding-right: 30px;
+    margin-right: 50% !important;
+    }
+
+    .main-timeline .date-outer {
+    width: 125px;
+    height: 125px;
+    font-size: 16px;
+    text-align: center;
+    z-index: 1;
+    }
+
+    .main-timeline .date-outer:before,
+    .main-timeline .date-outer:after {
+    content: "";
+    width: 125px;
+    height: 125px;
+    margin: 0 auto;
+    border-radius: 50%;
+    position: absolute;
+    right: 0;
+    }
+
+    .main-timeline .date-outer:before {
+    background: #fff;
+    border: 2px solid #232323;
+    left: -6px;
+    }
+
+    .main-timeline .date-outer:after {
+    border: 2px solid #c6c6c6;
+    left: 6px;
+    }
+
+    .main-timeline .date {
+    width: 100%;
+    position: absolute;
+    top: 27%;
+    left: 0;
+    }
+
+    @container timeline (max-width: 640px) {
+    .timeline {
+        flex-direction: column !important;
+    }
+
+    .main-timeline:before {
+        margin-left: 1px;
+    }
+
+    .main-timeline .icon {
+        margin: auto 2px;
+    }
+
+    .main-timeline .timeline-content {
+        padding: 10px 30px;
+    }
+
+    .order_1 {
+        order: 2;
+    }
+
+    .order_2 {
+        order: 1;
+        left: -1em;
+    }
+
+    .order_3 {
+        order: 3;
+    }
+
+    .order_1b {
+        order: 2;
+    }
+
+    .order_2b {
+        order: 1;
+        left: -1em;
+    }
+
+    .order_3b {
+        order: 3;
+    }
+
+    .main-timeline .order_1:before {
+        width: 100%;
+    }
+
+    .main-timeline .order_1b:before {
+        width: 100%;
+    }
+
+    .main-timeline .order_1b:before {
+        content: "";
+        width: 100%;
+        height: 2px;
+        background: #c6c6c6;
+        position: absolute;
+        top: 0;
+        padding-right: 30px;
+        bottom: 0;
+        margin-right: 50% !important;
+    }
+    }
+
+    @container timeline (max-width: 350px) {
+    .icon {
+        display: none;
+    }
+
+    .main-timeline .date-content:before {
+        visibility: hidden;
+    }
+
+    .date-content {
+        left: -15px;
+    }
+    }
+
+</style>
 
 {% endblock styles %}
 
@@ -43,6 +277,303 @@
         <div class="col-md-7">
             <div class="info_head"></div>
         </div>
+    </div>
+    <div v-show="viewLineGest">
+        <div class="container pt-5">
+            <div class="main-timeline">
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/syphilis.png' %}" width="70" alt=""></p>
+                                <!-- <p class="year pt-2">Bate</p> -->
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Bateria</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Bacteruria:</b>
+                                <span v-if="dat_gest.bacteruria != null"> [[ dat_gest.bacteruria ]] </span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Sifilis:</b>
+                                <span v-if="dat_gest.sifilis != null"> [[ dat_gest.sifilis ]] </span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Tamizaje:</b>
+                                <span v-if="dat_gest.tmz != null"> [[ dat_gest.tmz ]] </span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">VIH:</b>
+                                <span v-if="dat_gest.vih != null"> [[ dat_gest.vih ]] </span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/anemia.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Anemia</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Odontología:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Tamizaje Anemia:</b>
+                                <span v-if="dat_gest.tmz != null"> [[ dat_gest.tmz ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Dx Anemia:</b>
+                                <span v-if="dat_gest.visit2 != null"> [[ dat_gest.visit2 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/pregnancy-test.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Primer Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl1 != null"> [[ dat_gest.ctrl1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.suple1 != null"> [[ dat_gest.suple1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Fecha Probable Parto:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Fecha Última Regla:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/dos_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Segundo Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control: </b>
+                                <span v-if="dat_gest.ctrl2 != null"> [[ dat_gest.ctrl2 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación: </b>
+                                <span v-if="dat_gest.suple2 != null"> [[ dat_gest.suple2 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/tres_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Tercer Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl3 != null"> [[ dat_gest.ctrl3 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.suple3 != null"> [[ dat_gest.suple3 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/cuatro_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Cuarto Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control: </b>
+                                <span v-if="dat_gest.ctrl4 != null"> [[ dat_gest.ctrl4 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación: </b>
+                                <span v-if="dat_gest.suple4 != null"> [[ dat_gest.suple4 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/cinco_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Quinto Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl5 != null"> [[ dat_gest.ctrl5 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.suple5 != null"> [[ dat_gest.suple5 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/seis_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Sexto Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control: </b>
+                                <span v-if="dat_gest.ctrl6 != null"> [[ dat_gest.ctrl6 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación: </b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/siete_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Séptimo Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl7 != null"> [[ dat_gest.ctrl7 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/nueve_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Octavo Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control: </b>
+                                <span v-if="dat_gest.ctrl8 != null"> [[ dat_gest.ctrl8 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación: </b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/pregnancy-test.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Noveno Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl9 != null"> [[ dat_gest.ctrl9 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/diez_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2"></div>
+                    <div class="timeline-content order_3b col-md p-0" style="text-align: end;">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Décimo Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control: </b>
+                                <span v-if="dat_gest.ctrl10 != null"> [[ dat_gest.ctrl10 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación: </b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
+                    <div class="date-content order_1b">
+                        <div class="date-outer">
+                            <span class="date">
+                                <p class="year"><img src="{% static 'img/once_meses.png' %}" width="70" alt=""></p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="icon order_2b"></div>
+                    <div class="timeline-content order_3b col-md p-0">
+                        <h5 class="title pt-2 font-weight-bold text-dark">Onceavo Mes</h5>
+                        <p class="description">
+                            <p><b style="font-weight: 600;">Control:</b>
+                                <span v-if="dat_gest.ctrl11 != null"> [[ dat_gest.ctrl11 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                            <p><b style="font-weight: 600;">Suplementación:</b>
+                                <span v-if="dat_gest.visit1 != null"> [[ dat_gest.visit1 ]]</span>
+                                <span v-else class="text-danger">Pendiente</span></p>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="hr-line mt-4 mb-4"></div><br><br>
     </div>
     <div v-show="viewLinePqt">
         <section class="timeline" id="timelin">
