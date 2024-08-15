@@ -559,7 +559,7 @@ ol {
 }
 @media (min-width: 1600px){
     .right_col{
-        min-height: 590px !important;
+        min-height: 670px !important;
     }
     ol {
         max-width: 1600px;
