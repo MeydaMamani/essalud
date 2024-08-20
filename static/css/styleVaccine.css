@@ -451,9 +451,6 @@ ol {
         display: flex;
         align-items: center;
     }
-    .body_li:nth-child(8n+1){
-        /* top: 40px; */
-    }
     .body_li:nth-child(8n+2){
         top: 30px;
     }
