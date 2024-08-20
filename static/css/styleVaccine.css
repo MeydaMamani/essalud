@@ -440,10 +440,8 @@ ol {
         margin: 0 auto;
     }
     .body_li {
-        /* margin: 1rem; */
         width: calc(29% - 5rem);
         float: left;
-        /* min-height: 9rem; */
     }
     .body_li.body_li12m{
         width: 19%;
