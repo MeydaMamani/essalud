@@ -433,7 +433,7 @@ ol {
 }
 @media (min-width: 1433px) and (max-width: 1450px){
     .right_col{
-        min-height: 590px !important;
+        min-height: 610px !important;
     }
     ol {
         max-width: 1600px;
