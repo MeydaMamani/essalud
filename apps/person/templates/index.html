@@ -167,6 +167,7 @@
                 <div class="card">
                     <ul class="nav nav-tabs profile-tab" role="tablist">
                         <li class="nav-item" v-if='existuser'> <a class="nav-link active" data-toggle="tab" href="#pass" role="tab"> <i class='fa fa-key'></i> Contraseña</a> </li>
+                        <li class="nav-item" v-if='existuser'> <a class="nav-link" data-toggle="tab" href="#pass" role="tab"> <i class='fa fa-key'></i> Contraseña</a> </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="pass" role="tabpanel">
@@ -186,6 +187,71 @@
                                         <button type='submit' class="btn btn-sm btn-success"><span class="fa fa-save"></span> Guardar</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane active" id="home" role="tabpanel">
+                            <div class="card-body">
+                                <div v-if='existuser' class="row ">
+                                    <div class="col-md-4">
+                                        <label class="control-label text-left">Nivel</label>
+                                        <p class="control-label text-left">[[formDep.name_level]]</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="control-label text-left">Tipo</label>
+                                        <p class="control-label text-left">[[formDep.name_type]]</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="control-label text-left">Departamento</label>
+                                        <p class="control-label text-left">[[formDep.name_departaments]]</p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button type="button" @click="formdepartament = !formdepartament  ; listdepartament = !listdepartament" class="btn m-t-10 btn-warning btn-block waves-light text-white"><i class="ti-pencil"></i> Cambiar departamento</button>
+                                    </div>
+                                </div>
+                                <div v-else class="col-md-12 col-sm-12 col-xs-12">
+                                    <a @click="formdepartament = !formdepartament ; listdepartament = !listdepartament" class="btn m-t-10 btn-danger btn-block waves-light text-white">
+                                        <i class="ti-plus"></i> Agregar Departamento
+                                    </a>
+                                </div>
+                                <div v-if='formdepartament' class="formdepartament row" >
+                                    <!-- <div  class="col-md-12">
+                                        <i @click="formdepartament = !formdepartament  ; listdepartament = !listdepartament" class="float-right text-danger fa fa-close"></i>
+                                    </div> -->
+                                    <form @submit.prevent="senddepartament"  method="POST">
+                                        {% csrf_token %}
+                                        <div class="row ">
+                                            <input hidden type="text" name="perid" id="perid" :value='[[person.pk]]' required>
+                                            <input hidden type="text" name="username" id="username" :value='[[person.pid]]' required>
+                                            <input hidden type="text" name="uid" id="uid" v-model='formDep.uid'>
+                                            <div class="col-md-4">
+                                                <label class="control-label text-left">Nivel</label>
+                                                <select  id="level" name="level" v-model='formDep.level'class="selectpicker" v-selectpicker="''"  data-style="form-control btn-secondary" @change="list_type">
+                                                    <option value="">---------</option>
+                                                    {% for level in levels  %}
+                                                        <option value="{{level.pk}}">{{ level }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="control-label text-left">Tipo</label>
+                                                <select id="type" name="type" v-model='formDep.type'  v-selectpicker="''"   data-style=" form-control btn-secondary" @change="list_departure">
+                                                    <option value="">---------</option>
+                                                    <option v-for="type in typedepartament" :value="type.pk">[[ type.fields.name ]]</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="control-label text-left">Departamento</label>
+                                                <select id='departaments' name='departaments' v-model='formDep.departaments' v-select2="''"  class="form-control custom-select"  style="width: 100%; height:36px;" >
+                                                    <option>Seleccionar</option>
+                                                    <option v-for="depart in departament" :value="depart.pk">[[ depart.fields.name ]]</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn m-t-10 btn-success btn-block waves-light text-white"><i class="ti-save"></i> Guardar Departamento</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

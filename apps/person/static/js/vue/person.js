@@ -17,6 +17,7 @@ new Vue({
             axios.get('searchperson/', { params: { dni: this.doc } })
             .then(function (response) {
                 if (response.data.length > 0) {
+                    console.log(response.data);
                     self.listperson = true
                     self.addperson = false
                     self.person = response.data[0].fields

@@ -65,12 +65,21 @@ class User(AbstractBaseUser,PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ('email',)
 
+    CHOICES_TYPE_CA = (
+        ('DP', 'DEPARTAMENTO'),
+        ('PR', 'PROVINCIA'),
+        ('DS', 'DISTRITO'),
+        ('CA', 'CENTRO ASISTENCIAL'),
+    )
+
     username   = models.CharField(max_length=15, unique=True, db_index=True)
     email      = models.EmailField(max_length=255)
     is_active  = models.BooleanField(default=True)
     is_admin   = models.BooleanField(default=False)
 
     id_person  = models.ForeignKey(Person, on_delete=models.CASCADE, null=True)
+    type_ca    = models.CharField(max_length=2, choices=CHOICES_TYPE_CA)
+    code_ca    = models.IntegerField(blank=True, null=True)
     # id_red     = models.ForeignKey(Redes, on_delete=models.CASCADE, null=True,blank=True)
 
     objects = UserProfileManager()

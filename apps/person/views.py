@@ -17,7 +17,6 @@ class PersonView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = PersonForm
-        context['eid'] =1
         return context
 
 
