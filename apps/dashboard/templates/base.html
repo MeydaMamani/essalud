@@ -53,7 +53,7 @@
                 <!-- sidebar menu -->
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                     <div class="menu_section">
-                    <!-- <h3>{{ request.user.id_red.type }} - {{ request.user.id_red }}</h3> -->
+                    <!-- <h3>{{ request.user.type_ca }} - {{ request.session.sytem.nombreca }}</h3> -->
                     <ul class="nav side-menu">
                         <li><a><i class="fa fa-bar-chart-o"></i> Tableros <span class="fa fa-chevron-down"></span></a>
                             <ul class="nav child_menu">
@@ -87,7 +87,7 @@
                     <a data-toggle="tooltip" data-placement="top" title="Lock">
                     <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                    <a data-toggle="tooltip" data-placement="top" title="Logout" href="{% url 'dashboard:logout' %}">
                     <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                     </a>
                 </div>
@@ -103,8 +103,19 @@
                     </div>
                     <nav class="nav navbar-nav">
                         <ul class="navbar-right">
-                            <li class="nav-item" style="padding-left: 15px;">
-                                <a href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                            <li class="nav-item dropdown open" style="padding-left: 15px;">
+                                <a href="javascript:;" class="dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                                    {% if request.user.id_person.sex == 'M' %}
+                                        <img src="{% static 'img/doctor.png' %}" width="23" alt="user" class="img-circle border border-secondary mr-2">
+                                    {% else %}
+                                        <img src="{% static 'img/nurse.png' %}" width="23" alt="user" class="img-circle border border-secondary mr-2">
+                                    {% endif %}
+                                    {{ request.user.id_person.names }}
+                                </a>
+                                <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" data-toggle="modal" data-target=".change_pw"> Cambiar Contraseña</a>
+                                    <a class="dropdown-item" href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesión</a>
+                                </div>
                             </li>
                         </ul>
                     </nav>
@@ -126,6 +137,36 @@
             <!-- /footer content -->
         </div>
     </div>
+    <div class="modal fade change_pw" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel2">Cambiar Contraseña</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="appForPassword">
+                    <form class="form-horizontal form-material" @submit.prevent="sendPass">
+                        {% csrf_token %}
+                        <!-- <input type="hidden" name="pid" id="pid" :value='[[person.pk]]' required> -->
+                        <input type="hidden" id="pid" name="pid" value="{{request.user.id}}" required>
+                        <div class="col-md-12 mb-2">
+                            <label for="">Nueva contraseña</label>
+                            <input type="password" id='password' name='password' class="form-control form-control-line">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="">Repita nueva contraseña</label>
+                            <input type="password" id='password_r' name='password_r' class="form-control form-control-line">
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <button type='submit' class="btn btn-sm btn-success"><span class="fa fa-save"></span> Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
 
     <script src="{% static 'js/vue.js' %}"></script>
     <script src="{% static 'js/axios.min.js' %}"></script>
@@ -144,6 +185,7 @@
     <script src="{% static 'js/footable.all.min.js' %}"></script>
     <script src="{% static 'js/footable-init.js' %}"></script>
     <script src="{% static 'js/hammer.min.js' %}"></script>
+    <script src="{% static 'js/vue/profile.js' %}"></script>
     <script>
         Vue.directive('select2', {
             inserted: function (elem, fieldName) {
@@ -165,6 +207,7 @@
     </script>
 
     {% block scripts %}
+
     {% endblock scripts %}
 </body>
 </html>

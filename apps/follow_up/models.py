@@ -29,6 +29,13 @@ class Anemia(models.Model):
     nutricion11 = models.DateField(blank=True, null=True)
     den = models.IntegerField(blank=True, null=True)
     num = models.IntegerField(blank=True, null=True)
+    enf6 = models.DateField(blank=True, null=True)
+    enf7 = models.DateField(blank=True, null=True)
+    enf8 = models.DateField(blank=True, null=True)
+    enf9 = models.DateField(blank=True, null=True)
+    enf10 = models.DateField(blank=True, null=True)
+    enf11 = models.DateField(blank=True, null=True)
+    grupo_edad= models.CharField(max_length=100, blank=True, null=True)
 
     def natural_key(self):
         return self.pk, self.anio, self.mes, self.cod_dep, self.cod_prov, self.provincia, self.cod_dist,\

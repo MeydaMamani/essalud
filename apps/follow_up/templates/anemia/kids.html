@@ -44,8 +44,8 @@
                 <div class="col-sm-4 pt-2 pl-0">
                     <select class="form-control-sm w-100" name="tipo" id="tipo">
                         <option value="0">Seleccione Edad</option>
-                        <option value="MENOR1">MENOR 1 AÑO</option>
-                        <option value="ONEYEAR">1 AÑO</option>
+                        <option value="MENOR_1ANIO">MENOR 1 AÑO</option>
+                        <option value="1ANIO">1 AÑO</option>
                         <option value="TWOYEAR">2 AÑOS</option>
                         <option value="TODOS" selected>TODOS</option>
                     </select>
@@ -97,6 +97,13 @@
                             <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 4</th>
                             <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 5</th>
                             <th class="align-middle p-1" style="background: #c7dbf0 !important;">Nutrición 6</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 1</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 2</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 3</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 4</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 5</th>
+                            <th class="align-middle p-1" style="background: #a4c0de !important;">Enf 6</th>
+                            <th class="align-middle p-1" style="background: #aaf5bf !important;">Grupo</th>
                         </tr>
                     </thead>
                     <div class="float-right col-md-3 p-0">
@@ -142,6 +149,13 @@
                                 <td class="align-middle p-1" style="color: red;">[[ item.fields.nutricion11 ]]</td>
                             </template>
                             <template v-else><td class="align-middle p-1">[[ item.fields.nutricion11 ]]</td></template>
+                            <td class="align-middle p-1">[[ item.fields.enf6 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.enf7 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.enf8 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.enf9 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.enf10 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.enf11 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.grupo_edad ]]</td>
                         </tr>
                     </tbody>
                     <tfoot>

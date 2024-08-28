@@ -71,13 +71,13 @@ class NominalAnemia(View):
 
         else:
             if request.POST['eess'] == 'TODOS':
-                totProv = Anemia.objects.filter(anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
-                totNominal = Anemia.objects.filter(anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
                 totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
             else:
-                totProv = Anemia.objects.filter(cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
-                totNominal = Anemia.objects.filter(cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
                 totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
         dataList.append(list(totProv))
@@ -108,7 +108,7 @@ class PrintNomAnem(TemplateView):
         img = Image('static/img/logoPrint.png')
         ws.add_image(img, 'A2')
 
-        ws.merge_cells('B2:Q2')
+        ws.merge_cells('B2:X2')
         ws.row_dimensions[2].height = 23
 
         ws.column_dimensions['A'].width = 6
@@ -118,16 +118,17 @@ class PrintNomAnem(TemplateView):
         ws.column_dimensions['E'].width = 11
         ws.column_dimensions['G'].width = 25
         ws.column_dimensions['I'].width = 25
+        ws.column_dimensions['X'].width = 15
 
         ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
         ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
         ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO DE NIÑOS Y NIÑAS CON DX ANEMIA - ' + str(nameMonth).upper() + ' ' + str(request.GET['anio'])
 
-        ws.merge_cells('A4:Q4')
+        ws.merge_cells('A4:X4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
         ws['A4'] = 'CODIFICACION: '
 
-        ws.merge_cells('A6:Q6')
+        ws.merge_cells('A6:X6')
         ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
         ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
@@ -233,6 +234,48 @@ class PrintNomAnem(TemplateView):
         ws['Q8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
         ws['Q8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
+        ws['R8'] = 'Enf 1'
+        ws['R8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['R8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['R8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['R8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['S8'] = 'Enf 2'
+        ws['S8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['S8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['S8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['S8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['T8'] = 'Enf 3'
+        ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['T8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['T8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['U8'] = 'Enf 4'
+        ws['U8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['U8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['U8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['U8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['V8'] = 'Enf 5'
+        ws['V8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['V8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['V8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['V8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['W8'] = 'Enf 6'
+        ws['W8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['W8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['W8'].fill = PatternFill(start_color='a4c0de', end_color='a4c0de', fill_type='solid')
+        ws['W8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['X8'] = 'Grupo'
+        ws['X8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['X8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['X8'].fill = PatternFill(start_color='C7DBF0', end_color='C7DBF0', fill_type='solid')
+        ws['X8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
         if request.GET['tipo'] == 'TODOS':
             if request.GET['eess'] == 'TODOS':
                 totNominal = Anemia.objects.filter(anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
@@ -242,10 +285,10 @@ class PrintNomAnem(TemplateView):
 
         else:
             if request.GET['eess'] == 'TODOS':
-                totNominal = Anemia.objects.filter(anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
             elif request.GET['eess'] != 'TODOS':
-                totNominal = Anemia.objects.filter(cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
         totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
@@ -357,6 +400,41 @@ class PrintNomAnem(TemplateView):
                     ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=17).value = nom['fields']['nutricion11']
 
+                ws.cell(row=cont, column=18).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=18).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=18).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=18).value = nom['fields']['enf6']
+
+                ws.cell(row=cont, column=19).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=19).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=19).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=19).value = nom['fields']['enf7']
+
+                ws.cell(row=cont, column=20).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=20).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=20).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=20).value = nom['fields']['enf8']
+
+                ws.cell(row=cont, column=21).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=21).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=21).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=21).value = nom['fields']['enf9']
+
+                ws.cell(row=cont, column=22).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=22).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=22).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=22).value = nom['fields']['enf10']
+
+                ws.cell(row=cont, column=23).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=23).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=23).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=23).value = nom['fields']['enf11']
+
+                ws.cell(row=cont, column=24).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=24).border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                ws.cell(row=cont, column=24).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=24).value = nom['fields']['grupo_edad']
+
                 cont = cont+1
                 num = num+1
 
@@ -375,6 +453,68 @@ class MetasPriorView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['establecimiento'] = Establecimiento.objects.all()
         return context
+
+
+class ListMetasPrior(TemplateView):
+    def get(self, request, *args, **kwargs):
+        dataList = []
+        nameEess = Establecimiento.objects.get(codigo=request.GET['eess'])
+
+        a = connection.cursor()
+        a.execute("""select (select sum(meta) from metas_priorizadas where cod_centro=%s and anio=%s) meta, sum(IIF(ene is null, 0, ene)) ene,
+                    sum(IIF(feb is null, 0, feb)) feb, sum(IIF(mar is null, 0, mar)) mar, sum(IIF(abr is null, 0, abr)) abr, sum(IIF(may is null, 0, may)) may,
+                    sum(IIF(jun is null, 0, jun)) jun, sum(IIF(jul is null, 0, jul)) jul, sum(IIF(ago is null, 0, ago)) ago, sum(IIF([set] is null, 0, [set])) [set],
+                    sum(IIF(oct is null, 0, oct)) oct, sum(IIF(nov is null, 0, nov)) nov, sum(IIF([dic] is null, 0, [dic])) dic, (sum(IIF(ene is null, 0, ene))+
+                    sum(IIF(feb is null, 0, feb))+sum(IIF(mar is null, 0, mar))+sum(IIF(abr is null, 0, abr))+sum(IIF(may is null, 0, may))+sum(IIF(jun is null, 0, jun))
+                    +sum(IIF(jul is null, 0, jul))+sum(IIF(ago is null, 0, ago))+sum(IIF([set] is null, 0, [set]))+sum(IIF([oct] is null, 0,
+                    [oct]))+sum(IIF([nov] is null, 0, [nov]))+sum(IIF([dic] is null, 0, [dic]))) avance
+                    from ESSALUD.dbo.avance where cod_centro=%s and anio=%s""" % (request.GET['eess'], request.GET['anio'], request.GET['eess'], request.GET['anio']))
+
+        resulTotal = { 'name': nameEess.nombre + ' - ' + request.GET['anio'] }
+        for tot in a.fetchall():
+            total = { 'meta': tot[0], 'ene': tot[1], 'feb': tot[2], 'mar': tot[3], 'abr': tot[4],
+                     'may': tot[5], 'jun': tot[6], 'jul': tot[7], 'ago': tot[8], 'set': tot[9],
+                     'oct': tot[10], 'nov': tot[11], 'dic': tot[12], 'avance': tot[13], 'avporcent': round((tot[13]/tot[0])*100, 1) }
+
+            if tot[0] == 0 or tot[0] == None or tot[13] == None:
+                avGeneralAnio = 0
+                avEne = 0
+                avFeb = 0
+                avMar = 0
+                avAbr = 0
+                avMay = 0
+                avJun = 0
+                avJul = 0
+                avAgo = 0
+                avSet = 0
+                avOct = 0
+                avNov = 0
+                avDic = 0
+            else:
+                avGeneralAnio = round((tot[13]/tot[0])*100, 1)
+                avEne = round((tot[1]/(tot[0]/12))*100, 1)
+                avFeb = round((tot[1]+tot[2])/((tot[0]/12)*2)*100, 1)
+                avMar = round((tot[1]+tot[2]+tot[3])/((tot[0]/12)*3)*100, 1)
+                avAbr = round((tot[1]+tot[2]+tot[3]+tot[4])/((tot[0]/12)*4)*100, 1)
+                avMay = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5])/((tot[0]/12)*5)*100, 1)
+                avJun = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6])/((tot[0]/12)*6)*100, 1)
+                avJul = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7])/((tot[0]/12)*7)*100, 1)
+                avAgo = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8])/((tot[0]/12)*8)*100, 1)
+                avSet = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9])/((tot[0]/12)*9)*100, 1)
+                avOct = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9]+tot[10])/((tot[0]/12)*10)*100, 1)
+                avNov = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9]+tot[10]+tot[11])/((tot[0]/12)*11)*100, 1)
+                avDic = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9]+tot[10]+tot[11]+tot[12])/((tot[0]/12)*12)*100, 1)
+
+            totalAv = { 'av_ene': avEne, 'av_feb': avFeb, 'av_mar': avMar, 'av_abr': avAbr,
+                     'av_may': avMay, 'av_jun': avJun, 'av_jul': avJul, 'av_ago': avAgo, 'av_set': avSet,
+                     'av_oct': avOct, 'av_nov': avNov, 'av_dic': avDic }
+
+        dataList.extend([resulTotal])
+        dataList.extend([total])
+        dataList.extend([totalAv])
+        # print(dataList)
+
+        return HttpResponse(json.dumps(dataList), content_type='application/json')
 
 
 class PrintNominal(TemplateView):

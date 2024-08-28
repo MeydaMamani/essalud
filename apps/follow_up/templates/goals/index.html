@@ -42,31 +42,375 @@
         <h5 class="mb-2 font-weight-bold">Seguimiento de Metas Priorizadas</h5>
     </div>
     <div class="clearfix"></div>
-    <br><br>
-    <div class="col-md-4 offset-md-4">
-        <div class="post-it2">
-            <h3 class="text-center mt-3 mb-0" style="color: #3b3eb9;"><b>Metas Priorizadas</b></h3><br>
-            <form method="POST" @submit.prevent="PrintExcel" class="form-horizontal">
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <label class="text-dark">Seleccione Centro Asistencial:</label>
-                        <select class="form-control w-100" name="eess" id="eess" v-select2="''">
-                            {% for eess in establecimiento %}
-                                <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label class="text-dark">Seleccione Año:</label>
-                        <select class="form-control" name="anio" id="anio" v-select2="''">
-                        </select>
-                    </div>
+    <div class="col-md-5 mb-4">
+        <form method="GET" @submit.prevent="listDat" class="form-horizontal">
+            <div class="row">
+                <div class="form-group col-md-7">
+                    <select class="form-control w-100" name="eess" id="eess" v-select2="''">
+                        {% for eess in establecimiento %}
+                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="col-md-12 text-center mt-4">
-                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-download"></i> Descargar Excel</button>
+                <div class="form-group col-md-4">
+                    <select class="form-control" name="anio" id="anio" v-select2="''">
+                    </select>
                 </div>
-            </form>
+                <div class="col-md-1 text-center pl-0">
+                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-search"></i> </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-12">
+        <div class="border border-secondary text-center p-2">
+            <b class="m-0 font-20" style="color: #1F497D;">ESSALUD PASCO: [[ list.name ]]</b>
         </div>
+        <br>
+        <table class="table table-bordered">
+            <thead>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th style="background: #2F4C70; color: white;">ACTIVIDADES</th>
+                    <th style="background: #2F4C70; color: white;">META</th>
+                    <th style="background: #2F4C70; color: white;">ENE</th>
+                    <th style="background: #2F4C70; color: white;">FEB</th>
+                    <th style="background: #2F4C70; color: white;">MAR</th>
+                    <th style="background: #2F4C70; color: white;">ABR</th>
+                    <th style="background: #2F4C70; color: white;">MAY</th>
+                    <th style="background: #2F4C70; color: white;">JUN</th>
+                    <th style="background: #2F4C70; color: white;">JUL</th>
+                    <th style="background: #2F4C70; color: white;">AGO</th>
+                    <th style="background: #2F4C70; color: white;">SET</th>
+                    <th style="background: #2F4C70; color: white;">OCT</th>
+                    <th style="background: #2F4C70; color: white;">NOV</th>
+                    <th style="background: #2F4C70; color: white;">DIC</th>
+                    <th style="background: #2F4C70; color: white;">AVANCE</th>
+                    <th style="background: #2F4C70; color: white;">% AVANCE AÑO</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th style="background: #F7F7F7;"></th>
+                    <th style="background: #C5D9F1;">[[ totales.meta ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.ene ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.feb ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.mar ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.abr ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.may ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.jun ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.jul ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.ago ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.set ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.oct ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.nov ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.dic ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.avance ]]</th>
+                    <th style="background: #C5D9F1;">[[ totales.avporcent ]] %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th style="background: #C5D9F1;">% AVANCE AL MES</th>
+                    <th style="background: white;"></th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_ene < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_ene > 80 && totales2.av_ene < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_ene > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_ene ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_feb < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_feb > 80 && totales2.av_feb < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_feb > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_feb ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_mar < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_mar > 80 && totales2.av_mar < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_mar > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_mar ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_abr < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_abr > 80 && totales2.av_abr < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_abr > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_abr ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_may < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_may > 80 && totales2.av_may < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_may > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_may ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_jun < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_jun > 80 && totales2.av_jun < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_jun > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_jun ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_jul < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_jul > 80 && totales2.av_jul < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_jul > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_jul ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_ago < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_ago > 80 && totales2.av_ago < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_ago > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_ago ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_set < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_set > 80 && totales2.av_set < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_set > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_set ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_oct < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_oct > 80 && totales2.av_oct < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_oct > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_oct ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_nov < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_nov > 80 && totales2.av_nov < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_nov > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_nov ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;">
+                        <template v-if="totales2.av_dic < 81">
+                            <span style='color: #FF2929;'> [[ totales2.av_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_dic > 80 && totales2.av_dic < 96">
+                            <span style='color: #FF9900;'> [[ totales2.av_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="totales2.av_dic > 95">
+                            <span style='color: #00B050;'> [[ totales2.av_dic ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th style="background: white;"></th>
+                    <th style="background: white;"></th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">PSICOPROFILAXIS OBSTETRICA</th>
+                    <th class="p-1" style="background: #F2F2F2;">18</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">6</th>
+                    <th class="p-1" style="background: #F2F2F2;">1</th>
+                    <th class="p-1" style="background: #F2F2F2;">1</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">8</th>
+                    <th class="p-1" style="background: #F2F2F2;">44.4 %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">ODONTOLOGIA</th>
+                    <th class="p-1" style="background: #F2F2F2;">29440</th>
+                    <th class="p-1" style="background: #F2F2F2;">359</th>
+                    <th class="p-1" style="background: #F2F2F2;">327</th>
+                    <th class="p-1" style="background: #F2F2F2;">357</th>
+                    <th class="p-1" style="background: #F2F2F2;">342</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">1385</th>
+                    <th class="p-1" style="background: #F2F2F2;">47.1 %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">NUTRICIÓN</th>
+                    <th class="p-1" style="background: #F2F2F2;">3048</th>
+                    <th class="p-1" style="background: #F2F2F2;">366</th>
+                    <th class="p-1" style="background: #F2F2F2;">328</th>
+                    <th class="p-1" style="background: #F2F2F2;">334</th>
+                    <th class="p-1" style="background: #F2F2F2;">347</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">1375</th>
+                    <th class="p-1" style="background: #F2F2F2;">45.1 %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">EMERGENCIA</th>
+                    <th class="p-1" style="background: #F2F2F2;">4766</th>
+                    <th class="p-1" style="background: #F2F2F2;">89</th>
+                    <th class="p-1" style="background: #F2F2F2;">59</th>
+                    <th class="p-1" style="background: #F2F2F2;">167</th>
+                    <th class="p-1" style="background: #F2F2F2;">268</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">583</th>
+                    <th class="p-1" style="background: #F2F2F2;">12.3 %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">PSICOLOGIA</th>
+                    <th class="p-1" style="background: #F2F2F2;">6960</th>
+                    <th class="p-1" style="background: #F2F2F2;">367</th>
+                    <th class="p-1" style="background: #F2F2F2;">359</th>
+                    <th class="p-1" style="background: #F2F2F2;">330</th>
+                    <th class="p-1" style="background: #F2F2F2;">248</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">1304</th>
+                    <th class="p-1" style="background: #F2F2F2;">18.7 %</th>
+                </tr>
+                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                    <th class="p-1" style="background: #F2F2F2;">ENFERMERIA</th>
+                    <th class="p-1" style="background: #F2F2F2;">13692</th>
+                    <th class="p-1" style="background: #F2F2F2;">964</th>
+                    <th class="p-1" style="background: #F2F2F2;">872</th>
+                    <th class="p-1" style="background: #F2F2F2;">916</th>
+                    <th class="p-1" style="background: #F2F2F2;">1956</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">0</th>
+                    <th class="p-1" style="background: #F2F2F2;">4708</th>
+                    <th class="p-1" style="background: #F2F2F2;">34.4 %</th>
+                </tr>
+                <tr></tr>
+            </thead>
+        </table>
+        <br>
+        <table class="table table-bordered">
+            <tr class="text-center font-10 border" style="background: #AED6F1;">
+                <th class="p-1" style="background: #4F81BD;">ATENCION ENFERMERIA</th>
+                <th class="p-1" style="background: #4F81BD;">13692</th>
+                <th class="p-1" style="background: #4F81BD;">964</th>
+                <th class="p-1" style="background: #4F81BD;">872</th>
+                <th class="p-1" style="background: #4F81BD;">916</th>
+                <th class="p-1" style="background: #4F81BD;">1956</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">0</th>
+                <th class="p-1" style="background: #4F81BD;">4708</th>
+                <th class="p-1" style="background: #4F81BD;">34.4 %</th>
+            </tr>
+            <tr class="text-center font-10 border" style="background: #AED6F1;">
+                <th style="background: #C5D9F1;">% AVANCE AL MES</th>
+                <th style="background: white;"></th>
+                <th style="background: white;">83.3%</th>
+                <th style="background: white;">78.7%</th>
+                <th style="background: white;">78.5%</th>
+                <th style="background: white;">86.6%</th>
+                <th style="background: white;">69.3%</th>
+                <th style="background: white;">57.7%</th>
+                <th style="background: white;">49.5%</th>
+                <th style="background: white;">43.3%</th>
+                <th style="background: white;">38.5%</th>
+                <th style="background: white;">34.6%</th>
+                <th style="background: white;">31.5%</th>
+                <th style="background: white;">28.9%</th>
+                <th style="background: white;"></th>
+                <th style="background: white;"></th>
+            </tr>
+            <tr class="text-center font-10 border" style="background: #AED6F1;">
+                <th class="p-1" style="background: white;">Otras Atención de Enfermería</th>
+                <th class="p-1" style="background: white;">18</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">6</th>
+                <th class="p-1" style="background: white;">1</th>
+                <th class="p-1" style="background: white;">1</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">0</th>
+                <th class="p-1" style="background: white;">8</th>
+                <th class="p-1" style="background: white;">44.4 %</th>
+            </tr>
+        </table>
     </div>
 </div>
 {% endblock content %}

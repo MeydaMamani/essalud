@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import KidsView, AnemiaKidsView, SearchKidsView, NominalAnemia, PrintNomAnem, MetasPriorView, PrintNominal
+from .views import KidsView, AnemiaKidsView, SearchKidsView, NominalAnemia, PrintNomAnem, MetasPriorView, PrintNominal, ListMetasPrior
 from django.contrib.auth.decorators import permission_required, login_required
 
 app_name='follow_up'
@@ -11,5 +11,6 @@ urlpatterns = [
     path('anemiaKids/search/', NominalAnemia.as_view(), name='anemia_search'),
     path('anemiaKids/printNominal/', PrintNomAnem.as_view(), name='anemia_print'),
     path('goals/', login_required(MetasPriorView.as_view()), name='index_goals'),
+    path('goals/list/', ListMetasPrior.as_view(), name='goals_list'),
     path('goals/printExcel/', PrintNominal.as_view(), name='goals_print'),
 ]
