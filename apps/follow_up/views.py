@@ -455,7 +455,7 @@ class MetasPriorView(TemplateView):
         return context
 
 
-class ListMetasPrior(TemplateView):
+class ListMetasPrior(View):
     def get(self, request, *args, **kwargs):
         dataList = []
         nameEess = Establecimiento.objects.get(codigo=request.GET['eess'])
@@ -471,11 +471,8 @@ class ListMetasPrior(TemplateView):
                     from ESSALUD.dbo.avance where cod_centro=%s and anio=%s""" % (request.GET['eess'], request.GET['anio'], request.GET['eess'], request.GET['anio']))
 
         resulTotal = { 'name': nameEess.nombre + ' - ' + request.GET['anio'] }
-        for tot in a.fetchall():
-            total = { 'meta': tot[0], 'ene': tot[1], 'feb': tot[2], 'mar': tot[3], 'abr': tot[4],
-                     'may': tot[5], 'jun': tot[6], 'jul': tot[7], 'ago': tot[8], 'set': tot[9],
-                     'oct': tot[10], 'nov': tot[11], 'dic': tot[12], 'avance': tot[13], 'avporcent': round((tot[13]/tot[0])*100, 1) }
 
+        for tot in a.fetchall():
             if tot[0] == 0 or tot[0] == None or tot[13] == None:
                 avGeneralAnio = 0
                 avEne = 0
@@ -505,16 +502,157 @@ class ListMetasPrior(TemplateView):
                 avNov = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9]+tot[10]+tot[11])/((tot[0]/12)*11)*100, 1)
                 avDic = round((tot[1]+tot[2]+tot[3]+tot[4]+tot[5]+tot[6]+tot[7]+tot[8]+tot[9]+tot[10]+tot[11]+tot[12])/((tot[0]/12)*12)*100, 1)
 
+            total = { 'meta': tot[0], 'ene': tot[1], 'feb': tot[2], 'mar': tot[3], 'abr': tot[4],
+                    'may': tot[5], 'jun': tot[6], 'jul': tot[7], 'ago': tot[8], 'set': tot[9],
+                    'oct': tot[10], 'nov': tot[11], 'dic': tot[12], 'avance': tot[13], 'avporcent': avGeneralAnio }
+
             totalAv = { 'av_ene': avEne, 'av_feb': avFeb, 'av_mar': avMar, 'av_abr': avAbr,
                      'av_may': avMay, 'av_jun': avJun, 'av_jul': avJul, 'av_ago': avAgo, 'av_set': avSet,
                      'av_oct': avOct, 'av_nov': avNov, 'av_dic': avDic }
 
+        b = connection.cursor()
+        b.execute("""SELECT cod_act, sum(meta) meta into ESSALUD.dbo.metas_prior from metas_priorizadas where cod_centro=%s and anio=%s group by cod_act""" % (request.GET['eess'], request.GET['anio']))
+        b.execute("""SELECT b.nombre, c.meta, sum(IIF(ene is null, 0, ene)) ene, sum(IIF(feb is null, 0, feb)) feb, sum(IIF(mar is null, 0, mar)) mar,
+                    sum(IIF(abr is null, 0, abr)) abr, sum(IIF(may is null, 0, may)) may, sum(IIF(jun is null, 0, jun)) jun, sum(IIF(jul is null, 0, jul)) jul,
+                    sum(IIF(ago is null, 0, ago)) ago, sum(IIF([set] is null, 0, [set])) [set], sum(IIF(oct is null, 0, oct)) oct, sum(IIF(nov is null, 0, nov)) nov,
+                    sum(IIF([dic] is null, 0, [dic])) dic, (sum(IIF(ene is null, 0, ene))+sum(IIF(feb is null, 0, feb))+sum(IIF(mar is null, 0, mar))+
+                    sum(IIF(abr is null, 0, abr))+sum(IIF(may is null, 0, may))+sum(IIF(jun is null, 0, jun))+sum(IIF(jul is null, 0, jul))+sum(IIF(ago is null, 0, ago))+
+                    sum(IIF([set] is null, 0, [set]))+sum(IIF([oct] is null, 0, [oct]))+sum(IIF([nov] is null, 0, [nov]))+sum(IIF([dic] is null, 0, [dic]))) avance
+                    FROM ESSALUD.dbo.avance a left join ESSALUD.dbo.actividades b on a.cod_Act=b.codigo left join ESSALUD.dbo.metas_prior c on a.cod_act=c.cod_act
+                    where a.cod_centro=%s and a.anio=%s group by b.nombre, c.meta
+                    drop table ESSALUD.dbo.metas_prior""" % (request.GET['eess'], request.GET['anio']))
+
+        dataAct = []
+        for avAct in b.fetchall():
+            totalAct = { 'nombre': avAct[0], 'meta': avAct[1], 'ene': avAct[2], 'feb': avAct[3], 'mar': avAct[4], 'abr': avAct[5],
+                     'may': avAct[6], 'jun': avAct[7], 'jul': avAct[8], 'ago': avAct[9], 'set': avAct[10], 'oct': avAct[11],
+                     'nov': avAct[12], 'dic': avAct[13], 'avance': avAct[14], 'avporcent': round((avAct[14]/avAct[1])*100, 1) }
+
+            dataAct.append(totalAct)
+
+        c = connection.cursor()
+        c.execute("""SELECT a.cod_act, b.nombre from metas_priorizadas a left join actividades b on a.cod_act=b.codigo where cod_centro=%s and anio=%s
+                        group by a.cod_act, b.nombre""" % (request.GET['eess'], request.GET['anio']))
+
+        d = connection.cursor()
+        e = connection.cursor()
+
+        dataActDetail = []
+        dataAvActDetail = []
+        dataSubActiv = []
+        for act in c.fetchall():
+            e.execute("""select (select sum(meta) from metas_priorizadas where cod_centro=%s and anio=%s and cod_act=%s) meta, sum(IIF(ene is null, 0, ene)) ene,
+                        sum(IIF(feb is null, 0, feb)) feb, sum(IIF(mar is null, 0, mar)) mar, sum(IIF(abr is null, 0, abr)) abr, sum(IIF(may is null, 0, may)) may,
+                        sum(IIF(jun is null, 0, jun)) jun, sum(IIF(jul is null, 0, jul)) jul, sum(IIF(ago is null, 0, ago)) ago, sum(IIF([set] is null, 0, [set])) [set],
+                        sum(IIF(oct is null, 0, oct)) oct, sum(IIF(nov is null, 0, nov)) nov, sum(IIF([dic] is null, 0, [dic])) dic, (sum(IIF(ene is null, 0, ene))+
+                        sum(IIF(feb is null, 0, feb))+sum(IIF(mar is null, 0, mar))+sum(IIF(abr is null, 0, abr))+sum(IIF(may is null, 0, may))+sum(IIF(jun is null, 0, jun))
+                        +sum(IIF(jul is null, 0, jul))+sum(IIF(ago is null, 0, ago))+sum(IIF([set] is null, 0, [set]))+sum(IIF([oct] is null, 0,
+                        [oct]))+sum(IIF([nov] is null, 0, [nov]))+sum(IIF([dic] is null, 0, [dic]))) avance
+                        from avance where cod_centro=%s and anio=%s and cod_act=%s""" % (request.GET['eess'], request.GET['anio'], "'"+act[0]+"'", request.GET['eess'], request.GET['anio'], "'"+act[0]+"'"))
+
+            for totsub in e.fetchall():
+                if totsub[0] == 0 or totsub[0] == None or totsub[13] == None:
+                    avSubAct = 0
+                    subActene = 0
+                    subActfeb = 0
+                    subActmar = 0
+                    subActabr = 0
+                    subActmay = 0
+                    subActjun = 0
+                    subActjul = 0
+                    subActago = 0
+                    subActset = 0
+                    subActoct = 0
+                    subActnov = 0
+                    subActdic = 0
+                else:
+                    avSubAct = round((totsub[13]/totsub[0])*100, 1)
+                    subActene = round((0 if totsub[1] == None else totsub[1]/(totsub[0]/12))*100, 1)
+                    subActfeb = round((0 if totsub[1] == None else totsub[1]+totsub[2])/((totsub[0]/12)*2)*100, 1)
+                    subActmar = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3])/((totsub[0]/12)*3)*100, 1)
+                    subActabr = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4])/((totsub[0]/12)*4)*100, 1)
+                    subActmay = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5])/((totsub[0]/12)*5)*100, 1)
+                    subActjun = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6])/((totsub[0]/12)*6)*100, 1)
+                    subActjul = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7])/((totsub[0]/12)*7)*100, 1)
+                    subActago = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7]+totsub[8])/((totsub[0]/12)*8)*100, 1)
+                    subActset = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7]+totsub[8]+totsub[9])/((totsub[0]/12)*9)*100, 1)
+                    subActoct = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7]+totsub[8]+totsub[9]+totsub[10])/((totsub[0]/12)*10)*100, 1)
+                    subActnov = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7]+totsub[8]+totsub[9]+totsub[10]+totsub[11])/((totsub[0]/12)*11)*100, 1)
+                    subActdic = round((0 if totsub[1] == None else totsub[1]+totsub[2]+totsub[3]+totsub[4]+totsub[5]+totsub[6]+totsub[7]+totsub[8]+totsub[9]+totsub[10]+totsub[11]+totsub[12])/((totsub[0]/12)*12)*100, 1)
+
+
+                totalActDetail = { 'cod_act': act[0], 'nombre_act': act[1],  'meta': totsub[0], 'ene': totsub[1], 'feb': totsub[2], 'mar': totsub[3], 'abr': totsub[4],
+                                    'may': totsub[5], 'jun': totsub[6], 'jul': totsub[7], 'ago': totsub[8], 'set': totsub[9], 'oct': totsub[10],
+                                    'nov': totsub[11], 'dic': totsub[12], 'avance': totsub[13], 'avporcent': avSubAct }
+
+                totalAvActDetail = { 'cod_act': act[0], 'avAct_ene': subActene, 'avAct_feb': subActfeb, 'avAct_mar': subActmar, 'avAct_abr': subActabr, 'avAct_may': subActmay,
+                                    'avAct_jun': subActjun, 'avAct_jul': subActjul, 'avAct_ago': subActago, 'avAct_set': subActset, 'avAct_oct': subActoct,
+                                    'avAct_nov': subActnov, 'avAct_dic': subActdic }
+
+                dataActDetail.append(totalActDetail)
+                dataAvActDetail.append(totalAvActDetail)
+
+            d.execute("""SELECT cod_act, cod_subact, meta into ESSALUD.dbo.metaprior_subact
+                            from ESSALUD.dbo.metas_priorizadas where cod_centro=%s and anio=%s
+                            group by cod_act, cod_subact, meta""" % (request.GET['eess'], request.GET['anio']))
+
+            d.execute("""SELECT b.nombre nomsubact, c.meta, sum(IIF(ene is null, 0, ene)) ene, sum(IIF(feb is null, 0, feb)) feb, sum(IIF(mar is null, 0, mar)) mar,
+                        sum(IIF(abr is null, 0, abr)) abr, sum(IIF(may is null, 0, may)) may, sum(IIF(jun is null, 0, jun)) jun, sum(IIF(jul is null, 0, jul)) jul,
+                        sum(IIF(ago is null, 0, ago)) ago, sum(IIF([set] is null, 0, [set])) [set], sum(IIF(oct is null, 0, oct)) oct, sum(IIF(nov is null, 0, nov)) nov,
+                        sum(IIF([dic] is null, 0, [dic])) dic, (sum(IIF(ene is null, 0, ene))+sum(IIF(feb is null, 0, feb))+sum(IIF(mar is null, 0, mar))+
+                        sum(IIF(abr is null, 0, abr))+sum(IIF(may is null, 0, may))+sum(IIF(jun is null, 0, jun))+sum(IIF(jul is null, 0, jul))+sum(IIF(ago is null, 0, ago))+
+                        sum(IIF([set] is null, 0, [set]))+sum(IIF([oct] is null, 0, [oct]))+sum(IIF([nov] is null, 0, [nov]))+sum(IIF([dic] is null, 0, [dic]))) avance
+                        FROM ESSALUD.dbo.avance a left join ESSALUD.dbo.subactividades b on a.cod_subact=b.codigo
+                        left join ESSALUD.dbo.metaprior_subact c on a.cod_subact=c.cod_subact
+                        where a.cod_centro=%s and a.anio=%s and a.cod_act=%s
+                        group by b.nombre, c.meta
+                        drop table ESSALUD.dbo.metaprior_subact""" % (request.GET['eess'], request.GET['anio'], "'"+act[0]+"'"))
+
+            for dsub in d.fetchall():
+                subAct = { 'cod_act': act[0], 'nombre_act': act[1],  'nombresub': dsub[0], 'meta': dsub[1], 'ene': dsub[2], 'feb': dsub[3],
+                            'mar': dsub[4], 'abr': dsub[5], 'may': dsub[6], 'jun': dsub[7], 'jul': dsub[8], 'ago': dsub[9], 'set': dsub[10],
+                            'oct': dsub[11], 'nov': dsub[12], 'dic': dsub[13], 'avance': dsub[14] }#'avporcent': round((dsub[13]/dsub[0])*100, 1)
+
+                dataSubActiv.append(subAct)
+
+        f = connection.cursor()
+        f.execute("""select a.cod_centro, a.cod_act, b.nombre from ESSALUD.dbo.avance a left join ESSALUD.dbo.actividades b on a.cod_act=b.codigo
+                    where cod_centro=%s and anio=%s group by a.cod_centro, a.cod_act, b.nombre""" % (request.GET['eess'], request.GET['anio']))
+
+        nameActividad = []
+        for nameAct in f.fetchall():
+            names = { 'cod_act': nameAct[1], 'nombre': nameAct[2] }
+            nameActividad.append(names)
+
         dataList.extend([resulTotal])
         dataList.extend([total])
         dataList.extend([totalAv])
-        # print(dataList)
+        dataList.extend([dataAct])
+        dataList.extend([dataActDetail])
+        dataList.extend([dataAvActDetail])
+        dataList.extend([dataSubActiv])
+        dataList.extend([nameActividad])
 
         return HttpResponse(json.dumps(dataList), content_type='application/json')
+
+
+class AdvMetasPriorXAct(View):
+    def get(self, request, *args, **kwargs):
+        e = connection.cursor()
+        e.execute("""select (select sum(meta) from metas_priorizadas where cod_centro=%s and anio=%s and cod_act=%s) meta, sum(IIF(ene is null, 0, ene)) ene,
+                        sum(IIF(feb is null, 0, feb)) feb, sum(IIF(mar is null, 0, mar)) mar, sum(IIF(abr is null, 0, abr)) abr, sum(IIF(may is null, 0, may)) may,
+                        sum(IIF(jun is null, 0, jun)) jun, sum(IIF(jul is null, 0, jul)) jul, sum(IIF(ago is null, 0, ago)) ago, sum(IIF([set] is null, 0, [set])) [set],
+                        sum(IIF(oct is null, 0, oct)) oct, sum(IIF(nov is null, 0, nov)) nov, sum(IIF([dic] is null, 0, [dic])) dic, (sum(IIF(ene is null, 0, ene))+
+                        sum(IIF(feb is null, 0, feb))+sum(IIF(mar is null, 0, mar))+sum(IIF(abr is null, 0, abr))+sum(IIF(may is null, 0, may))+sum(IIF(jun is null, 0, jun))
+                        +sum(IIF(jul is null, 0, jul))+sum(IIF(ago is null, 0, ago))+sum(IIF([set] is null, 0, [set]))+sum(IIF([oct] is null, 0,
+                        [oct]))+sum(IIF([nov] is null, 0, [nov]))+sum(IIF([dic] is null, 0, [dic]))) avance
+                        from avance where cod_centro=%s and anio=%s and cod_act=%s""" % (request.GET['eess'], request.GET['anio'], "'"+request.GET['act']+"'", request.GET['eess'], request.GET['anio'], "'"+request.GET['act']+"'"))
+
+        for adv in e.fetchall():
+            avance = { 'meta': adv[0], 'avAct_ene': adv[1], 'avAct_feb': adv[2], 'avAct_mar': adv[3], 'avAct_abr': adv[4], 'avAct_may': adv[5], 'avAct_jun': adv[6],
+                        'avAct_jul': adv[7], 'avAct_ago': adv[8], 'avAct_set': adv[9], 'avAct_oct': adv[10], 'avAct_nov': adv[11], 'avAct_dic': adv[12] }
+
+        return HttpResponse(json.dumps(avance), content_type='application/json')
 
 
 class PrintNominal(TemplateView):

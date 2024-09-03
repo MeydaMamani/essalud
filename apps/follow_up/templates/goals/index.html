@@ -42,34 +42,41 @@
         <h5 class="mb-2 font-weight-bold">Seguimiento de Metas Priorizadas</h5>
     </div>
     <div class="clearfix"></div>
-    <div class="col-md-5 mb-4">
-        <form method="GET" @submit.prevent="listDat" class="form-horizontal">
-            <div class="row">
-                <div class="form-group col-md-7">
-                    <select class="form-control w-100" name="eess" id="eess" v-select2="''">
-                        {% for eess in establecimiento %}
-                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
-                        {% endfor %}
-                    </select>
+    <div class="d-flex">
+        <div class="col-md-5 mb-3">
+            <form method="GET" @submit.prevent="listDat" class="form-horizontal">
+                <div class="row">
+                    <div class="form-group col-md-7">
+                        <select class="form-control w-100" name="eess" id="eess" v-select2="''">
+                            {% for eess in establecimiento %}
+                                <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <select class="form-control" name="anio" id="anio" v-select2="''">
+                        </select>
+                    </div>
+                    <div class="col-md-1 text-center pl-0">
+                        <button class="btn btn-outline-primary btn-sm" id="search" type="submit"><i class="fa fa-search"></i> </button>
+                    </div>
                 </div>
-                <div class="form-group col-md-4">
-                    <select class="form-control" name="anio" id="anio" v-select2="''">
-                    </select>
-                </div>
-                <div class="col-md-1 text-center pl-0">
-                    <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-search"></i> </button>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="col-md-12">
-        <div class="border border-secondary text-center p-2">
-            <b class="m-0 font-20" style="color: #1F497D;">ESSALUD PASCO: [[ list.name ]]</b>
+            </form>
         </div>
-        <br>
+        <div class="col-md-1 p-0">
+            <button class="btn btn-danger btn-sm" data-toggle="modal" data-target=".ModalChart" @click="btnAdvActividad"> <i class="fa fa-eye"></i></button>
+        </div>
+        <div class="col-md-6 p-0 text-right">
+            <button class="btn btn-success btn-sm" @click="PrintExcel"> <i class="fa fa-print"></i></button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="text-center p-2 mb-3" style="border: 2px solid #1F497D;">
+            <b class="m-0 font-20" style="color: #1F497D;">ESSALUD PASCO: [[ nameCa.name ]]</b>
+        </div>
         <table class="table table-bordered">
             <thead>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                <tr class="text-center font-10 border">
                     <th style="background: #2F4C70; color: white;">ACTIVIDADES</th>
                     <th style="background: #2F4C70; color: white;">META</th>
                     <th style="background: #2F4C70; color: white;">ENE</th>
@@ -87,330 +94,394 @@
                     <th style="background: #2F4C70; color: white;">AVANCE</th>
                     <th style="background: #2F4C70; color: white;">% AVANCE AÑO</th>
                 </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
+                <!-- AVANCES GENERAL -->
+                <tr class="text-center font-10 border">
+                    <th class="align-middle p-1" style="background: #F7F7F7;"></th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.meta ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.ene ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.feb ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.mar ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.abr ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.may ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.jun ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.jul ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.ago ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.set ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.oct ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.nov ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.dic ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.avance ]]</th>
+                    <th class="align-middle p-1" style="background: #C5D9F1;">[[ totGeneral.avporcent ]] %</th>
+                </tr>
+                <tr class="text-center font-10 border">
+                    <th class="align-middle p-1" style="background: #C5D9F1;">% AVANCE AL MES</th>
+                    <th class="align-middle p-1" style="background: #F7F7F7;"></th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_ene < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_ene > 80 && avGeneral.av_ene < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_ene > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_ene ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_feb < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_feb > 80 && avGeneral.av_feb < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_feb > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_feb ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_mar < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_mar > 80 && avGeneral.av_mar < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_mar > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_mar ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_abr < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_abr > 80 && avGeneral.av_abr < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_abr > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_abr ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_may < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_may > 80 && avGeneral.av_may < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_may > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_may ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_jun < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_jun > 80 && avGeneral.av_jun < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_jun > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_jun ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_jul < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_jul > 80 && avGeneral.av_jul < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_jul > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_jul ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_ago < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_ago > 80 && avGeneral.av_ago < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_ago > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_ago ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_set < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_set > 80 && avGeneral.av_set < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_set > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_set ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_oct < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_oct > 80 && avGeneral.av_oct < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_oct > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_oct ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_nov < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_nov > 80 && avGeneral.av_nov < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_nov > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_nov ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white;">
+                        <template v-if="avGeneral.av_dic < 81">
+                            <span style='color: #FF2929;'> [[ avGeneral.av_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_dic > 80 && avGeneral.av_dic < 96">
+                            <span style='color: #FF9900;'> [[ avGeneral.av_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="avGeneral.av_dic > 95">
+                            <span style='color: #00B050;'> [[ avGeneral.av_dic ]] % ⬤</span>
+                        </template>
+                    </th>
                     <th style="background: #F7F7F7;"></th>
-                    <th style="background: #C5D9F1;">[[ totales.meta ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.ene ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.feb ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.mar ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.abr ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.may ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.jun ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.jul ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.ago ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.set ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.oct ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.nov ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.dic ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.avance ]]</th>
-                    <th style="background: #C5D9F1;">[[ totales.avporcent ]] %</th>
+                    <th style="background: #F7F7F7;"></th>
                 </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th style="background: #C5D9F1;">% AVANCE AL MES</th>
-                    <th style="background: white;"></th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_ene < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_ene ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_ene > 80 && totales2.av_ene < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_ene ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_ene > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_ene ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_feb < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_feb ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_feb > 80 && totales2.av_feb < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_feb ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_feb > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_feb ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_mar < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_mar ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_mar > 80 && totales2.av_mar < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_mar ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_mar > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_mar ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_abr < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_abr ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_abr > 80 && totales2.av_abr < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_abr ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_abr > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_abr ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_may < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_may ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_may > 80 && totales2.av_may < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_may ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_may > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_may ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_jun < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_jun ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_jun > 80 && totales2.av_jun < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_jun ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_jun > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_jun ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_jul < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_jul ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_jul > 80 && totales2.av_jul < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_jul ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_jul > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_jul ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_ago < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_ago ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_ago > 80 && totales2.av_ago < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_ago ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_ago > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_ago ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_set < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_set ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_set > 80 && totales2.av_set < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_set ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_set > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_set ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_oct < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_oct ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_oct > 80 && totales2.av_oct < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_oct ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_oct > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_oct ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_nov < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_nov ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_nov > 80 && totales2.av_nov < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_nov ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_nov > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_nov ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;">
-                        <template v-if="totales2.av_dic < 81">
-                            <span style='color: #FF2929;'> [[ totales2.av_dic ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_dic > 80 && totales2.av_dic < 96">
-                            <span style='color: #FF9900;'> [[ totales2.av_dic ]] % ⬤</span>
-                        </template>
-                        <template v-else-if="totales2.av_dic > 95">
-                            <span style='color: #00B050;'> [[ totales2.av_dic ]] % ⬤</span>
-                        </template>
-                    </th>
-                    <th style="background: white;"></th>
-                    <th style="background: white;"></th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">PSICOPROFILAXIS OBSTETRICA</th>
-                    <th class="p-1" style="background: #F2F2F2;">18</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">6</th>
-                    <th class="p-1" style="background: #F2F2F2;">1</th>
-                    <th class="p-1" style="background: #F2F2F2;">1</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">8</th>
-                    <th class="p-1" style="background: #F2F2F2;">44.4 %</th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">ODONTOLOGIA</th>
-                    <th class="p-1" style="background: #F2F2F2;">29440</th>
-                    <th class="p-1" style="background: #F2F2F2;">359</th>
-                    <th class="p-1" style="background: #F2F2F2;">327</th>
-                    <th class="p-1" style="background: #F2F2F2;">357</th>
-                    <th class="p-1" style="background: #F2F2F2;">342</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">1385</th>
-                    <th class="p-1" style="background: #F2F2F2;">47.1 %</th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">NUTRICIÓN</th>
-                    <th class="p-1" style="background: #F2F2F2;">3048</th>
-                    <th class="p-1" style="background: #F2F2F2;">366</th>
-                    <th class="p-1" style="background: #F2F2F2;">328</th>
-                    <th class="p-1" style="background: #F2F2F2;">334</th>
-                    <th class="p-1" style="background: #F2F2F2;">347</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">1375</th>
-                    <th class="p-1" style="background: #F2F2F2;">45.1 %</th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">EMERGENCIA</th>
-                    <th class="p-1" style="background: #F2F2F2;">4766</th>
-                    <th class="p-1" style="background: #F2F2F2;">89</th>
-                    <th class="p-1" style="background: #F2F2F2;">59</th>
-                    <th class="p-1" style="background: #F2F2F2;">167</th>
-                    <th class="p-1" style="background: #F2F2F2;">268</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">583</th>
-                    <th class="p-1" style="background: #F2F2F2;">12.3 %</th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">PSICOLOGIA</th>
-                    <th class="p-1" style="background: #F2F2F2;">6960</th>
-                    <th class="p-1" style="background: #F2F2F2;">367</th>
-                    <th class="p-1" style="background: #F2F2F2;">359</th>
-                    <th class="p-1" style="background: #F2F2F2;">330</th>
-                    <th class="p-1" style="background: #F2F2F2;">248</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">1304</th>
-                    <th class="p-1" style="background: #F2F2F2;">18.7 %</th>
-                </tr>
-                <tr class="text-center font-10 border" style="background: #AED6F1;">
-                    <th class="p-1" style="background: #F2F2F2;">ENFERMERIA</th>
-                    <th class="p-1" style="background: #F2F2F2;">13692</th>
-                    <th class="p-1" style="background: #F2F2F2;">964</th>
-                    <th class="p-1" style="background: #F2F2F2;">872</th>
-                    <th class="p-1" style="background: #F2F2F2;">916</th>
-                    <th class="p-1" style="background: #F2F2F2;">1956</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">0</th>
-                    <th class="p-1" style="background: #F2F2F2;">4708</th>
-                    <th class="p-1" style="background: #F2F2F2;">34.4 %</th>
+                <!-- AVANCES DE ACTIVIDADES -->
+                <tr class="text-center font-10 border" v-for="item, key in totalAct">
+                    <td class="align-middle p-1 text-right" style="background: #F2F2F2;">[[ item.nombre ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.meta ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.ene ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.feb ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.mar ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.abr ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.may ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.jun ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.jul ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.ago ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.set ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.oct ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.nov ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.dic ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.avance ]]</td>
+                    <td class="align-middle p-1" style="background: #F2F2F2;">[[ item.avporcent ]] %</td>
                 </tr>
                 <tr></tr>
             </thead>
         </table>
         <br>
         <table class="table table-bordered">
-            <tr class="text-center font-10 border" style="background: #AED6F1;">
-                <th class="p-1" style="background: #4F81BD;">ATENCION ENFERMERIA</th>
-                <th class="p-1" style="background: #4F81BD;">13692</th>
-                <th class="p-1" style="background: #4F81BD;">964</th>
-                <th class="p-1" style="background: #4F81BD;">872</th>
-                <th class="p-1" style="background: #4F81BD;">916</th>
-                <th class="p-1" style="background: #4F81BD;">1956</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">0</th>
-                <th class="p-1" style="background: #4F81BD;">4708</th>
-                <th class="p-1" style="background: #4F81BD;">34.4 %</th>
-            </tr>
-            <tr class="text-center font-10 border" style="background: #AED6F1;">
-                <th style="background: #C5D9F1;">% AVANCE AL MES</th>
-                <th style="background: white;"></th>
-                <th style="background: white;">83.3%</th>
-                <th style="background: white;">78.7%</th>
-                <th style="background: white;">78.5%</th>
-                <th style="background: white;">86.6%</th>
-                <th style="background: white;">69.3%</th>
-                <th style="background: white;">57.7%</th>
-                <th style="background: white;">49.5%</th>
-                <th style="background: white;">43.3%</th>
-                <th style="background: white;">38.5%</th>
-                <th style="background: white;">34.6%</th>
-                <th style="background: white;">31.5%</th>
-                <th style="background: white;">28.9%</th>
-                <th style="background: white;"></th>
-                <th style="background: white;"></th>
-            </tr>
-            <tr class="text-center font-10 border" style="background: #AED6F1;">
-                <th class="p-1" style="background: white;">Otras Atención de Enfermería</th>
-                <th class="p-1" style="background: white;">18</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">6</th>
-                <th class="p-1" style="background: white;">1</th>
-                <th class="p-1" style="background: white;">1</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">0</th>
-                <th class="p-1" style="background: white;">8</th>
-                <th class="p-1" style="background: white;">44.4 %</th>
-            </tr>
+            <template v-for="activ, key in totalActDetail">
+                <tr class="text-center font-10">
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.nombre_act ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.meta ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.ene ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.feb ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.mar ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.abr ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.may ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.jun ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.jul ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.ago ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.set ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.oct ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.nov ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.dic ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.avance ]]</th>
+                    <th class="align-middle p-1" style="background: #4F81BD; border: 2px solid #4BACC6;">[[ activ.avporcent ]] %</th>
+                </tr>
+                <template v-for="av_activ, key in totalAvActDetail">
+                <tr class="text-center font-10" v-if="av_activ.cod_act == activ.cod_act">
+                    <th class="align-middle p-1" style="background: #C5D9F1; border: 2px solid #4BACC6;">% AVANCE AL MES</th>
+                    <th class="align-middle p-1" style="border: 2px solid #4BACC6"></th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_ene < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_ene > 80 && av_activ.avAct_ene < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_ene ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_ene > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_ene ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_feb < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_feb > 80 && av_activ.avAct_feb < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_feb ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_feb > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_feb ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_mar < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_mar > 80 && av_activ.avAct_mar < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_mar ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_mar > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_mar ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_abr < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_abr > 80 && av_activ.avAct_abr < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_abr ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_abr > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_abr ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_may < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_may > 80 && av_activ.avAct_may < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_may ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_may > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_may ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_jun < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_jun > 80 && av_activ.avAct_jun < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_jun ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_jun > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_jun ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_jul < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_jul > 80 && av_activ.avAct_jul < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_jul ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_jul > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_jul ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_ago < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_ago > 80 && av_activ.avAct_ago < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_ago ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_ago > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_ago ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_set < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_set > 80 && av_activ.avAct_set < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_set ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_set > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_set ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_oct < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_oct > 80 && av_activ.avAct_oct < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_oct ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_oct > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_oct ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_nov < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_nov > 80 && av_activ.avAct_nov < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_nov ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_nov > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_nov ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th class="align-middle p-1" style="background: white; border: 2px solid #4BACC6">
+                        <template v-if="av_activ.avAct_dic < 81">
+                            <span style='color: #FF2929;'> [[ av_activ.avAct_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_dic > 80 && av_activ.avAct_dic < 96">
+                            <span style='color: #FF9900;'> [[ av_activ.avAct_dic ]] % ⬤</span>
+                        </template>
+                        <template v-else-if="av_activ.avAct_dic > 95">
+                            <span style='color: #00B050;'> [[ av_activ.avAct_dic ]] % ⬤</span>
+                        </template>
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </template>
+                <template v-for="subact, key in subactividades">
+                <tr class="text-center font-10 border" v-if="subact.cod_act == activ.cod_act">
+                    <td class="align-middle p-1 text-right" style="border: 2px solid #4BACC6;">[[ subact.nombresub ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.meta ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.ene ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.feb ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.mar ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.abr ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.may ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.jun ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.jul ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.ago ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.set ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.oct ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.nov ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.dic ]]</td>
+                    <td class="align-middle p-1" style="border: 2px solid #4BACC6;">[[ subact.avance ]]</td>
+                    <td class="align-middle p-0" style="border: 2px solid #4BACC6;">44.4 %</td>
+                </tr>
+                </template>
+                <br>
+            </template>
         </table>
+        <br>
+    </div>
+    <!-- modal de resumen -->
+    <div class="modal fade ModalChart" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <form method="GET" @submit.prevent="btnAdvActividad" class="form-horizontal">
+                        <div class="row">
+                            <div class="form-group col-md-8 pr-0">
+                                <select class="form-control custom-select w-100" style="width: 100%; height:36px;" name="actividad" id="actividad" v-select2="''">
+                                    <option v-for="item, key in actividad" :value="[[ item.cod_act ]]">[[ item.nombre ]]</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 text-center">
+                                <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </form>
+                    <br>
+                    <div class="chartnino"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}
@@ -418,5 +489,6 @@
 {% block scripts %}
 
 <script src="{% static 'vue/goals.js' %}"></script>
+<script src="{% static 'js/goals.js' %}"></script>
 
 {% endblock scripts %}
