@@ -290,10 +290,10 @@ class PrintNomAnem(TemplateView):
 
         else:
             if request.GET['eess'] == 'TODOS':
-                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
             elif request.GET['eess'] != 'TODOS':
-                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
         totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
