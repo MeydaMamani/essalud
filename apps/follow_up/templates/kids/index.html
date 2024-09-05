@@ -261,7 +261,7 @@
                         <select class="form-control-sm w-100" name="type" id="type" aria-label="Default select example">
                             <option value="1">Niño</option>
                             <option value="2">Gestante</option>
-                            <!-- <option value="3">Inmunización</option> -->
+                            <option value="3">Inmunización</option>
                             <option value="4">Niño Anemia</option>
                         </select>
                     </div>
@@ -936,6 +936,43 @@
                 <li></li>
             </ol>
         </section>
+    </div>
+    <div v-show="viewInmunization">
+        <br>
+        <div class="col-12 table-responsive p-0">
+            <table class="table table-hover table-bordered table-striped">
+                <thead>
+                    <tr height="20" style="background: #cbe0fa; font-size: 11px;">
+                        <th class="align-middle p-1">#</th>
+                        <th class="align-middle p-1">Fecha Atención</th>
+                        <th class="align-middle p-1">Id EESS</th>
+                        <th class="align-middle p-1">Tipo Doc</th>
+                        <th class="align-middle p-1">Documento</th>
+                        <th class="align-middle p-1">Fecha Nacido</th>
+                        <th class="align-middle p-1">Código</th>
+                        <th class="align-middle p-1">Valor Lab</th>
+                        <th class="align-middle p-1">Descripción</th>
+                        <th class="align-middle p-1">Edad</th>
+                        <th class="align-middle p-1">Tipo Edad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="text-center font-10" v-for="item, key in dat_inmuno">
+                        <td class="align-middle p-1">[[ key+1 ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.fec_atencion ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.id_eess ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.tipo_doc ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.documento ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.codigo ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.lab ]]</td>
+                        <td class="align-middle p-1 text-left font-9">[[ item.fields.descripcion ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                        <td class="align-middle p-1">[[ item.fields.tipo_edad ]]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

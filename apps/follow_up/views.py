@@ -14,7 +14,7 @@ from django.db import connection
 
 from apps.packages.models import PackChildFollow, PregnantFollow
 from apps.main.models import Provincia, Distrito, Establecimiento
-from apps.follow_up.models import Anemia
+from apps.follow_up.models import Anemia, VaccinexPat
 
 # library excel
 from openpyxl import Workbook
@@ -35,6 +35,11 @@ class SearchKidsView(View):
 
         elif request.GET['type'] == '2':
             data_saved = PregnantFollow.objects.filter(documento=request.GET['doc'])
+            format_data = serializers.serialize('json', data_saved, indent=2, use_natural_foreign_keys=True)
+            return HttpResponse(format_data, content_type='application/json')
+
+        elif request.GET['type'] == '3':
+            data_saved = VaccinexPat.objects.filter(documento=request.GET['doc'])
             format_data = serializers.serialize('json', data_saved, indent=2, use_natural_foreign_keys=True)
             return HttpResponse(format_data, content_type='application/json')
 

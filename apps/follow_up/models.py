@@ -47,3 +47,23 @@ class Anemia(models.Model):
     def __str__(self):
         return '%s %s, %s' % (self.provincia, self.distrito, self.establecimiento)
 
+
+class VaccinexPat(models.Model):
+    anio = models.IntegerField(blank=True, null=True)
+    mes = models.IntegerField(blank=True, null=True)
+    fec_atencion = models.DateField(blank=True, null=True)
+    id_eess = models.IntegerField(blank=True, null=True)
+    tipo_doc = models.CharField(max_length=20, blank=True, null=True)
+    documento = models.CharField(max_length=25, blank=True, null=True)
+    fec_nac = models.DateField(blank=True, null=True)
+    codigo = models.CharField(max_length=15, blank=True, null=True)
+    lab = models.CharField(max_length=15, blank=True, null=True)
+    descripcion = models.CharField(max_length=1500, blank=True, null=True)
+    edad = models.IntegerField(blank=True, null=True)
+    tipo_edad = models.CharField(max_length=5, blank=True, null=True)
+    anio_act= models.IntegerField(blank=True, null=True)
+
+    def natural_key(self):
+        return self.pk, self.anio, self.mes, self.fec_atencion, self.id_eess, self.tipo_doc, self.documento,\
+               self.fec_nac, self.codigo, self.lab, self.descripcion, self.edad, self.tipo_edad, self.anio_act
+

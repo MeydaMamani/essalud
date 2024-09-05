@@ -5,10 +5,12 @@ new Vue({
         dat_pqt: [],
         dat_anemia: [],
         dat_gest: [],
+        dat_inmuno: [],
         errors: [],
         viewLinePqt: false,
         viewLineAnemia: false,
-        viewLineGest: false
+        viewLineGest: false,
+        viewInmunization: false
     },
     created:function(){
 
@@ -33,6 +35,7 @@ new Vue({
                         self.viewLineAnemia = false
                         self.viewLinePqt = false
                         self.viewLineGest = false
+                        self.viewInmunization = false
                         new PNotify({
                             title: 'Error!',
                             text: 'Usuario No Encontrado...',
@@ -46,18 +49,28 @@ new Vue({
                             self.viewLineAnemia = false
                             self.viewLinePqt = true
                             self.viewLineGest = false
+                            self.viewInmunization = false
                             self.dat_pqt = respuesta.data[0].fields
                         }
                         else if(type == 2){
                             self.viewLineGest = true
                             self.viewLineAnemia = false
                             self.viewLinePqt = false
+                            self.viewInmunization = false
                             self.dat_gest = respuesta.data[0].fields
+                        }
+                        else if(type == 3){
+                            self.viewInmunization = true
+                            self.viewLineAnemia = false
+                            self.viewLinePqt = false
+                            self.viewLineGest = false
+                            self.dat_inmuno= respuesta.data
                         }
                         else if(type == 4){
                             self.viewLineAnemia = true
                             self.viewLinePqt = false
                             self.viewLineGest = false
+                            self.viewInmunization = false
                             self.dat_anemia = respuesta.data[0].fields
                         }
                     }
