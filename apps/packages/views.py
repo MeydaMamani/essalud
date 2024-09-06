@@ -637,20 +637,20 @@ class PrintPackPregnant(View):
         img = Image('static/img/logoPrint.png')
         ws.add_image(img, 'A2')
 
-        ws.merge_cells('B2:AO2')
+        ws.merge_cells('B2:BY2')
         ws.row_dimensions[2].height = 23
         ws.column_dimensions['A'].width = 7
         ws.column_dimensions['B'].width = 35
         ws.column_dimensions['C'].width = 10
         ws.column_dimensions['D'].width = 35
-        ws.column_dimensions['E'].width = 11
+        ws.column_dimensions['E'].width = 6
         ws.column_dimensions['F'].width = 11
         ws.column_dimensions['G'].width = 11
         ws.column_dimensions['H'].width = 11
-        ws.column_dimensions['I'].width = 11
-        ws.column_dimensions['J'].width = 11
+        ws.column_dimensions['I'].width = 6
+        ws.column_dimensions['J'].width = 6
         ws.column_dimensions['K'].width = 11
-        ws.column_dimensions['L'].width = 11
+        ws.column_dimensions['L'].width = 6
         ws.column_dimensions['M'].width = 11
         ws.column_dimensions['N'].width = 11
         ws.column_dimensions['O'].width = 11
@@ -675,18 +675,21 @@ class PrintPackPregnant(View):
         ws.column_dimensions['AH'].width = 11
         ws.column_dimensions['AI'].width = 11
         ws.column_dimensions['AJ'].width = 11
-        ws.column_dimensions['AK'].width = 11
-        ws.column_dimensions['AL'].width = 11
+        ws.column_dimensions['AK'].width = 6
+        ws.column_dimensions['AL'].width = 6
+        ws.column_dimensions['AM'].width = 6
+        ws.column_dimensions['AN'].width = 6
+        ws.column_dimensions['AO'].width = 6
 
         ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
         ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
         ws['B2'] = 'ESSALUD: Seguimiento de gestantes que recibieron el paquete integrado de servicios - ' + nameMonth.upper() + ' ' + request.GET['anio']
 
-        ws.merge_cells('A4:Ao4')
+        ws.merge_cells('A4:BY4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
         ws['A4'] = 'CODIFICACION: '
 
-        ws.merge_cells('A6:Ao6')
+        ws.merge_cells('A6:BY6')
         ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
         ws['A6'] = 'Fuente: EsSalud con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
@@ -694,271 +697,529 @@ class PrintPackPregnant(View):
         ws['A9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['A9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['A9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['A9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+        ws['A9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
         ws['B9'] = 'Centro Asistencial'
         ws['B9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['B9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['B9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['B9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+        ws['B9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
         ws['C9'] = 'Documento'
         ws['C9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['C9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['C9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['C9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+        ws['C9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
         ws['D9'] = 'Apellidos y Nombres'
         ws['D9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['D9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['D9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['D9'].fill = PatternFill(start_color='DBCAF4', end_color='DBCAF4', fill_type='solid')
+        ws['D9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        # ws.merge_cells('E8:G8')
-        # ws['E8'] = 'Sem Captación'
-        # ws['E8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        # ws['E8'].alignment = Alignment(horizontal="center", vertical="center")
-        # ws['E8'].fill = PatternFill(start_color='F4A2F8', end_color='F4A2F8', fill_type='solid')
-
-        ws['E9'] = 'Sem Captación'
+        ws['E9'] = 'Edad Capt.'
         ws['E9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['E9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['E9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['E9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+        ws['E9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['F9'] = 'FUR'
+        ws['F9'] = 'Max Sem 13'
         ws['F9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['F9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['F9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['F9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+        ws['F9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['G9'] = 'FPP'
+        ws['G9'] = 'Sem Captación'
         ws['G9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['G9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['G9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['G9'].fill = PatternFill(start_color='F7C3FA', end_color='F7C3FA', fill_type='solid')
+        ws['G9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        # ws.merge_cells('H8:K8')
-        # ws['H8'] = 'EXAMENES AUXILIARES'
-        # ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        # ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
-        # ws['H8'].fill = PatternFill(start_color='EBE795', end_color='EBE795', fill_type='solid')
-
-        ws['H9'] = 'Laboratorio'
+        ws['H9'] = 'FUR'
         ws['H9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['H9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['H9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['H9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+        ws['H9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['I9'] = 'Resultado'
+        ws['I9'] = 'Peso'
         ws['I9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['I9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['I9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['I9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+        ws['I9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['J9'] = 'Tamizaje'
+        ws['J9'] = 'Talla'
         ws['J9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['J9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['J9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['J9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+        ws['J9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['K9'] = 'Dx Anemia'
+        ws['K9'] = 'FPP'
         ws['K9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['K9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['K9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['K9'].fill = PatternFill(start_color='F5F3CB', end_color='F5F3CB', fill_type='solid')
+        ws['K9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['L9'] = 'Perfil Obs.'
+        ws['L9'] = 'LBT'
         ws['L9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['L9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['L9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['L9'].fill = PatternFill(start_color='E6B8B7', end_color='E6B8B7', fill_type='solid')
+        ws['L9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['M9'] = 'Edad Capt.'
+        ws['M9'] = 'Result.'
         ws['M9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['M9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['M9'].alignment = Alignment(horizontal="center", vertical="center")
         ws['M9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws.merge_cells('N8:AC8')
-        ws['N8'] = 'CONTROLES'
-        ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['N8'].fill = PatternFill(start_color='AED0EC', end_color='AED0EC', fill_type='solid')
-
-        ws['N9'] = 'Ctrl 1'
+        ws['N9'] = 'Tmz Viol.'
         ws['N9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['N9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['N9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['N9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['N9'].fill = PatternFill(start_color='c7d2f0', end_color='c7d2f0', fill_type='solid')
 
-        ws['O9'] = 'Ctrl 2'
+        ws['O9'] = 'Ctrl 1'
         ws['O9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['O9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['O9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['O9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['O9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['P9'] = 'Ctrl 3'
+        ws.merge_cells('P8:Q8')
+        ws['P8'] = 'Anemia'
+        ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['P8'].fill = PatternFill(start_color='bbe5ea', end_color='bbe5ea', fill_type='solid')
+
+        ws['P9'] = 'Dx Anemia'
         ws['P9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['P9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['P9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['P9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['P9'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
 
-        ws['Q9'] = 'Ctrl 4'
+        ws['Q9'] = 'Dx Anemia2'
         ws['Q9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['Q9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['Q9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['Q9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['Q9'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
 
-        ws['R9'] = 'Ctrl 5'
+        ws.merge_cells('R8:S8')
+        ws['R8'] = 'Riesgo Obstétrico'
+        ws['R8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['R8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['R8'].fill = PatternFill(start_color='d0c0ec', end_color='d0c0ec', fill_type='solid')
+
+        ws['R9'] = 'ARO'
         ws['R9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['R9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['R9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['R9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['R9'].fill = PatternFill(start_color='d6c7f0', end_color='d6c7f0', fill_type='solid')
 
-        ws['S9'] = 'Ctrl 6'
+        ws['S9'] = 'BRO'
         ws['S9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['S9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['S9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['S9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['S9'].fill = PatternFill(start_color='d6c7f0', end_color='d6c7f0', fill_type='solid')
 
-        ws['T9'] = 'Ctrl 7'
+        ws.merge_cells('T8:V8')
+        ws['T8'] = 'Consulta Médica'
+        ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['T8'].fill = PatternFill(start_color='dbbaea', end_color='dbbaea', fill_type='solid')
+
+        ws['T9'] = '1 CMP'
         ws['T9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['T9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['T9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['T9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['T9'].fill = PatternFill(start_color='e3c7f0', end_color='e3c7f0', fill_type='solid')
 
-        ws['U9'] = 'Ctrl 8'
+        ws['U9'] = '2 CMP'
         ws['U9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['U9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['U9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['U9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['U9'].fill = PatternFill(start_color='e3c7f0', end_color='e3c7f0', fill_type='solid')
 
-        ws['V9'] = 'Ctrl 9'
+        ws['V9'] = '3 CMP'
         ws['V9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['V9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['V9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['V9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['V9'].fill = PatternFill(start_color='e3c7f0', end_color='e3c7f0', fill_type='solid')
 
-        ws['W9'] = 'Ctrl 10'
+        ws.merge_cells('W8:AB8')
+        ws['W8'] = 'Nutrición'
+        ws['W8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['W8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['W8'].fill = PatternFill(start_color='ecbbea', end_color='ecbbea', fill_type='solid')
+
+        ws['W9'] = 'Nutri. 1'
         ws['W9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['W9'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['W9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['W9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['W9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws['W9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['X9'] = 'Ctrl 11'
+        ws['X9'] = 'Nutri. 2'
         ws['X9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['X9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['X9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['X9'].fill = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')
+        ws['X9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['Y9'] = 'C1-C2'
+        ws['Y9'] = 'Nutri. 3'
         ws['Y9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['Y9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['Y9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['Y9'].fill = PatternFill(start_color='aac7e6', end_color='aac7e6', fill_type='solid')
+        ws['Y9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['Z9'] = 'C2-C3'
+        ws['Z9'] = 'Nutri. 4'
         ws['Z9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['Z9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['Z9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['Z9'].fill = PatternFill(start_color='aac7e6', end_color='aac7e6', fill_type='solid')
+        ws['Z9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['AA9'] = 'C3-C4'
+        ws['AA9'] = 'Nutri. 5'
         ws['AA9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AA9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AA9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['AA9'].fill = PatternFill(start_color='aac7e6', end_color='aac7e6', fill_type='solid')
+        ws['AA9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['AB9'] = 'C4-C5'
+        ws['AB9'] = 'Nutri. 6'
         ws['AB9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AB9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AB9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['AB9'].fill = PatternFill(start_color='aac7e6', end_color='aac7e6', fill_type='solid')
+        ws['AB9'].fill = PatternFill(start_color='f0c7ee', end_color='f0c7ee', fill_type='solid')
 
-        ws['AC9'] = 'C5-C6'
+        ws.merge_cells('AC8:AO8')
+        ws['AC8'] = 'Atención Pre Natal'
+        ws['AC8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AC8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AC8'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
+
+        ws['AC9'] = 'Control2'
         ws['AC9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AC9'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['AC9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['AC9'].fill = PatternFill(start_color='aac7e6', end_color='aac7e6', fill_type='solid')
+        ws['AC9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AC9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws.merge_cells('AD8:AI8')
-        ws['AD8'] = 'SUPLEMENTACIONES'
-        ws['AD8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['AD8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AD8'].fill = PatternFill(start_color='B1D49C', end_color='B1D49C', fill_type='solid')
-
-        ws['AD9'] = 'Suple 1'
+        ws['AD9'] = 'Control3'
         ws['AD9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AD9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AD9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['AD9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AD9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AE9'] = 'Suple 2'
+        ws['AE9'] = 'Control4'
         ws['AE9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AE9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AE9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AE9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AE9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AF9'] = 'Suple 3'
+        ws['AF9'] = 'Control5'
         ws['AF9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AF9'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['AF9'].alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-        ws['AF9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AF9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AF9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AG9'] = 'Suple 4'
+        ws['AG9'] = 'Control6'
         ws['AG9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AG9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AG9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AG9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AG9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AH9'] = 'Suple 5'
+        ws['AH9'] = 'Control7'
         ws['AH9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AH9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AH9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AH9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AH9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AI9'] = 'Suple Ant. 13'
+        ws['AI9'] = 'Control8'
         ws['AI9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AI9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AI9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AI9'].fill = PatternFill(start_color='E2EFDA', end_color='E2EFDA', fill_type='solid')
+        ws['AI9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AJ9'] = 'Ini Sem 28'
+        ws['AJ9'] = 'Control9'
         ws['AJ9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AJ9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AJ9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AJ9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+        ws['AJ9'].fill = PatternFill(start_color='ddebf7', end_color='ddebf7', fill_type='solid')
 
-        ws['AK9'] = 'Ini Sem 33'
+        ws['AK9'] = 'C1-C2'
         ws['AK9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AK9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AK9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AK9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+        ws['AK9'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
 
-        ws['AL9'] = 'Max Sem 13'
+        ws['AL9'] = 'C2-C3'
         ws['AL9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AL9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AL9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AL9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+        ws['AL9'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
 
-        ws['AM9'] = 'Peso'
+        ws['AM9'] = 'C3-C4'
         ws['AM9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AM9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AM9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AM9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+        ws['AM9'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
 
-        ws['AN9'] = 'Talla'
+        ws['AN9'] = 'C4-C5'
         ws['AN9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AN9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AN9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AN9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+        ws['AN9'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
 
-        ws['AO9'] = 'Cumple'
+        ws['AO9'] = 'C5-C6'
         ws['AO9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
         ws['AO9'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['AO9'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AO9'].fill = PatternFill(start_color='b3f5c2', end_color='b3f5c2', fill_type='solid')
+        ws['AO9'].fill = PatternFill(start_color='d0e3f3', end_color='d0e3f3', fill_type='solid')
+
+        ws.merge_cells('AP8:AQ8')
+        ws['AP8'] = 'Odontología'
+        ws['AP8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AP8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AP8'].fill = PatternFill(start_color='ebecc7', end_color='ebecc7', fill_type='solid')
+
+        ws['AP9'] = 'Odonto. 1'
+        ws['AP9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AP9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AP9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AP9'].fill = PatternFill(start_color='f1f2d0', end_color='f1f2d0', fill_type='solid')
+
+        ws['AQ9'] = 'Odonto. 2'
+        ws['AQ9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AQ9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AQ9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AQ9'].fill = PatternFill(start_color='f1f2d0', end_color='f1f2d0', fill_type='solid')
+
+        ws['AR9'] = 'Psicología'
+        ws['AR9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AR9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AR9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AR9'].fill = PatternFill(start_color='e1e2e3', end_color='e1e2e3', fill_type='solid')
+
+        ws.merge_cells('AS8:AV8')
+        ws['AS8'] = 'Enfermería'
+        ws['AS8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AS8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AS8'].fill = PatternFill(start_color='c2ece4', end_color='c2ece4', fill_type='solid')
+
+        ws['AS9'] = 'DT'
+        ws['AS9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AS9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AS9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AS9'].fill = PatternFill(start_color='d0f2eb', end_color='d0f2eb', fill_type='solid')
+
+        ws['AT9'] = 'DTPA'
+        ws['AT9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AT9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AT9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AT9'].fill = PatternFill(start_color='d0f2eb', end_color='d0f2eb', fill_type='solid')
+
+        ws['AU9'] = 'Hepatitis'
+        ws['AU9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AU9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AU9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AU9'].fill = PatternFill(start_color='d0f2eb', end_color='d0f2eb', fill_type='solid')
+
+        ws['AV9'] = 'Influenza'
+        ws['AV9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AV9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AV9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AV9'].fill = PatternFill(start_color='d0f2eb', end_color='d0f2eb', fill_type='solid')
+
+        ws['AW9'] = 'Ate Parto'
+        ws['AW9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AW9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AW9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AW9'].fill = PatternFill(start_color='d3d0f2', end_color='d3d0f2', fill_type='solid')
+
+        ws.merge_cells('AX8:BE8')
+        ws['AX8'] = 'Suplementación Sulfato Ferroso'
+        ws['AX8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AX8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AX8'].fill = PatternFill(start_color='d2e3c7', end_color='d2e3c7', fill_type='solid')
+
+        ws['AX9'] = 'Suple 1'
+        ws['AX9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AX9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AX9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AX9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['AY9'] = 'Suple 2'
+        ws['AY9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AY9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AY9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AY9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['AZ9'] = 'Suple 3'
+        ws['AZ9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['AZ9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AZ9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AZ9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['BA9'] = 'Suple 4'
+        ws['BA9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BA9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BA9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BA9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['BB9'] = 'Suple 5'
+        ws['BB9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BB9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BB9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BB9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['BC9'] = 'Suple Ant 13'
+        ws['BC9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BC9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BC9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BC9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['BD9'] = 'Suple Ant 13_2'
+        ws['BD9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BD9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BD9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BD9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws['BE9'] = 'Suple Ant 13_3'
+        ws['BE9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BE9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BE9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BE9'].fill = PatternFill(start_color='e2efda', end_color='e2efda', fill_type='solid')
+
+        ws.merge_cells('BF8:BJ8')
+        ws['BF8'] = 'Suple. Carbonato de Calcio'
+        ws['BF8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BF8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BF8'].fill = PatternFill(start_color='e2dfc6', end_color='e2dfc6', fill_type='solid')
+
+        ws['BF9'] = 'CaCO 1'
+        ws['BF9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BF9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BF9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BF9'].fill = PatternFill(start_color='f0eeda', end_color='f0eeda', fill_type='solid')
+
+        ws['BG9'] = 'CaCO 2'
+        ws['BG9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BG9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BG9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BG9'].fill = PatternFill(start_color='f0eeda', end_color='f0eeda', fill_type='solid')
+
+        ws['BH9'] = 'CaCO 3'
+        ws['BH9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BH9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BH9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BH9'].fill = PatternFill(start_color='f0eeda', end_color='f0eeda', fill_type='solid')
+
+        ws['BI9'] = 'CaCO 4'
+        ws['BI9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BI9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BI9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BI9'].fill = PatternFill(start_color='f0eeda', end_color='f0eeda', fill_type='solid')
+
+        ws['BJ9'] = 'CaCO 5'
+        ws['BJ9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BJ9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BJ9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BJ9'].fill = PatternFill(start_color='f0eeda', end_color='f0eeda', fill_type='solid')
+
+        ws.merge_cells('BK8:BP8')
+        ws['BK8'] = 'Psicoprofilaxis'
+        ws['BK8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BK8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BK8'].fill = PatternFill(start_color='dddaa1', end_color='dddaa1', fill_type='solid')
+
+        ws['BK9'] = 'PPO1'
+        ws['BK9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BK9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BK9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BK9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws['BL9'] = 'PPO2'
+        ws['BL9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BL9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BL9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BL9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws['BM9'] = 'PPO3'
+        ws['BM9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BM9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BM9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BM9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws['BN9'] = 'PPO4'
+        ws['BN9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BN9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BN9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BN9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws['BO9'] = 'PPO5'
+        ws['BO9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BO9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BO9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BO9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws['BP9'] = 'PPO6'
+        ws['BP9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BP9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BP9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BP9'].fill = PatternFill(start_color='e8e5b0', end_color='e8e5b0', fill_type='solid')
+
+        ws.merge_cells('BQ8:BV8')
+        ws['BQ8'] = 'Estimulación Prenatal'
+        ws['BQ8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BQ8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BQ8'].fill = PatternFill(start_color='efedbb', end_color='efedbb', fill_type='solid')
+
+        ws['BQ9'] = 'EPN1'
+        ws['BQ9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BQ9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BQ9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BQ9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BR9'] = 'EPN2'
+        ws['BR9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BR9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BR9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BR9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BS9'] = 'EPN3'
+        ws['BS9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BS9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BS9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BS9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BT9'] = 'EPN4'
+        ws['BT9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BT9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BT9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BT9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BU9'] = 'EPN5'
+        ws['BU9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BU9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BU9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BU9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BV9'] = 'EPN6'
+        ws['BV9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BV9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BV9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BV9'].fill = PatternFill(start_color='f5f3cb', end_color='f5f3cb', fill_type='solid')
+
+        ws['BW9'] = 'Ini Sem 28'
+        ws['BW9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BW9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BW9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BW9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+
+        ws['BX9'] = 'Ini Sem 33'
+        ws['BX9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BX9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BX9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BX9'].fill = PatternFill(start_color='ebf5b3', end_color='ebf5b3', fill_type='solid')
+
+        ws['BY9'] = 'Cumple'
+        ws['BY9'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        ws['BY9'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['BY9'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['BY9'].fill = PatternFill(start_color='b3f5c2', end_color='b3f5c2', fill_type='solid')
 
         if len(request.GET['mes']) == 1:
             mes = '0'+request.GET['mes']
@@ -982,42 +1243,89 @@ class PrintPackPregnant(View):
                 ws.cell(row=cont, column=2).value = paqGest['fields']['establecimiento']
                 ws.cell(row=cont, column=3).value = paqGest['fields']['documento']
                 ws.cell(row=cont, column=4).value = paqGest['fields']['ape_nombres']
-                ws.cell(row=cont, column=5).value = paqGest['fields']['sem_captada']
-                ws.cell(row=cont, column=6).value = paqGest['fields']['fur']
-                ws.cell(row=cont, column=7).value = paqGest['fields']['fpp']
-                ws.cell(row=cont, column=8).value = paqGest['fields']['laboratorio']
-                ws.cell(row=cont, column=9).value = paqGest['fields']['result']
-                ws.cell(row=cont, column=10).value = paqGest['fields']['tmz']
-                ws.cell(row=cont, column=11).value = paqGest['fields']['dx_anemia']
-                ws.cell(row=cont, column=12).value = paqGest['fields']['perf_obst']
-                ws.cell(row=cont, column=13).value = paqGest['fields']['edad_cap']
-                ws.cell(row=cont, column=14).value = paqGest['fields']['ctrl1']
-                ws.cell(row=cont, column=15).value = paqGest['fields']['ctrl2']
-                ws.cell(row=cont, column=16).value = paqGest['fields']['ctrl3']
-                ws.cell(row=cont, column=17).value = paqGest['fields']['ctrl4']
-                ws.cell(row=cont, column=18).value = paqGest['fields']['ctrl5']
-                ws.cell(row=cont, column=19).value = paqGest['fields']['ctrl6']
-                ws.cell(row=cont, column=20).value = paqGest['fields']['ctrl7']
-                ws.cell(row=cont, column=21).value = paqGest['fields']['ctrl8']
-                ws.cell(row=cont, column=22).value = paqGest['fields']['ctrl9']
-                ws.cell(row=cont, column=23).value = paqGest['fields']['ctrl10']
-                ws.cell(row=cont, column=24).value = paqGest['fields']['ctrl11']
-                ws.cell(row=cont, column=25).value = paqGest['fields']['c1_c2']
-                ws.cell(row=cont, column=26).value = paqGest['fields']['c2_c3']
-                ws.cell(row=cont, column=27).value = paqGest['fields']['c3_c4']
-                ws.cell(row=cont, column=28).value = paqGest['fields']['c4_c5']
-                ws.cell(row=cont, column=29).value = paqGest['fields']['c5_c6']
-                ws.cell(row=cont, column=30).value = paqGest['fields']['suple1']
-                ws.cell(row=cont, column=31).value = paqGest['fields']['suple2']
-                ws.cell(row=cont, column=32).value = paqGest['fields']['suple3']
-                ws.cell(row=cont, column=33).value = paqGest['fields']['suple4']
-                ws.cell(row=cont, column=34).value = paqGest['fields']['suple5']
-                ws.cell(row=cont, column=35).value = paqGest['fields']['suple_ant13']
-                ws.cell(row=cont, column=36).value = paqGest['fields']['ini_sem28']
-                ws.cell(row=cont, column=37).value = paqGest['fields']['ini_sem33']
-                ws.cell(row=cont, column=38).value = paqGest['fields']['max_sem13']
-                ws.cell(row=cont, column=39).value = paqGest['fields']['peso']
-                ws.cell(row=cont, column=40).value = paqGest['fields']['talla']
+                ws.cell(row=cont, column=5).value = paqGest['fields']['edad_cap']
+                ws.cell(row=cont, column=6).value = paqGest['fields']['max_sem13']
+                ws.cell(row=cont, column=7).value = paqGest['fields']['sem_captada']
+                ws.cell(row=cont, column=8).value = paqGest['fields']['fur']
+                ws.cell(row=cont, column=9).value = paqGest['fields']['peso']
+                ws.cell(row=cont, column=10).value = paqGest['fields']['talla']
+                ws.cell(row=cont, column=11).value = paqGest['fields']['fpp']
+                ws.cell(row=cont, column=12).value = paqGest['fields']['laboratorio']
+                ws.cell(row=cont, column=13).value = paqGest['fields']['result']
+                ws.cell(row=cont, column=14).value = paqGest['fields']['tmz']
+                ws.cell(row=cont, column=15).value = paqGest['fields']['ctrl1']
+                ws.cell(row=cont, column=16).value = paqGest['fields']['dx_anemia']
+                ws.cell(row=cont, column=17).value = paqGest['fields']['dx_anemia2']
+                ws.cell(row=cont, column=18).value = paqGest['fields']['aro']
+                ws.cell(row=cont, column=19).value = paqGest['fields']['bro']
+                ws.cell(row=cont, column=20).value = paqGest['fields']['cmp1']
+                ws.cell(row=cont, column=21).value = paqGest['fields']['cmp2']
+                ws.cell(row=cont, column=22).value = paqGest['fields']['cmp3']
+                ws.cell(row=cont, column=23).value = paqGest['fields']['nutricion1']
+                ws.cell(row=cont, column=24).value = paqGest['fields']['nutricion2']
+                ws.cell(row=cont, column=25).value = paqGest['fields']['nutricion3']
+                ws.cell(row=cont, column=26).value = paqGest['fields']['nutricion4']
+                ws.cell(row=cont, column=27).value = paqGest['fields']['nutricion5']
+                ws.cell(row=cont, column=28).value = paqGest['fields']['nutricion6']
+                ws.cell(row=cont, column=29).value = paqGest['fields']['ctrl2']
+                ws.cell(row=cont, column=30).value = paqGest['fields']['ctrl3']
+                ws.cell(row=cont, column=31).value = paqGest['fields']['ctrl4']
+                ws.cell(row=cont, column=32).value = paqGest['fields']['ctrl5']
+                ws.cell(row=cont, column=33).value = paqGest['fields']['ctrl6']
+                ws.cell(row=cont, column=34).value = paqGest['fields']['ctrl7']
+                ws.cell(row=cont, column=35).value = paqGest['fields']['ctrl8']
+                ws.cell(row=cont, column=36).value = paqGest['fields']['ctrl9']
+                ws.cell(row=cont, column=37).value = paqGest['fields']['c1_c2']
+                ws.cell(row=cont, column=38).value = paqGest['fields']['c2_c3']
+                ws.cell(row=cont, column=39).value = paqGest['fields']['c3_c4']
+                ws.cell(row=cont, column=40).value = paqGest['fields']['c4_c5']
+                ws.cell(row=cont, column=41).value = paqGest['fields']['c5_c6']
+
+                ws.cell(row=cont, column=42).value = paqGest['fields']['odontologia1']
+                ws.cell(row=cont, column=43).value = paqGest['fields']['odontologia2']
+                ws.cell(row=cont, column=44).value = paqGest['fields']['psicologia']
+                ws.cell(row=cont, column=45).value = paqGest['fields']['dt']
+                ws.cell(row=cont, column=46).value = paqGest['fields']['dtpa']
+                ws.cell(row=cont, column=47).value = paqGest['fields']['hepatitis']
+                ws.cell(row=cont, column=48).value = paqGest['fields']['influenza']
+                ws.cell(row=cont, column=49).value = paqGest['fields']['ate_parto']
+                ws.cell(row=cont, column=50).value = paqGest['fields']['suple1']
+                ws.cell(row=cont, column=51).value = paqGest['fields']['suple2']
+                ws.cell(row=cont, column=52).value = paqGest['fields']['suple3']
+                ws.cell(row=cont, column=53).value = paqGest['fields']['suple4']
+                ws.cell(row=cont, column=54).value = paqGest['fields']['suple5']
+                ws.cell(row=cont, column=55).value = paqGest['fields']['suple_ant13']
+                ws.cell(row=cont, column=56).value = paqGest['fields']['suple_ant13_2']
+                ws.cell(row=cont, column=57).value = paqGest['fields']['suple_ant13_3']
+                ws.cell(row=cont, column=58).value = paqGest['fields']['carbonato1']
+                ws.cell(row=cont, column=59).value = paqGest['fields']['carbonato2']
+                ws.cell(row=cont, column=60).value = paqGest['fields']['carbonato3']
+                ws.cell(row=cont, column=61).value = paqGest['fields']['carbonato4']
+                ws.cell(row=cont, column=62).value = paqGest['fields']['carbonato5']
+                ws.cell(row=cont, column=63).value = paqGest['fields']['ppo1']
+                ws.cell(row=cont, column=64).value = paqGest['fields']['ppo2']
+                ws.cell(row=cont, column=65).value = paqGest['fields']['ppo3']
+                ws.cell(row=cont, column=66).value = paqGest['fields']['ppo4']
+                ws.cell(row=cont, column=67).value = paqGest['fields']['ppo5']
+                ws.cell(row=cont, column=68).value = paqGest['fields']['ppo6']
+                ws.cell(row=cont, column=69).value = paqGest['fields']['epn1']
+                ws.cell(row=cont, column=70).value = paqGest['fields']['epn2']
+                ws.cell(row=cont, column=71).value = paqGest['fields']['epn3']
+                ws.cell(row=cont, column=72).value = paqGest['fields']['epn4']
+                ws.cell(row=cont, column=73).value = paqGest['fields']['epn5']
+                ws.cell(row=cont, column=74).value = paqGest['fields']['epn6']
+                ws.cell(row=cont, column=75).value = paqGest['fields']['ini_sem28']
+                ws.cell(row=cont, column=76).value = paqGest['fields']['ini_sem33']
+
+                if paqGest['fields']['num'] == '1':
+                    cumplen = '✔'
+                    ws.cell(row=cont, column=77).font = Font(name='Calibri', size=10, color='00AC4E')
+                else:
+                    cumplen = '✘'
+                    ws.cell(row=cont, column=77).font = Font(name='Calibri', size=10, color='C00000')
+
+                ws.cell(row=cont, column=77).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=77).value = cumplen
 
                 cont = cont+1
                 num = num+1
