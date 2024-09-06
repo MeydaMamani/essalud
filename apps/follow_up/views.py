@@ -39,7 +39,7 @@ class SearchKidsView(View):
             return HttpResponse(format_data, content_type='application/json')
 
         elif request.GET['type'] == '3':
-            data_saved = VaccinexPat.objects.filter(documento=request.GET['doc'])
+            data_saved = VaccinexPat.objects.filter(documento=request.GET['doc']).order_by('-fec_atencion')
             format_data = serializers.serialize('json', data_saved, indent=2, use_natural_foreign_keys=True)
             return HttpResponse(format_data, content_type='application/json')
 
