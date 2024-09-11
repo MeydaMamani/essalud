@@ -13,11 +13,11 @@
 <div id="appDashboard">
     <div class="page-title">
         <div class="col-md-11 mb-2">
-            <b class="font-18">Seguimiento paquete niño </b>
+            <b class="font-18">Seguimiento paquete niño <span class="text-danger">(Actividades del Mes)</span></b>
         </div>
     </div>
     <div class="clearfix"></div>
-    <div class="col-md-12 mb-3">
+    <div class="col-md-12 mb-2">
         <div class="col-md-8 p-0">
             <form method="GET" @submit.prevent="formVaccine">
                 <div class="col-sm-5 pl-0">
@@ -34,7 +34,7 @@
                     </select>
                 </div>
                 <div class="col-sm-3 pl-0">
-                    <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes">
+                    <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes" v-select2="''">
                         <option value="0" selected>Seleccione Mes</option>
                     </select>
                 </div>

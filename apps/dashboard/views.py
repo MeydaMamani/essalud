@@ -21,7 +21,7 @@ import locale
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side, Color
-from apps.main.models import Provincia, Distrito, Establecimiento
+from apps.main.models import Departamento, Provincia, Distrito, Establecimiento
 
 User = get_user_model()
 from apps.person.models import Person
@@ -58,21 +58,24 @@ class LoginView(FormView):
         try:
             ObjPerson = Person.objects.get(pk=user.id_person.id)
             ObjUser = User.objects.get(pk=user.pk)
-            self.request.session['sytem'] = {'eid': ObjPerson.eid_id, 'full_name': ObjPerson.last_name0+' '+ObjPerson.last_name1+', '+ObjPerson.names.title(),
-                                            'doc': ObjPerson.pdoc, 'red': ObjUser.id_red.pk, 'redCode': ObjUser.id_red.code, 'redLevel': ObjUser.id_red.level,
-                                            'redName': ObjUser.id_red.name,
-                                            'redState': ObjUser.id_red.state
-                                        }
+            if ObjUser.type_ca == 'CA':
+                name_ca = Establecimiento.objects.get(codigo=ObjUser.code_ca)
+            elif ObjUser.type_ca == 'DS':
+                name_ca = Distrito.objects.get(codigo=ObjUser.code_ca)
+            elif ObjUser.type_ca == 'PR':
+                name_ca = Provincia.objects.get(codigo=ObjUser.code_ca)
+            elif ObjUser.type_ca == 'DP':
+                name_ca = Departamento.objects.get(codigo=ObjUser.code_ca)
+
+            self.request.session['sytem'] = { 'full_name': ObjPerson.last_name0+' '+ObjPerson.last_name1+', '+ObjPerson.names.title(),
+                                            'doc': ObjPerson.pdoc,
+                                            'typeca': ObjUser.type_ca, 'codeca': ObjUser.code_ca, 'nombreca': name_ca.nombre }
 
         except:
             print("Hay un error en los valores de entrada")
 
         return super(LoginView, self).form_valid(form)
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['form3'] = ChangePassForm
-    #     return context
 
 def logoutUser(request):
     logout(request)
@@ -83,7 +86,14 @@ class DahboardView(TemplateView):
     template_name = 'dash.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['establecimiento'] = Establecimiento.objects.all()
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
         return context
 
 
@@ -96,7 +106,7 @@ class AttentionToday(View):
             mes = request.GET['mes']
 
         a = connection.cursor()
-        a.execute("""SELECT cod_eess, establecimiento, ape_nombres, fec_nac, documento, Convert(Integer, Datediff(Day, [fec_nac], EOMONTH('%s-%s-01'))/30) Edad,
+        a.execute("""SELECT cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, fec_nac, documento, Convert(Integer, Datediff(Day, [fec_nac], EOMONTH('%s-%s-01'))/30) Edad,
                     CASE WHEN CRED11 IS NOT NULL THEN CONCAT(CRED11, ' / CRED11')
                         WHEN CRED10 IS NOT NULL THEN CONCAT(CRED10, ' / CRED10')
                         WHEN CRED9 IS NOT NULL THEN CONCAT(CRED9, ' / CRED9')
@@ -123,7 +133,11 @@ class AttentionToday(View):
                         WHEN suple4 IS NOT NULL THEN CONCAT(suple4, ' / SUPLE4')
                     ELSE null end ULT_SUPLE,
                     neumo2, rota2, polio2, penta2, neumo4, rota4, penta4, polio4, polio6, penta6,
-                    CASE WHEN CRED1 IS NULL THEN 'CRED1' END C1,
+                    CASE WHEN ctrl1rn IS NULL THEN 'CRED1RN' END C1RN,
+                        CASE WHEN ctrl2rn IS NULL THEN 'CRED2RN' END C2RN,
+                        CASE WHEN ctrl3rn IS NULL THEN 'CRED3RN' END C3RN,
+                        CASE WHEN ctrl4rn IS NULL THEN 'CRED4RN' END C4RN,
+                        CASE WHEN CRED1 IS NULL THEN 'CRED1' END C1,
                         CASE WHEN CRED2 IS NULL THEN 'CRED2' END C2,
                         CASE WHEN CRED3 IS NULL THEN 'CRED3' END C3,
                         CASE WHEN CRED4 IS NULL THEN 'CRED4' END C4,
@@ -155,9 +169,10 @@ class AttentionToday(View):
                     into ESSALUD.dbo.ult_aten
                     FROM packages_packchildfollow""" % (request.GET['anio'], mes))
 
-        a.execute("""SELECT cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad,
-                    CASE WHEN ULT_CRED IS NULL THEN
-                        CASE WHEN Edad=1 THEN CONCAT(DATEADD(day, 30, fec_nac), ' / CRED1')
+        a.execute("""SELECT cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad,
+                CASE WHEN ULT_CRED IS NULL THEN
+                        CASE WHEN Edad=0 THEN 'CTRLS RN'
+                            WHEN Edad=1 THEN CONCAT(DATEADD(day, 30, fec_nac), ' / CRED1')
                             WHEN Edad=2 THEN CONCAT(DATEADD(day, 60, fec_nac), ' / CRED2')
                             WHEN Edad=3 THEN CONCAT(DATEADD(day, 90, fec_nac), ' / CRED3')
                             WHEN Edad=4 THEN CONCAT(DATEADD(day, 120, fec_nac), ' / CRED4')
@@ -288,7 +303,7 @@ class AttentionToday(View):
                     CASE WHEN Edad=4 THEN CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE4' THEN ULT_SUPLE END
                     WHEN Edad=5 THEN
                         CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN 'TIENE'
-                            WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE5') END
+                            WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE4' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE5') END
                     WHEN Edad=6 THEN
                         CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE6' THEN 'TIENE'
                             WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE6')
@@ -377,17 +392,18 @@ class AttentionToday(View):
                     WHEN Edad not in (2,4,6) then 'NO TOCA'
                 END polio_hoy,
                 CASE
-                    WHEN Edad=1 THEN C1
-                    WHEN Edad=2 THEN TRIM(CONCAT(C1, ' ', C2))
-                    WHEN Edad=3 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3))
-                    WHEN Edad=4 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4))
-                    WHEN Edad=5 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5))
-                    WHEN Edad=6 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6))
-                    WHEN Edad=7 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7))
-                    WHEN Edad=8 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8))
-                    WHEN Edad=9 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9))
-                    WHEN Edad=10 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10))
-                    WHEN Edad>=11 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10, ' ', C11))
+                    WHEN Edad=0 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN))
+                    WHEN Edad=1 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1))
+                    WHEN Edad=2 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2))
+                    WHEN Edad=3 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3))
+                    WHEN Edad=4 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4))
+                    WHEN Edad=5 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5))
+                    WHEN Edad=6 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6))
+                    WHEN Edad=7 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7))
+                    WHEN Edad=8 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8))
+                    WHEN Edad=9 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9))
+                    WHEN Edad=10 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10))
+                    WHEN Edad>=11 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10, ' ', C11))
                 ELSE NULL END cred_falta,
                 CASE
                     WHEN Edad=4 THEN TRIM(SPL4)
@@ -407,23 +423,60 @@ class AttentionToday(View):
                     WHEN Edad=5 THEN TRIM(CONCAT(neu2, ' ', rot2, ' ', pol2, ' ', pen2, ' ', neu4, ' ', rot4, ' ', pen4, ' ', pol4))
                     WHEN Edad>=6 THEN TRIM(CONCAT(neu2, ' ', rot2, ' ', pol2, ' ', pen2, ' ', neu4, ' ', rot4, ' ', pen4, ' ', pol4, ' ', pol6, ' ', pen6))
                 ELSE NULL END vac_falta
-            INTO ESSALUD.dbo.aten_hoy
-            FROM ESSALUD.dbo.ult_aten""")
+                INTO ESSALUD.dbo.aten_hoy
+                FROM ESSALUD.dbo.ult_aten""")
 
         if request.GET['eess'] == 'TODOS':
-            a.execute("""select *
-                        from ESSALUD.dbo.aten_hoy
-                        where Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+            if self.request.session['sytem']['typeca'] == 'CA':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                        where cod_eess=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                         (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                         (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
                         (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
                         (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
                         (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
                         drop table ESSALUD.dbo.ult_aten
-                        drop table ESSALUD.dbo.aten_hoy""" % (request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+                        drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                            suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                            where cod_dist=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                            (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                            (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                            (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                            (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                            (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                            drop table ESSALUD.dbo.ult_aten
+                            drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                            suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                            where cod_prov=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                            (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                            (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                            (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                            (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                            (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                            drop table ESSALUD.dbo.ult_aten
+                            drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                        where cod_dep=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                        (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                        (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                        (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                        (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                        (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                        drop table ESSALUD.dbo.ult_aten
+                        drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
         else:
-            a.execute("""select *
-                        from ESSALUD.dbo.aten_hoy
+            a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
                         where cod_eess=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                         (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                         (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
@@ -435,9 +488,9 @@ class AttentionToday(View):
 
         data = []
         for dat in a.fetchall():
-            datos = {'eess': dat[1], 'ape_nombres': dat[2], 'num_doc': dat[3], 'fech_nac': dat[4].strftime("%d/%m/%y"), 'edad': dat[5], 'credhoy':dat[6],
-                     'suplehoy':dat[7], 'neumohoy': dat[8], 'rotahoy': dat[9], 'pentahoy': dat[10], 'poliohoy': dat[11], 'credfalta': dat[12], 'suplefalta': dat[13],
-                     'vacfalta': dat[14],
+            datos = { 'eess': dat[4], 'ape_nombres': dat[5], 'num_doc': dat[6], 'fech_nac': dat[7].strftime("%d/%m/%y"), 'edad': dat[8], 'credhoy':dat[9],
+                     'suplehoy':dat[10], 'neumohoy': dat[11], 'rotahoy': dat[12], 'pentahoy': dat[13], 'poliohoy': dat[14], 'credfalta': dat[15], 'suplefalta': dat[16],
+                     'vacfalta': dat[17],
                     }
 
             data.append(datos)
@@ -593,7 +646,7 @@ class PrintAttentionToday(View):
             mes = request.GET['mes']
 
         a = connection.cursor()
-        a.execute("""SELECT cod_eess, establecimiento, ape_nombres, fec_nac, documento, Convert(Integer, Datediff(Day, [fec_nac], EOMONTH('%s-%s-01'))/30) Edad,
+        a.execute("""SELECT cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, fec_nac, documento, Convert(Integer, Datediff(Day, [fec_nac], EOMONTH('%s-%s-01'))/30) Edad,
                     CASE WHEN CRED11 IS NOT NULL THEN CONCAT(CRED11, ' / CRED11')
                         WHEN CRED10 IS NOT NULL THEN CONCAT(CRED10, ' / CRED10')
                         WHEN CRED9 IS NOT NULL THEN CONCAT(CRED9, ' / CRED9')
@@ -620,7 +673,11 @@ class PrintAttentionToday(View):
                         WHEN suple4 IS NOT NULL THEN CONCAT(suple4, ' / SUPLE4')
                     ELSE null end ULT_SUPLE,
                     neumo2, rota2, polio2, penta2, neumo4, rota4, penta4, polio4, polio6, penta6,
-                    CASE WHEN CRED1 IS NULL THEN 'CRED1' END C1,
+                    CASE WHEN ctrl1rn IS NULL THEN 'CRED1RN' END C1RN,
+                        CASE WHEN ctrl2rn IS NULL THEN 'CRED2RN' END C2RN,
+                        CASE WHEN ctrl3rn IS NULL THEN 'CRED3RN' END C3RN,
+                        CASE WHEN ctrl4rn IS NULL THEN 'CRED4RN' END C4RN,
+                        CASE WHEN CRED1 IS NULL THEN 'CRED1' END C1,
                         CASE WHEN CRED2 IS NULL THEN 'CRED2' END C2,
                         CASE WHEN CRED3 IS NULL THEN 'CRED3' END C3,
                         CASE WHEN CRED4 IS NULL THEN 'CRED4' END C4,
@@ -652,9 +709,10 @@ class PrintAttentionToday(View):
                     into ESSALUD.dbo.ult_aten
                     FROM packages_packchildfollow""" % (request.GET['anio'], mes))
 
-        a.execute("""SELECT cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad,
-                    CASE WHEN ULT_CRED IS NULL THEN
-                        CASE WHEN Edad=1 THEN CONCAT(DATEADD(day, 30, fec_nac), ' / CRED1')
+        a.execute("""SELECT cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad,
+                CASE WHEN ULT_CRED IS NULL THEN
+                        CASE WHEN Edad=0 THEN 'CTRLS RN'
+                            WHEN Edad=1 THEN CONCAT(DATEADD(day, 30, fec_nac), ' / CRED1')
                             WHEN Edad=2 THEN CONCAT(DATEADD(day, 60, fec_nac), ' / CRED2')
                             WHEN Edad=3 THEN CONCAT(DATEADD(day, 90, fec_nac), ' / CRED3')
                             WHEN Edad=4 THEN CONCAT(DATEADD(day, 120, fec_nac), ' / CRED4')
@@ -785,7 +843,7 @@ class PrintAttentionToday(View):
                     CASE WHEN Edad=4 THEN CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE4' THEN ULT_SUPLE END
                     WHEN Edad=5 THEN
                         CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN 'TIENE'
-                            WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE5') END
+                            WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE4' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE5') END
                     WHEN Edad=6 THEN
                         CASE WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE6' THEN 'TIENE'
                             WHEN SUBSTRING(ULT_SUPLE, 14, 25)='SUPLE5' THEN CONCAT(DATEADD(day, 30, CAST(SUBSTRING(ULT_SUPLE, 1, 10) AS date)), ' / SUPLE6')
@@ -874,17 +932,18 @@ class PrintAttentionToday(View):
                     WHEN Edad not in (2,4,6) then 'NO TOCA'
                 END polio_hoy,
                 CASE
-                    WHEN Edad=1 THEN C1
-                    WHEN Edad=2 THEN TRIM(CONCAT(C1, ' ', C2))
-                    WHEN Edad=3 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3))
-                    WHEN Edad=4 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4))
-                    WHEN Edad=5 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5))
-                    WHEN Edad=6 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6))
-                    WHEN Edad=7 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7))
-                    WHEN Edad=8 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8))
-                    WHEN Edad=9 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9))
-                    WHEN Edad=10 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10))
-                    WHEN Edad>=11 THEN TRIM(CONCAT(C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10, ' ', C11))
+                    WHEN Edad=0 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN))
+                    WHEN Edad=1 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1))
+                    WHEN Edad=2 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2))
+                    WHEN Edad=3 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3))
+                    WHEN Edad=4 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4))
+                    WHEN Edad=5 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5))
+                    WHEN Edad=6 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6))
+                    WHEN Edad=7 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7))
+                    WHEN Edad=8 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8))
+                    WHEN Edad=9 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9))
+                    WHEN Edad=10 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10))
+                    WHEN Edad>=11 THEN TRIM(CONCAT(C1RN, ' ', C2RN, ' ', C3RN, ' ', C4RN, ' ', C1, ' ', C2, ' ', C3, ' ', C4, ' ', C5, ' ', C6, ' ', C7, ' ', C8, ' ', C9, ' ', C10, ' ', C11))
                 ELSE NULL END cred_falta,
                 CASE
                     WHEN Edad=4 THEN TRIM(SPL4)
@@ -904,23 +963,60 @@ class PrintAttentionToday(View):
                     WHEN Edad=5 THEN TRIM(CONCAT(neu2, ' ', rot2, ' ', pol2, ' ', pen2, ' ', neu4, ' ', rot4, ' ', pen4, ' ', pol4))
                     WHEN Edad>=6 THEN TRIM(CONCAT(neu2, ' ', rot2, ' ', pol2, ' ', pen2, ' ', neu4, ' ', rot4, ' ', pen4, ' ', pol4, ' ', pol6, ' ', pen6))
                 ELSE NULL END vac_falta
-            INTO ESSALUD.dbo.aten_hoy
-            FROM ESSALUD.dbo.ult_aten""")
+                INTO ESSALUD.dbo.aten_hoy
+                FROM ESSALUD.dbo.ult_aten""")
 
         if request.GET['eess'] == 'TODOS':
-            a.execute("""select *
-                        from ESSALUD.dbo.aten_hoy
-                        where Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+            if self.request.session['sytem']['typeca'] == 'CA':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                        where cod_eess=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                         (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                         (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
                         (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
                         (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
                         (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
                         drop table ESSALUD.dbo.ult_aten
-                        drop table ESSALUD.dbo.aten_hoy""" % (request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+                        drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                            suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                            where cod_dist=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                            (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                            (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                            (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                            (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                            (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                            drop table ESSALUD.dbo.ult_aten
+                            drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                            suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                            where cod_prov=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                            (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                            (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                            (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                            (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                            (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                            drop table ESSALUD.dbo.ult_aten
+                            drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
+                        where cod_dep=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
+                        (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
+                        (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
+                        (CASE WHEN (rota_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(rota_hoy, 1,7) else rota_hoy end='%s-%s') OR
+                        (CASE WHEN (penta_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(penta_hoy, 1,7) else penta_hoy end='%s-%s') OR
+                        (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
+                        drop table ESSALUD.dbo.ult_aten
+                        drop table ESSALUD.dbo.aten_hoy""" % (self.request.session['sytem']['codeca'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
         else:
-            a.execute("""select *
-                        from ESSALUD.dbo.aten_hoy
+            a.execute("""select cod_dep, cod_prov, cod_dist, cod_eess, establecimiento, ape_nombres, documento, fec_nac, Edad, cred_hoy,
+                        suple_hoy, neumo_hoy, rota_hoy, penta_hoy, polio_hoy, trim(cred_falta) cred_falta, trim(suple_falta) suple_falta, trim(vac_falta) vac_falta from ESSALUD.dbo.aten_hoy
                         where cod_eess=%s and Edad<12 AND ((CASE WHEN (cred_hoy!='TIENE') then SUBSTRING(cred_hoy, 1,7) else cred_hoy end='%s-%s') OR
                         (CASE WHEN (suple_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(suple_hoy, 1,7) else suple_hoy end='%s-%s') OR
                         (CASE WHEN (neumo_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(neumo_hoy, 1,7) else neumo_hoy end='%s-%s') OR
@@ -929,6 +1025,7 @@ class PrintAttentionToday(View):
                         (CASE WHEN (polio_hoy not in ('TIENE', 'NO TOCA')) then SUBSTRING(polio_hoy, 1,7) else polio_hoy end='%s-%s'))
                         drop table ESSALUD.dbo.ult_aten
                         drop table ESSALUD.dbo.aten_hoy""" % (request.GET['eess'], request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes, request.GET['anio'], mes))
+
 
         cont = 9
         num=1
@@ -942,72 +1039,72 @@ class PrintAttentionToday(View):
             ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left", vertical="center")
             ws.cell(row=cont, column=2).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=2).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=2).value = pqt[1]
+            ws.cell(row=cont, column=2).value = pqt[4]
 
             ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=3).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=3).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=3).value = pqt[3]
+            ws.cell(row=cont, column=3).value = pqt[6]
 
             ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left", vertical="center")
             ws.cell(row=cont, column=4).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=4).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=4).value = pqt[2]
+            ws.cell(row=cont, column=4).value = pqt[5]
 
             ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=5).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=5).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=5).value = pqt[4]
+            ws.cell(row=cont, column=5).value = pqt[7]
 
             ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=6).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=6).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=6).value = pqt[5]
+            ws.cell(row=cont, column=6).value = pqt[8]
 
             ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=7).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=7).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=7).value = pqt[6]
+            ws.cell(row=cont, column=7).value = pqt[9]
 
             ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=8).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=8).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=8).value = pqt[7]
+            ws.cell(row=cont, column=8).value = pqt[10]
 
             ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=9).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=9).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=9).value = pqt[8]
+            ws.cell(row=cont, column=9).value = pqt[11]
 
             ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=10).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=10).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=10).value = pqt[9]
+            ws.cell(row=cont, column=10).value = pqt[12]
 
             ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=11).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=11).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=11).value = pqt[10]
+            ws.cell(row=cont, column=11).value = pqt[13]
 
             ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center", vertical="center")
             ws.cell(row=cont, column=12).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=12).value = pqt[11]
+            ws.cell(row=cont, column=12).value = pqt[14]
 
             ws.cell(row=cont, column=13).alignment = Alignment(horizontal="left", vertical="center", wrapText=True)
             ws.cell(row=cont, column=13).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=13).value = pqt[12]
+            ws.cell(row=cont, column=13).value = pqt[15]
 
             ws.cell(row=cont, column=14).alignment = Alignment(horizontal="left", vertical="center", wrapText=True)
             ws.cell(row=cont, column=14).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=14).value = pqt[13]
+            ws.cell(row=cont, column=14).value = pqt[16]
 
             ws.cell(row=cont, column=15).alignment = Alignment(horizontal="left", vertical="center", wrapText=True)
             ws.cell(row=cont, column=15).border = Border(bottom=Side(border_style="thin", color="808080"))
             ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9)
-            ws.cell(row=cont, column=15).value = pqt[14]
+            ws.cell(row=cont, column=15).value = pqt[17]
 
             cont = cont+1
             num = num+1
