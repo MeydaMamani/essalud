@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 class metaCoverage(models.Model):
     anio = models.CharField(max_length=5, blank=True, null=True)
+    cod_dep = models.CharField(max_length=10, blank=True, null=True)
+    departamento = models.CharField(max_length=150, blank=True, null=True)
     cod_prov = models.CharField(max_length=10, blank=True, null=True)
     cod_dist = models.CharField(max_length=10, blank=True, null=True)
     provincia = models.CharField(max_length=150, blank=True, null=True)
@@ -22,9 +24,9 @@ class metaCoverage(models.Model):
     boy9_13 = models.IntegerField(blank=False, null=False)
 
     def natural_key(self):
-        return self.pk, self.anio, self.cod_prov, self.cod_dist, self.provincia, self.distrito, self.cod_eess, self.establecimiento,\
-               self.rn, self.less_1year, self.one_year, self.two_year, self.three_year, self.four_year, self.pregnant,\
-               self.adult30, self.adult60, self.girl9_13, self.boy9_13
+        return self.pk, self.anio, self.cod_dep, self.departamento, self.cod_prov, self.cod_dist, self.provincia, \
+                self.distrito, self.cod_eess, self.establecimiento, self.rn, self.less_1year, self.one_year, \
+               self.two_year, self.three_year, self.four_year, self.pregnant, self.adult30, self.adult60, self.girl9_13, self.boy9_13
 
     def __str__(self):
         return '%s %s, %s' % (self.provincia, self.distrito)
@@ -34,6 +36,8 @@ class Coverage(models.Model):
     periodo = models.CharField(max_length=10, null=True, blank=True)
     anio = models.CharField(max_length=5, blank=False, null=False)
     mes = models.CharField(max_length=3, blank=False, null=False)
+    cod_dep = models.CharField(max_length=10, blank=True, null=True)
+    departamento = models.CharField(max_length=150, blank=True, null=True)
     cod_prov = models.CharField(max_length=10, blank=True, null=True)
     provincia = models.CharField(max_length=150, blank=True, null=True)
     cod_dist = models.CharField(max_length=10, blank=True, null=True)
@@ -61,10 +65,10 @@ class Coverage(models.Model):
     neumo_adult = models.IntegerField(blank=False, null=False)
 
     def natural_key(self):
-        return self.pk, self.periodo, self.anio, self.mes, self.cod_prov, self.provincia, self.cod_dist, self.distrito, \
-               self.cod_eess, self.eess, self.bcg, self.hvb, self.rota2, self.apo3, self.penta3, self.infl2, self.neumo3, \
-               self.varicela1, self.spr1, self.ama, self.hav, self.spr2, self.dpt2_ref, self.apo2_ref, self.vph_girl,\
-               self.vph_boy, self.dpta, self.infl_adult, self.neumo_adult
+        return self.pk, self.periodo, self.anio, self.mes, self.cod_dep, self.departamento, self.cod_prov, self.provincia,\
+                self.cod_dist, self.distrito, self.cod_eess, self.eess, self.bcg, self.hvb, self.rota2, self.apo3, self.penta3, \
+                self.infl2, self.neumo3, self.varicela1, self.spr1, self.ama, self.hav, self.spr2, self.dpt2_ref, self.apo2_ref, \
+                self.vph_girl, self.vph_boy, self.dpta, self.infl_adult, self.neumo_adult
 
     def __str__(self):
-        return '%s %s, %s' % (self.provincia, self.distrito, self.eess)
+        return '%s %s, %s' % (self.departamento, self.provincia, self.distrito, self.eess)

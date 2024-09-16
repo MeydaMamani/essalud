@@ -26,7 +26,14 @@ class CoverageView(TemplateView):
     template_name = 'coverage/index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['establecimiento'] = Establecimiento.objects.all()
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
         return context
 
 
@@ -35,35 +42,129 @@ class ListCoverage(TemplateView):
         dataList = []
         today = date.today()
         if request.GET['eess'] == 'TODOS':
-            metarn = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('rn'))
-            metaLessyear = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('less_1year'))
-            metaOneyear = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('one_year'))
-            metaFouryear = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('four_year'))
-            metaVphGirl = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('girl9_13'))
-            metaVphBoy = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('boy9_13'))
-            metaGest = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('pregnant'))
-            metaInfAdult = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('adult60'))
-            metaNeumoAdult = metaCoverage.objects.filter(anio=today.year).aggregate(total=Sum('adult30'))
+            if self.request.session['sytem']['typeca'] == 'CA':
+                metarn = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('rn'))
+                metaLessyear = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('less_1year'))
+                metaOneyear = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('one_year'))
+                metaFouryear = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('four_year'))
+                metaVphGirl = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('girl9_13'))
+                metaVphBoy = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('boy9_13'))
+                metaGest = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('pregnant'))
+                metaInfAdult = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult60'))
+                metaNeumoAdult = metaCoverage.objects.filter(anio=today.year, cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult30'))
 
-            bcg = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBcg=Sum('bcg'), av_bcg=Sum('bcg', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
-            hvb = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHvb=Sum('hvb'), av_hvb=Sum('hvb', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
-            rota = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalRota=Sum('rota2'), av_rota=Sum('rota2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
-            apo = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo=Sum('apo3'), av_apo=Sum('apo3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
-            penta = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalPenta=Sum('penta3'), av_penta=Sum('penta3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
-            infl2 = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInfl2=Sum('infl2'), av_infl2=Sum('infl2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
-            neumo3 = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumo3=Sum('neumo3'), av_neumo3=Sum('neumo3', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            var = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalVar=Sum('varicela1'), av_var=Sum('varicela1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            spr1 = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr1=Sum('spr1'), av_spr1=Sum('spr1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            ama = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalAma=Sum('ama'), av_ama=Sum('ama', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            hav = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHav=Sum('hav'), av_hav=Sum('hav', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            spr2 = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr2=Sum('spr2'), av_spr2=Sum('spr2', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
-            dpt2_ref = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpt2=Sum('dpt2_ref'), av_dpt2=Sum('dpt2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
-            apo2_ref = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo2=Sum('apo2_ref'), av_apo2=Sum('apo2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
-            vph_girl = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalGirl=Sum('vph_girl'), av_girl=Sum('vph_girl', output_field=FloatField()) / Cast(metaVphGirl['total'], FloatField()) * 100)
-            vph_boy = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBoy=Sum('vph_boy'), av_boy=Sum('vph_boy', output_field=FloatField()) / Cast(metaVphBoy['total'], FloatField()) * 100)
-            gestante = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpta=Sum('dpta'), av_gest=Sum('dpta', output_field=FloatField()) / Cast(metaGest['total'], FloatField()) * 100)
-            infAdult = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInflAdult=Sum('infl_adult'), av_infAdul=Sum('infl_adult', output_field=FloatField()) / Cast(metaInfAdult['total'], FloatField()) * 100)
-            neumoAdult = Coverage.objects.filter(anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumoAdult=Sum('neumo_adult'), av_NeumoAdul=Sum('neumo_adult', output_field=FloatField()) / Cast(metaNeumoAdult['total'], FloatField()) * 100)
+                bcg = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBcg=Sum('bcg'), av_bcg=Sum('bcg', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                hvb = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHvb=Sum('hvb'), av_hvb=Sum('hvb', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                rota = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalRota=Sum('rota2'), av_rota=Sum('rota2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                apo = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo=Sum('apo3'), av_apo=Sum('apo3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                penta = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalPenta=Sum('penta3'), av_penta=Sum('penta3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                infl2 = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInfl2=Sum('infl2'), av_infl2=Sum('infl2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                neumo3 = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumo3=Sum('neumo3'), av_neumo3=Sum('neumo3', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                var = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalVar=Sum('varicela1'), av_var=Sum('varicela1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr1 = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr1=Sum('spr1'), av_spr1=Sum('spr1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                ama = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalAma=Sum('ama'), av_ama=Sum('ama', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                hav = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHav=Sum('hav'), av_hav=Sum('hav', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr2 = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr2=Sum('spr2'), av_spr2=Sum('spr2', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                dpt2_ref = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpt2=Sum('dpt2_ref'), av_dpt2=Sum('dpt2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                apo2_ref = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo2=Sum('apo2_ref'), av_apo2=Sum('apo2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                vph_girl = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalGirl=Sum('vph_girl'), av_girl=Sum('vph_girl', output_field=FloatField()) / Cast(metaVphGirl['total'], FloatField()) * 100)
+                vph_boy = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBoy=Sum('vph_boy'), av_boy=Sum('vph_boy', output_field=FloatField()) / Cast(metaVphBoy['total'], FloatField()) * 100)
+                gestante = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpta=Sum('dpta'), av_gest=Sum('dpta', output_field=FloatField()) / Cast(metaGest['total'], FloatField()) * 100)
+                infAdult = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInflAdult=Sum('infl_adult'), av_infAdul=Sum('infl_adult', output_field=FloatField()) / Cast(metaInfAdult['total'], FloatField()) * 100)
+                neumoAdult = Coverage.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumoAdult=Sum('neumo_adult'), av_NeumoAdul=Sum('neumo_adult', output_field=FloatField()) / Cast(metaNeumoAdult['total'], FloatField()) * 100)
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                metarn = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('rn'))
+                metaLessyear = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('less_1year'))
+                metaOneyear = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('one_year'))
+                metaFouryear = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('four_year'))
+                metaVphGirl = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('girl9_13'))
+                metaVphBoy = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('boy9_13'))
+                metaGest = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('pregnant'))
+                metaInfAdult = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult60'))
+                metaNeumoAdult = metaCoverage.objects.filter(anio=today.year, cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult30'))
+
+                bcg = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBcg=Sum('bcg'), av_bcg=Sum('bcg', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                hvb = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHvb=Sum('hvb'), av_hvb=Sum('hvb', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                rota = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalRota=Sum('rota2'), av_rota=Sum('rota2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                apo = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo=Sum('apo3'), av_apo=Sum('apo3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                penta = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalPenta=Sum('penta3'), av_penta=Sum('penta3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                infl2 = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInfl2=Sum('infl2'), av_infl2=Sum('infl2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                neumo3 = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumo3=Sum('neumo3'), av_neumo3=Sum('neumo3', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                var = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalVar=Sum('varicela1'), av_var=Sum('varicela1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr1 = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr1=Sum('spr1'), av_spr1=Sum('spr1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                ama = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalAma=Sum('ama'), av_ama=Sum('ama', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                hav = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHav=Sum('hav'), av_hav=Sum('hav', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr2 = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr2=Sum('spr2'), av_spr2=Sum('spr2', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                dpt2_ref = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpt2=Sum('dpt2_ref'), av_dpt2=Sum('dpt2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                apo2_ref = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo2=Sum('apo2_ref'), av_apo2=Sum('apo2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                vph_girl = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalGirl=Sum('vph_girl'), av_girl=Sum('vph_girl', output_field=FloatField()) / Cast(metaVphGirl['total'], FloatField()) * 100)
+                vph_boy = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBoy=Sum('vph_boy'), av_boy=Sum('vph_boy', output_field=FloatField()) / Cast(metaVphBoy['total'], FloatField()) * 100)
+                gestante = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpta=Sum('dpta'), av_gest=Sum('dpta', output_field=FloatField()) / Cast(metaGest['total'], FloatField()) * 100)
+                infAdult = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInflAdult=Sum('infl_adult'), av_infAdul=Sum('infl_adult', output_field=FloatField()) / Cast(metaInfAdult['total'], FloatField()) * 100)
+                neumoAdult = Coverage.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumoAdult=Sum('neumo_adult'), av_NeumoAdul=Sum('neumo_adult', output_field=FloatField()) / Cast(metaNeumoAdult['total'], FloatField()) * 100)
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                metarn = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('rn'))
+                metaLessyear = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('less_1year'))
+                metaOneyear = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('one_year'))
+                metaFouryear = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('four_year'))
+                metaVphGirl = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('girl9_13'))
+                metaVphBoy = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('boy9_13'))
+                metaGest = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('pregnant'))
+                metaInfAdult = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult60'))
+                metaNeumoAdult = metaCoverage.objects.filter(anio=today.year, cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult30'))
+
+                bcg = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBcg=Sum('bcg'), av_bcg=Sum('bcg', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                hvb = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHvb=Sum('hvb'), av_hvb=Sum('hvb', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                rota = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalRota=Sum('rota2'), av_rota=Sum('rota2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                apo = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo=Sum('apo3'), av_apo=Sum('apo3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                penta = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalPenta=Sum('penta3'), av_penta=Sum('penta3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                infl2 = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInfl2=Sum('infl2'), av_infl2=Sum('infl2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                neumo3 = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumo3=Sum('neumo3'), av_neumo3=Sum('neumo3', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                var = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalVar=Sum('varicela1'), av_var=Sum('varicela1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr1 = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr1=Sum('spr1'), av_spr1=Sum('spr1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                ama = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalAma=Sum('ama'), av_ama=Sum('ama', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                hav = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHav=Sum('hav'), av_hav=Sum('hav', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr2 = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr2=Sum('spr2'), av_spr2=Sum('spr2', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                dpt2_ref = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpt2=Sum('dpt2_ref'), av_dpt2=Sum('dpt2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                apo2_ref = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo2=Sum('apo2_ref'), av_apo2=Sum('apo2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                vph_girl = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalGirl=Sum('vph_girl'), av_girl=Sum('vph_girl', output_field=FloatField()) / Cast(metaVphGirl['total'], FloatField()) * 100)
+                vph_boy = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBoy=Sum('vph_boy'), av_boy=Sum('vph_boy', output_field=FloatField()) / Cast(metaVphBoy['total'], FloatField()) * 100)
+                gestante = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpta=Sum('dpta'), av_gest=Sum('dpta', output_field=FloatField()) / Cast(metaGest['total'], FloatField()) * 100)
+                infAdult = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInflAdult=Sum('infl_adult'), av_infAdul=Sum('infl_adult', output_field=FloatField()) / Cast(metaInfAdult['total'], FloatField()) * 100)
+                neumoAdult = Coverage.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumoAdult=Sum('neumo_adult'), av_NeumoAdul=Sum('neumo_adult', output_field=FloatField()) / Cast(metaNeumoAdult['total'], FloatField()) * 100)
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                metarn = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('rn'))
+                metaLessyear = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('less_1year'))
+                metaOneyear = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('one_year'))
+                metaFouryear = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('four_year'))
+                metaVphGirl = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('girl9_13'))
+                metaVphBoy = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('boy9_13'))
+                metaGest = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('pregnant'))
+                metaInfAdult = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult60'))
+                metaNeumoAdult = metaCoverage.objects.filter(anio=today.year, cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('adult30'))
+
+                bcg = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBcg=Sum('bcg'), av_bcg=Sum('bcg', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                hvb = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHvb=Sum('hvb'), av_hvb=Sum('hvb', output_field=FloatField()) / Cast(metarn['total'], FloatField()) * 100)
+                rota = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalRota=Sum('rota2'), av_rota=Sum('rota2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                apo = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo=Sum('apo3'), av_apo=Sum('apo3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                penta = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalPenta=Sum('penta3'), av_penta=Sum('penta3', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                infl2 = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInfl2=Sum('infl2'), av_infl2=Sum('infl2', output_field=FloatField()) / Cast(metaLessyear['total'], FloatField()) * 100)
+                neumo3 = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumo3=Sum('neumo3'), av_neumo3=Sum('neumo3', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                var = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalVar=Sum('varicela1'), av_var=Sum('varicela1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr1 = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr1=Sum('spr1'), av_spr1=Sum('spr1', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                ama = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalAma=Sum('ama'), av_ama=Sum('ama', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                hav = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalHav=Sum('hav'), av_hav=Sum('hav', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                spr2 = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalSpr2=Sum('spr2'), av_spr2=Sum('spr2', output_field=FloatField()) / Cast(metaOneyear['total'], FloatField()) * 100)
+                dpt2_ref = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpt2=Sum('dpt2_ref'), av_dpt2=Sum('dpt2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                apo2_ref = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalApo2=Sum('apo2_ref'), av_apo2=Sum('apo2_ref', output_field=FloatField()) / Cast(metaFouryear['total'], FloatField()) * 100)
+                vph_girl = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalGirl=Sum('vph_girl'), av_girl=Sum('vph_girl', output_field=FloatField()) / Cast(metaVphGirl['total'], FloatField()) * 100)
+                vph_boy = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalBoy=Sum('vph_boy'), av_boy=Sum('vph_boy', output_field=FloatField()) / Cast(metaVphBoy['total'], FloatField()) * 100)
+                gestante = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalDpta=Sum('dpta'), av_gest=Sum('dpta', output_field=FloatField()) / Cast(metaGest['total'], FloatField()) * 100)
+                infAdult = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalInflAdult=Sum('infl_adult'), av_infAdul=Sum('infl_adult', output_field=FloatField()) / Cast(metaInfAdult['total'], FloatField()) * 100)
+                neumoAdult = Coverage.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=today.year, mes__range=[1, request.GET['month']]).aggregate(totalNeumoAdult=Sum('neumo_adult'), av_NeumoAdul=Sum('neumo_adult', output_field=FloatField()) / Cast(metaNeumoAdult['total'], FloatField()) * 100)
 
             resulTotal = {
                 'av_bcg': bcg['av_bcg'], 'av_hvb': hvb['av_hvb'], 'av_rota': rota['av_rota'],
@@ -412,15 +513,49 @@ class PrintNominal(TemplateView):
 
         c = connection.cursor()
         if request.GET['eess'] == 'TODOS':
-            c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
+            if self.request.session['sytem']['typeca'] == 'CA':
+                c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
                         SUM(infl2) infl2, sum(neumo3) neumo3, sum(varicela1) varicel, sum(spr1) spr1, sum(ama) ama, sum(hav) hav, sum(spr2) spr2,
                         sum(dpt2_ref) dpt2_ref, sum(apo2_ref) apo2_ref, sum(vph_girl) vph_girl, sum(vph_boy) vph_boy, sum(dpta) dpta,
                         sum(infl_adult) infl_adult, sum(neumo_adult) neumo_adult
                         INTO ESSALUD.dbo.printCobertNominal
-                        FROM ESSALUD.dbo.boards_coverage WHERE Anio=%s and (Mes BETWEEN 1 and %s)
+                        FROM ESSALUD.dbo.boards_coverage WHERE Anio=%s and (Mes BETWEEN 1 and %s) and cod_eess=%s
                         AND provincia IS NOT NULL
                         GROUP BY cod_prov, provincia, cod_dist, distrito, cod_eess, eess
-                        ORDER BY cod_prov, provincia, cod_dist, distrito""" % ((date.today()).year, request.GET['mes']))
+                        ORDER BY cod_prov, provincia, cod_dist, distrito""" % ((date.today()).year, request.GET['mes'], self.request.session['sytem']['codeca']))
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
+                        SUM(infl2) infl2, sum(neumo3) neumo3, sum(varicela1) varicel, sum(spr1) spr1, sum(ama) ama, sum(hav) hav, sum(spr2) spr2,
+                        sum(dpt2_ref) dpt2_ref, sum(apo2_ref) apo2_ref, sum(vph_girl) vph_girl, sum(vph_boy) vph_boy, sum(dpta) dpta,
+                        sum(infl_adult) infl_adult, sum(neumo_adult) neumo_adult
+                        INTO ESSALUD.dbo.printCobertNominal
+                        FROM ESSALUD.dbo.boards_coverage WHERE Anio=%s and (Mes BETWEEN 1 and %s) and cod_dist=%s
+                        AND provincia IS NOT NULL
+                        GROUP BY cod_prov, provincia, cod_dist, distrito, cod_eess, eess
+                        ORDER BY cod_prov, provincia, cod_dist, distrito""" % ((date.today()).year, request.GET['mes'], self.request.session['sytem']['codeca']))
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
+                        SUM(infl2) infl2, sum(neumo3) neumo3, sum(varicela1) varicel, sum(spr1) spr1, sum(ama) ama, sum(hav) hav, sum(spr2) spr2,
+                        sum(dpt2_ref) dpt2_ref, sum(apo2_ref) apo2_ref, sum(vph_girl) vph_girl, sum(vph_boy) vph_boy, sum(dpta) dpta,
+                        sum(infl_adult) infl_adult, sum(neumo_adult) neumo_adult
+                        INTO ESSALUD.dbo.printCobertNominal
+                        FROM ESSALUD.dbo.boards_coverage WHERE Anio=%s and (Mes BETWEEN 1 and %s) and cod_prov=%s
+                        AND provincia IS NOT NULL
+                        GROUP BY cod_prov, provincia, cod_dist, distrito, cod_eess, eess
+                        ORDER BY cod_prov, provincia, cod_dist, distrito""" % ((date.today()).year, request.GET['mes'], self.request.session['sytem']['codeca']))
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
+                        SUM(infl2) infl2, sum(neumo3) neumo3, sum(varicela1) varicel, sum(spr1) spr1, sum(ama) ama, sum(hav) hav, sum(spr2) spr2,
+                        sum(dpt2_ref) dpt2_ref, sum(apo2_ref) apo2_ref, sum(vph_girl) vph_girl, sum(vph_boy) vph_boy, sum(dpta) dpta,
+                        sum(infl_adult) infl_adult, sum(neumo_adult) neumo_adult
+                        INTO ESSALUD.dbo.printCobertNominal
+                        FROM ESSALUD.dbo.boards_coverage WHERE Anio=%s and (Mes BETWEEN 1 and %s) and cod_dep=%s
+                        AND provincia IS NOT NULL
+                        GROUP BY cod_prov, provincia, cod_dist, distrito, cod_eess, eess
+                        ORDER BY cod_prov, provincia, cod_dist, distrito""" % ((date.today()).year, request.GET['mes'], self.request.session['sytem']['codeca']))
 
         else:
             c.execute("""SELECT cod_prov, provincia, cod_dist, distrito, cod_eess, eess, SUM(bcg) bcg, SUM(hvb) hvb, SUM(rota2) rota2, SUM(apo3) apo3, SUM(penta3) penta3,
@@ -468,6 +603,7 @@ class PrintNominal(TemplateView):
                     GROUP BY B.provincia, B.distrito, B.establecimiento, A.bcg, A.hvb, a.rota2, a.apo3, a.penta3, a.infl2, a.neumo3, a.varicel, a.spr1, a.ama, a.hav, a.spr2,
                     dpt2_ref, apo2_ref, a.vph_girl, a.vph_boy, a.dpta, a.infl_adult, a.neumo_adult
                     DROP TABLE ESSALUD.dbo.printCobertNominal""" % ((date.today()).year))
+
         cont = 10
         num = 1
         data = []
@@ -910,7 +1046,7 @@ class PrintNominal(TemplateView):
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={0}".format(nombre_archivo)
         response["Content-Disposition"] = contenido
-        ws.title = 'NOMINAL NIÑOS RN'
+        ws.title = 'COBERTURA DE VACUNACION'
         wb.save(response)
         return response
 
