@@ -27,23 +27,26 @@ class Provincia(models.Model):
 class Distrito(models.Model):
     codigo = models.CharField(max_length=7, primary_key=True)
     nombre = models.CharField(max_length=50)
-    parent= models.ForeignKey(Provincia, on_delete=models.CASCADE, null=True, blank=True)
+    prov= models.ForeignKey(Provincia, on_delete=models.CASCADE, null=True, blank=True)
+    dep= models.ForeignKey(Departamento, on_delete=models.CASCADE, null=True, blank=True)
 
     def natural_key(self):
-        return self.codigo, self.nombre, self.parent
+        return self.codigo, self.nombre, self.prov
 
     def __str__(self):
-        return '%s %s %s' % (self.codigo, self.nombre, self.parent)
+        return '%s %s %s' % (self.codigo, self.nombre, self.prov)
 
 
 class Establecimiento(models.Model):
     codigo = models.CharField(max_length=5, primary_key=True)
     nombre = models.CharField(max_length=90)
-    parent= models.ForeignKey(Distrito, on_delete=models.CASCADE, null=True, blank=True)
+    dist= models.ForeignKey(Distrito, on_delete=models.CASCADE, null=True, blank=True)
+    prov= models.ForeignKey(Provincia, on_delete=models.CASCADE, null=True, blank=True)
+    dep= models.ForeignKey(Departamento, on_delete=models.CASCADE, null=True, blank=True)
 
     def natural_key(self):
-        return self.codigo, self.nombre, self.parent
+        return self.codigo, self.nombre, self.dist
 
     def __str__(self):
-        return '%s %s %s' % (self.codigo, self.nombre, self.parent)
+        return '%s %s %s' % (self.codigo, self.nombre, self.dist)
 
