@@ -947,11 +947,11 @@
     <div v-show="viewInmunization">
         <div class="row">
             <div class="col-md-1 offset-9 d-flex">
-                <div style="background: #edcdcd; width: 15px; height: 15px; border-radius: 50%;"></div>
+                <div style="background: #d44949; width: 15px; height: 15px; border-radius: 50%;"></div>
                 <label class="pl-2">MINSA</label>
             </div>
             <div class="col-md-2 d-flex">
-                <div style="background: #cdd4ed; width: 15px; height: 15px; border-radius: 50%;"></div>
+                <div style="background: #465899; width: 15px; height: 15px; border-radius: 50%;"></div>
                 <label class="pl-2">ESSALUD</label>
             </div>
         </div>
@@ -961,7 +961,7 @@
                     <tr height="20" style="background: #cbe0fa; font-size: 11px;">
                         <th class="align-middle p-1">#</th>
                         <th class="align-middle p-1">Fecha Atención</th>
-                        <th class="align-middle p-1">Id EESS</th>
+                        <th class="align-middle p-1">Nombre EESS</th>
                         <th class="align-middle p-1">Tipo Doc</th>
                         <th class="align-middle p-1">Documento</th>
                         <th class="align-middle p-1">Fecha Nacido</th>
@@ -980,10 +980,10 @@
                                         item.fields.id_eess == 11252 || item.fields.id_eess == 11251 || item.fields.id_eess == 11237 || item.fields.id_eess == 11233 ||
                                         item.fields.id_eess == 11250 || item.fields.id_eess == 11234 || item.fields.id_eess == 11231 || item.fields.id_eess == 11240 ||
                                         item.fields.id_eess == 11247">
-                            <td class="align-middle p-1" style="background: #cdd4ed;">[[ item.fields.id_eess ]]</td>
+                            <td class="align-middle p-1 text-left" style="color: #465899;">[[ item.fields.eess ]]</td>
                         </template>
                         <template v-else>
-                            <td class="align-middle p-1" style="background: #edcdcd;">[[ item.fields.id_eess ]]</td>
+                            <td class="align-middle p-1 text-left" style="color: #d44949;">[[ item.fields.eess ]]</td>
                         </template>
                         <td class="align-middle p-1">[[ item.fields.tipo_doc ]]</td>
                         <td class="align-middle p-1">[[ item.fields.documento ]]</td>

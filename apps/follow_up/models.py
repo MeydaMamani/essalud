@@ -53,6 +53,7 @@ class VaccinexPat(models.Model):
     mes = models.IntegerField(blank=True, null=True)
     fec_atencion = models.DateField(blank=True, null=True)
     id_eess = models.IntegerField(blank=True, null=True)
+    eess = models.CharField(max_length=500, blank=True, null=True)
     tipo_doc = models.CharField(max_length=20, blank=True, null=True)
     documento = models.CharField(max_length=25, blank=True, null=True)
     fec_nac = models.DateField(blank=True, null=True)
