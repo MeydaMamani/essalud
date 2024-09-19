@@ -25,7 +25,14 @@ class FollowKidsView(TemplateView):
     template_name = 'boys/index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['establecimiento'] = Establecimiento.objects.all()
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
         return context
 
 
@@ -39,21 +46,61 @@ class ListKidsFollow(View):
             mes = request.POST['mes']
 
         if request.POST['eess'] == 'TODOS':
-            total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').aggregate(total=Sum('den'))['total']
-            cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').aggregate(cumplen=Sum('num'))['cumplen']
-            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
-            dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(denominador=Sum('den'),
-                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
-                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
-            dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(denominador=Sum('den'),
-                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
-                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
-            dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01').order_by('cod_eess')
-            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+            if self.request.session['sytem']['typeca'] == 'CA':
+                total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
 
         else:
-            total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Count('id'))['total']
-            cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', num=1, cod_eess=request.POST['eess']).aggregate(cumplen=Count('id'))['cumplen']
+            total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Sum('den'))['total']
+            cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(cumplen=Sum('num'))['cumplen']
             dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
             dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('provincia').annotate(denominador=Sum('den'),
                         numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
@@ -98,9 +145,10 @@ class PrintPackChild(View):
         ws.column_dimensions['B'].width = 35
         ws.column_dimensions['C'].width = 10
         ws.column_dimensions['D'].width = 35
-        ws.column_dimensions['E'].width = 10
+        ws.column_dimensions['E'].width = 12
         ws.column_dimensions['F'].width = 10
 
+        ws.column_dimensions['AQ'].width = 6
         ws.column_dimensions['AR'].width = 6
         ws.column_dimensions['AS'].width = 6
         ws.column_dimensions['AT'].width = 6
@@ -447,7 +495,15 @@ class PrintPackChild(View):
             mes = request.GET['mes']
 
         if request.GET['eess'] == 'TODOS':
-            dataNom = PackChildFollow.objects.filter(fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            if self.request.session['sytem']['typeca'] == 'CA':
+                dataNom = PackChildFollow.objects.filter(cod_eess=self.request.session['sytem']['codeca'], fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            if self.request.session['sytem']['typeca'] == 'DS':
+                dataNom = PackChildFollow.objects.filter(cod_dist=self.request.session['sytem']['codeca'], fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            if self.request.session['sytem']['typeca'] == 'PR':
+                dataNom = PackChildFollow.objects.filter(cod_prov=self.request.session['sytem']['codeca'], fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            if self.request.session['sytem']['typeca'] == 'DP':
+                dataNom = PackChildFollow.objects.filter(cod_dep=self.request.session['sytem']['codeca'], fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+
             dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
         else:
             dataNom = PackChildFollow.objects.filter(cod_eess=request.GET['eess'], fec_nac__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
@@ -560,7 +616,14 @@ class FollowPregnantView(TemplateView):
     template_name = 'pregnant/index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['establecimiento'] = Establecimiento.objects.all()
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
         return context
 
 
@@ -574,22 +637,79 @@ class ListPregnantFollow(View):
             mes = request.POST['mes']
 
         if request.POST['eess'] == 'TODOS':
-            total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').aggregate(total=Sum('den'))['total']
-            cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').aggregate(cumplen=Sum('num'))['cumplen']
-            if total==0 or total==None:
-                total=0
-            if cumplen==0 or cumplen==None:
-                cumplen=0
+            if self.request.session['sytem']['typeca'] == 'CA':
+                total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                if total==0 or total==None:
+                    total=0
+                if cumplen==0 or cumplen==None:
+                    cumplen=0
 
-            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
-            dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').values('provincia').annotate(denominador=Sum('den'),
-                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
-                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
-            dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').values('establecimiento').annotate(denominador=Sum('den'),
-                        numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
-                        output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
-            dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01').order_by('cod_eess')
-            dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                print('AQUI TOY')
+                print(self.request.session['sytem']['codeca'])
+                total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                if total==0 or total==None:
+                    total=0
+                if cumplen==0 or cumplen==None:
+                    cumplen=0
+
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                if total==0 or total==None:
+                    total=0
+                if cumplen==0 or cumplen==None:
+                    cumplen=0
+
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
+
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
+                cumplen = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
+                if total==0 or total==None:
+                    total=0
+                if cumplen==0 or cumplen==None:
+                    cumplen=0
+
+                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataDist = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('establecimiento').annotate(denominador=Sum('den'),
+                            numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
+                            output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
+                dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
 
         else:
             total = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Count('id'))['total']
@@ -1227,7 +1347,15 @@ class PrintPackPregnant(View):
             mes = request.GET['mes']
 
         if request.GET['eess'] == 'TODOS':
-            dataNom = PregnantFollow.objects.filter(ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            if self.request.session['sytem']['typeca'] == 'CA':
+                dataNom = PregnantFollow.objects.filter(cod_eess=self.request.session['sytem']['codeca'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                dataNom = PregnantFollow.objects.filter(cod_dist=self.request.session['sytem']['codeca'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                dataNom = PregnantFollow.objects.filter(cod_prov=self.request.session['sytem']['codeca'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                dataNom = PregnantFollow.objects.filter(cod_dep=self.request.session['sytem']['codeca'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')
+
             dataNom = json.loads(serializers.serialize('json', dataNom, indent=2, use_natural_foreign_keys=True))
         else:
             dataNom = PregnantFollow.objects.filter(cod_eess=request.GET['eess'], ctrl1__gte=request.GET['anio']+'-'+mes+'-01').order_by('cod_eess')

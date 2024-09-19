@@ -4,6 +4,8 @@ from django.db import models
 class PackChildFollow(models.Model):
     anio = models.CharField(max_length=5, blank=True, null=True)
     mes = models.CharField(max_length=3, blank=True, null=True)
+    cod_dep = models.CharField(max_length=10, blank=True, null=True)
+    departamento = models.CharField(max_length=70, blank=True, null=True)
     cod_prov = models.CharField(max_length=10, blank=True, null=True)
     cod_dist = models.CharField(max_length=10, blank=True, null=True)
     provincia = models.CharField(max_length=150, blank=True, null=True)
@@ -92,6 +94,8 @@ class PackChildFollow(models.Model):
 
 
 class PregnantFollow(models.Model):
+    cod_dep = models.CharField(max_length=10, blank=True, null=True)
+    departamento = models.CharField(max_length=70, blank=True, null=True)
     cod_prov = models.CharField(max_length=10, blank=True, null=True)
     provincia = models.CharField(max_length=150, blank=True, null=True)
     cod_dist = models.CharField(max_length=10, blank=True, null=True)
