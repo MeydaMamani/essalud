@@ -253,9 +253,9 @@
         </div>
     </div>
     <div class="clearfix"></div>
-    <div class="d-flex">
-        <div class="col-md-5 p-0">
-            <div class="x_panel bg-dark pl-2 pt-1 pb-1">
+    <div class="d-flex mb-3">
+        <div class="col-md-5 pl-0 shadow border border-dark">
+            <div class="pl-2 pt-1 pb-1">
                 <form class="form-inline" method="GET" @submit.prevent="formSearch">
                     <div class="col-md-4 pl-0">
                         <select class="form-control-sm w-100" name="type" id="type" aria-label="Default select example">
@@ -269,24 +269,31 @@
                         <input class="form-control-sm w-100" type="text" name="doc" id="doc" placeholder="Ingrese su dni..." maxlength="8" onkeypress="return event.charCode>=48 && event.charCode<=57">
                     </div>
                     <div class="col-md-2 p-0">
-                        <button class="btn btn-primary btn-sm mt-1" id="btn_buscar" type="submit"> Buscar</button>
+                        <button class="btn btn-dark btn-sm mt-1" id="btn_buscar" type="submit"> Buscar</button>
                     </div>
                 </form>
             </div>
         </div>
-        <div class="col-md-7">
-            <div class="info_head"></div>
+        <div class="col-md-6 offset-md-1">
+            <div class="border border-blue row p-3" v-show="viewLinePqt">
+                <div class="col-md-4 p-0 text-dark"><b class="text-success">Fecha Nacido: </b>[[ dat_pqt.fec_nac ]]</div>
+                <div class="col-md-4 text-dark"><b class="text-info">Padrón Nominal: </b>
+                    <template v-if="dat_pqt.pn == 1"> SI</template>
+                    <template v-else> NO</template>
+                </div>
+                <div class="col-md-4 text-dark"><b class="text-danger">Programa: </b>[[ dat_pqt.programa ]]</div>
+            </div>
         </div>
     </div>
+    <div class="carga text-center"></div>
     <div v-show="viewLineGest">
-        <div class="container pt-5">
+        <div class="container pt-3">
             <div class="main-timeline">
                 <div class="timeline-item d-flex flex-row flex-wrap justify-content-center align-items-center">
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/syphilis.png' %}" width="70" alt=""></p>
-                                <!-- <p class="year pt-2">Bate</p> -->
+                                <p class="year"><img src="{% static 'img/timeline/syphilis.png' %}" alt="Bateria"></p>
                             </span>
                         </div>
                     </div>
@@ -313,7 +320,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/anemia.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/anemia.png' %}" alt="anemia"></p>
                             </span>
                         </div>
                     </div>
@@ -337,7 +344,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/pregnancy-test.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/pregnancy-test.png' %}" alt="primer mes"></p>
                             </span>
                         </div>
                     </div>
@@ -364,7 +371,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/dos_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/dos_meses.png' %}" alt="dos meses"></p>
                             </span>
                         </div>
                     </div>
@@ -385,7 +392,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/tres_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/tres_meses.png' %}" alt="tres meses"></p>
                             </span>
                         </div>
                     </div>
@@ -406,7 +413,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/cuatro_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/cuatro_meses.png' %}" alt="cuatro meses"></p>
                             </span>
                         </div>
                     </div>
@@ -427,7 +434,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/cinco_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/cinco_meses.png' %}" alt="cinco meses"></p>
                             </span>
                         </div>
                     </div>
@@ -448,7 +455,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/seis_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/seis_meses.png' %}" alt="seis meses"></p>
                             </span>
                         </div>
                     </div>
@@ -469,7 +476,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/siete_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/siete_meses.png' %}" alt="siete meses"></p>
                             </span>
                         </div>
                     </div>
@@ -490,7 +497,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/nueve_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/ocho_meses.png' %}" alt="ocho meses"></p>
                             </span>
                         </div>
                     </div>
@@ -511,7 +518,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/nueve_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/nueve_meses.png' %}" alt="nueve meses"></p>
                             </span>
                         </div>
                     </div>
@@ -532,7 +539,7 @@
                     <div class="date-content order_1">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/diez_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/diez_meses.png' %}" alt="diez meses"></p>
                             </span>
                         </div>
                     </div>
@@ -553,7 +560,7 @@
                     <div class="date-content order_1b">
                         <div class="date-outer">
                             <span class="date">
-                                <p class="year"><img src="{% static 'img/timeline/once_meses.png' %}" width="70" alt=""></p>
+                                <p class="year"><img src="{% static 'img/timeline/once_meses.png' %}" alt="once meses"></p>
                             </span>
                         </div>
                     </div>
@@ -938,8 +945,17 @@
         </section>
     </div>
     <div v-show="viewInmunization">
-        <br>
-        <div class="col-12 table-responsive p-0">
+        <div class="row">
+            <div class="col-md-1 offset-9 d-flex">
+                <div style="background: #edcdcd; width: 15px; height: 15px; border-radius: 50%;"></div>
+                <label class="pl-2">MINSA</label>
+            </div>
+            <div class="col-md-2 d-flex">
+                <div style="background: #cdd4ed; width: 15px; height: 15px; border-radius: 50%;"></div>
+                <label class="pl-2">ESSALUD</label>
+            </div>
+        </div>
+        <div class="col-12 table-responsive nominalTable p-0" id="tableNominal">
             <table class="table table-hover table-bordered table-striped">
                 <thead>
                     <tr height="20" style="background: #cbe0fa; font-size: 11px;">
@@ -960,7 +976,15 @@
                     <tr class="text-center font-10" v-for="item, key in dat_inmuno">
                         <td class="align-middle p-1">[[ key+1 ]]</td>
                         <td class="align-middle p-1">[[ item.fields.fec_atencion ]]</td>
-                        <td class="align-middle p-1">[[ item.fields.id_eess ]]</td>
+                        <template v-if="item.fields.id_eess == 11238 || item.fields.id_eess == 11243 || item.fields.id_eess == 11249 || item.fields.id_eess == 11235 ||
+                                        item.fields.id_eess == 11252 || item.fields.id_eess == 11251 || item.fields.id_eess == 11237 || item.fields.id_eess == 11233 ||
+                                        item.fields.id_eess == 11250 || item.fields.id_eess == 11234 || item.fields.id_eess == 11231 || item.fields.id_eess == 11240 ||
+                                        item.fields.id_eess == 11247">
+                            <td class="align-middle p-1" style="background: #cdd4ed;">[[ item.fields.id_eess ]]</td>
+                        </template>
+                        <template v-else>
+                            <td class="align-middle p-1" style="background: #edcdcd;">[[ item.fields.id_eess ]]</td>
+                        </template>
                         <td class="align-middle p-1">[[ item.fields.tipo_doc ]]</td>
                         <td class="align-middle p-1">[[ item.fields.documento ]]</td>
                         <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>

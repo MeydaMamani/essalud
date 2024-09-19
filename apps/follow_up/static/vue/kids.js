@@ -29,8 +29,15 @@ new Vue({
                     delay: 3000,
                 });
             }else{
+                self.viewLineAnemia = false
+                self.viewLinePqt = false
+                self.viewLineGest = false
+                self.viewInmunization = false
+                $(".carga").show();
+                $(".carga").html('<div class="lds-roller mt-5 text-end"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>');
                 axios.get('search/', { params: { type: type, doc: doc  } })
                 .then(function (respuesta) {
+                    $(".carga").hide();
                     if(respuesta.data == ''){
                         self.viewLineAnemia = false
                         self.viewLinePqt = false

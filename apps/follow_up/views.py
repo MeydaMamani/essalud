@@ -53,7 +53,14 @@ class AnemiaKidsView(TemplateView):
     template_name = 'anemia/kids.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['establecimiento'] = Establecimiento.objects.all()
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
         return context
 
 
@@ -65,9 +72,25 @@ class NominalAnemia(View):
 
         if request.POST['tipo'] == 'TODOS':
             if request.POST['eess'] == 'TODOS':
-                totProv = Anemia.objects.filter( anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
-                totNominal = Anemia.objects.filter(anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
-                totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totProv = Anemia.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totProv = Anemia.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totProv = Anemia.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totProv = Anemia.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
             else:
                 totProv = Anemia.objects.filter(cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
@@ -76,9 +99,25 @@ class NominalAnemia(View):
 
         else:
             if request.POST['eess'] == 'TODOS':
-                totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
-                totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
-                totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_dist=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_dist=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_prov=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_prov=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_dep=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
+                    totNominal = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_dep=self.request.session['sytem']['codeca'], anio=request.POST['anio'], mes=request.POST['mes']).order_by('cod_eess')
+                    totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
             else:
                 totProv = Anemia.objects.filter(grupo_edad=request.POST['tipo'], cod_eess=request.POST['eess'], anio=request.POST['anio'], mes=request.POST['mes']).values('provincia').annotate(total=Sum('den'))
@@ -283,14 +322,28 @@ class PrintNomAnem(TemplateView):
 
         if request.GET['tipo'] == 'TODOS':
             if request.GET['eess'] == 'TODOS':
-                totNominal = Anemia.objects.filter(anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totNominal = Anemia.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totNominal = Anemia.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totNominal = Anemia.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totNominal = Anemia.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
             elif request.GET['eess'] != 'TODOS':
                 totNominal = Anemia.objects.filter(cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
         else:
             if request.GET['eess'] == 'TODOS':
-                totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_eess=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_dist=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_prov=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_dep=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
             elif request.GET['eess'] != 'TODOS':
                 totNominal = Anemia.objects.filter(grupo_edad=request.GET['tipo'], cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')

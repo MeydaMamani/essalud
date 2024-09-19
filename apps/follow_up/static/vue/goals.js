@@ -56,10 +56,10 @@ new Vue({
                         datasets: [{
                             label: "Meta",
                             borderColor: "#03586A",
-                            data: [ this.advanceAct.meta, this.advanceAct.meta, this.advanceAct.meta,
-                                    this.advanceAct.meta, this.advanceAct.meta, this.advanceAct.meta,
-                                    this.advanceAct.meta, this.advanceAct.meta, this.advanceAct.meta,
-                                    this.advanceAct.meta, this.advanceAct.meta, this.advanceAct.meta ]
+                            data: [ this.advanceAct.meta/12, this.advanceAct.meta/12, this.advanceAct.meta/12,
+                                    this.advanceAct.meta/12, this.advanceAct.meta/12, this.advanceAct.meta/12,
+                                    this.advanceAct.meta/12, this.advanceAct.meta/12, this.advanceAct.meta/12,
+                                    this.advanceAct.meta/12, this.advanceAct.meta/12, this.advanceAct.meta/12]
                         },
                         {
                             label: "Avance",
