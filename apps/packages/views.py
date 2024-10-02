@@ -124,7 +124,7 @@ class PrintPackChild(View):
         ws = wb.active
 
         locale.setlocale(locale.LC_TIME, 'es_ES')
-        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+        nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         def set_border(self, ws, cell_range, types, colors):
             thin = Side(border_style=types, color=colors)
@@ -742,7 +742,7 @@ class PrintPackPregnant(View):
         ws = wb.active
 
         locale.setlocale(locale.LC_TIME, 'es_ES')
-        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+        nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         def set_border(self, ws, cell_range, types, colors):
             thin = Side(border_style=types, color=colors)

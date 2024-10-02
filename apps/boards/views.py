@@ -223,7 +223,7 @@ class ListCoverage(TemplateView):
 class PrintNominal(TemplateView):
     def get(self, request, *args, **kwargs):
         locale.setlocale(locale.LC_TIME, 'es_ES')
-        nameMonth = datetime.date(1900, int(request.GET['mes']), 1).strftime('%B')
+        nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         wb = Workbook()
         ws = wb.active
