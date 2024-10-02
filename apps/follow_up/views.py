@@ -133,7 +133,7 @@ class NominalAnemia(View):
 
 class PrintNomAnem(TemplateView):
     def get(self, request, *args, **kwargs):
-        locale.setlocale(locale.LC_TIME, 'es_ES')
+        locale.setlocale(locale.LC_ALL, "C")
         nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         wb = Workbook()
@@ -715,7 +715,7 @@ class AdvMetasPriorXAct(View):
 
 class PrintNominal(TemplateView):
     def get(self, request, *args, **kwargs):
-        locale.setlocale(locale.LC_TIME, 'es_ES')
+        locale.setlocale(locale.LC_ALL, "C")
 
         wb = Workbook()
         ws = wb.active

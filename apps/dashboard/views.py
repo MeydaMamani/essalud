@@ -503,7 +503,7 @@ class PrintAttentionToday(View):
         wb = Workbook()
         ws = wb.active
 
-        locale.setlocale(locale.LC_TIME, 'es_ES')
+        locale.setlocale(locale.LC_ALL, "C")
         nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
 
         def set_border(self, ws, cell_range, types, colors):
