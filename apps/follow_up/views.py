@@ -14,7 +14,7 @@ from django.db import connection
 
 from apps.packages.models import PackChildFollow, PregnantFollow
 from apps.main.models import Provincia, Distrito, Establecimiento
-from apps.follow_up.models import Anemia, VaccinexPat
+from apps.follow_up.models import Anemia, VaccinexPat, Inmunization
 
 # library excel
 from openpyxl import Workbook
@@ -23,7 +23,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side, Color
 
 
 class KidsView(TemplateView):
-    template_name = 'kids/index.html'
+    template_name = 'person/index.html'
 
 
 class SearchKidsView(View):
@@ -131,7 +131,7 @@ class NominalAnemia(View):
         return HttpResponse(json.dumps(dataList), content_type='application/json')
 
 
-class PrintNomAnem(TemplateView):
+class PrintNomAnem(View):
     def get(self, request, *args, **kwargs):
         locale.setlocale(locale.LC_ALL, "C")
         nameMonth = date(1900, int(request.GET['mes']), 1).strftime('%B')
@@ -713,7 +713,7 @@ class AdvMetasPriorXAct(View):
         return HttpResponse(json.dumps(avance), content_type='application/json')
 
 
-class PrintNominal(TemplateView):
+class PrintGoals(View):
     def get(self, request, *args, **kwargs):
         locale.setlocale(locale.LC_ALL, "C")
 
@@ -1608,3 +1608,394 @@ class PrintNominal(TemplateView):
         wb.save(response)
         return response
 
+
+class InmunizationView(TemplateView):
+    template_name = 'inmunizations/index.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.session['sytem']['typeca'] == 'CA':
+            context['establecimiento'] = Establecimiento.objects.filter(codigo=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DS':
+            context['establecimiento'] = Establecimiento.objects.filter(dist_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'PR':
+            context['establecimiento'] = Establecimiento.objects.filter(prov_id=self.request.session['sytem']['codeca'])
+        elif self.request.session['sytem']['typeca'] == 'DP':
+            context['establecimiento'] = Establecimiento.objects.filter(dep_id=self.request.session['sytem']['codeca'])
+        return context
+
+
+class NominalInmunization(View):
+    def get(self, request, *args, **kwargs):
+        if request.GET['eess'] == 'TODOS':
+            if request.GET['edad'] == 'TODOS':
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    nominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    nominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    nominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    nominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
+            else:
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    nominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    nominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    nominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    nominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+        else:
+            if request.GET['edad'] == 'TODOS':
+                nominal = Inmunization.objects.filter(cod_eess=request.GET['eess']).order_by('cod_eess')
+            else:
+                nominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad=request.GET['edad']).order_by('cod_eess')
+
+        nominal = serializers.serialize('json', nominal, indent=2, use_natural_foreign_keys=True)
+
+        return HttpResponse(nominal, content_type='application/json')
+
+
+class PrintInmunization(View):
+    def get(self, request, *args, **kwargs):
+        wb = Workbook()
+        ws = wb.active
+
+        def set_border(self, ws, cell_range, types, colors):
+            thin = Side(border_style=types, color=colors)
+            for row in ws[cell_range]:
+                for cell in row:
+                    cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+
+        set_border(self, ws, "A2:Q2", "medium", "57267C")
+        set_border(self, ws, "A4:Q4", "medium", "366092")
+        set_border(self, ws, "A6:Q6", "medium", "D9D9D9")
+
+        img = Image('static/img/logoPrint.png')
+        ws.add_image(img, 'A2')
+
+        ws.merge_cells('B2:Z2')
+        ws.row_dimensions[2].height = 23
+
+        ws.column_dimensions['A'].width = 6
+        ws.column_dimensions['B'].width = 30
+        ws.column_dimensions['C'].width = 10
+        ws.column_dimensions['D'].width = 33
+        ws.column_dimensions['E'].width = 11
+        ws.column_dimensions['F'].width = 5
+
+        ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+        ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES'
+
+        ws.merge_cells('A4:Z4')
+        ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+        ws['A4'] = 'CODIFICACION: '
+
+        ws.merge_cells('A6:Z6')
+        ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+        ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+        ws['A8'] = '#'
+        ws['A8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['A8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['A8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['A8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['B8'] = 'Centro Asistencial'
+        ws['B8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['B8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['B8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['B8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['C8'] = 'Documento'
+        ws['C8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['C8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['C8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['C8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['D8'] = 'Apellidos y Nombres'
+        ws['D8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['D8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['D8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['D8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['E8'] = 'Fecha Nacido'
+        ws['E8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['E8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['E8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['E8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['F8'] = 'Edad'
+        ws['F8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['F8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['F8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+        ws['F8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['G8'] = 'HVB'
+        ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['G8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+        ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['H8'] = 'BCG'
+        ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['H8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+        ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['I8'] = 'Rota 2m'
+        ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['I8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['J8'] = 'Apo 2m'
+        ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['J8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['J8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['K8'] = 'Penta 2m'
+        ws['K8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['K8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['K8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['L8'] = 'Neumo 2m'
+        ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['L8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['M8'] = 'Rota 4m'
+        ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['M8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['N8'] = 'Apo 4m'
+        ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['N8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['N8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['O8'] = 'Penta 4m'
+        ws['O8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['O8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['O8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['O8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['P8'] = 'Neumo 4m'
+        ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['P8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['Q8'] = 'Apo 6m'
+        ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['Q8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['Q8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['R8'] = 'Penta 6m'
+        ws['R8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['R8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['R8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['R8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['S8'] = 'Neumo 6m'
+        ws['S8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['S8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['S8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['S8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['T8'] = 'Infl 6m'
+        ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['T8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['T8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['U8'] = 'Infl 7m'
+        ws['U8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['U8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['U8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['U8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['V8'] = 'SPR1'
+        ws['V8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['V8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['V8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['V8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['W8'] = 'Varicela'
+        ws['W8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['W8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['W8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['W8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['X8'] = 'HIV'
+        ws['X8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['X8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['X8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['X8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['Y8'] = 'AMA'
+        ws['Y8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Y8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['Y8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['Y8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['Z8'] = 'SPR2'
+        ws['Z8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['Z8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['Z8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['Z8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        if request.GET['eess'] == 'TODOS':
+            if request.GET['edad'] == 'TODOS':
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totNominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totNominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totNominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totNominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
+            else:
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    totNominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    totNominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    totNominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    totNominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+
+        elif request.GET['eess'] != 'TODOS':
+            if request.GET['edad'] == 'TODOS':
+                totNominal = Inmunization.objects.filter(cod_eess=request.GET['eess']).order_by('cod_eess')
+            else:
+                totNominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad=request.GET['edad']).order_by('cod_eess')
+
+        totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+
+        cont = 9
+        cant = len(totNominal)
+        num = 1
+        if cant > 0:
+            for nom in totNominal:
+                ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=1).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=1).value = num
+
+                ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                ws.cell(row=cont, column=2).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=3).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                ws.cell(row=cont, column=4).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=5).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=6).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=7).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=7).value = nom['fields']['hvb']
+
+                ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=8).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=8).value = nom['fields']['bcg']
+
+                ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=9).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=9).value = nom['fields']['rota2m']
+
+                ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=10).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=10).value = nom['fields']['apo2m']
+
+                ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=11).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=11).value = nom['fields']['penta2m']
+
+                ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=12).value = nom['fields']['neumo2m']
+
+                ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=13).value = nom['fields']['rota4m']
+
+                ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=14).value = nom['fields']['apo4m']
+
+                ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=15).value = nom['fields']['penta4m']
+
+                ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=16).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=16).value = nom['fields']['neumo4m']
+
+                ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=17).value = nom['fields']['apo6m']
+
+                ws.cell(row=cont, column=18).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=18).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=18).value = nom['fields']['penta6m']
+
+                ws.cell(row=cont, column=19).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=19).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=19).value = nom['fields']['neumo6m']
+
+                ws.cell(row=cont, column=20).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=20).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=20).value = nom['fields']['infl6m']
+
+                ws.cell(row=cont, column=21).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=21).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=21).value = nom['fields']['infl7m']
+
+                ws.cell(row=cont, column=22).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=22).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=22).value = nom['fields']['spr1']
+
+                ws.cell(row=cont, column=23).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=23).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=23).value = nom['fields']['varicela']
+
+                ws.cell(row=cont, column=24).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=24).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=24).value = nom['fields']['hiv']
+
+                ws.cell(row=cont, column=25).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=25).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=25).value = nom['fields']['ama']
+
+                ws.cell(row=cont, column=26).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=26).font = Font(name='Calibri', size=9)
+                ws.cell(row=cont, column=26).value = nom['fields']['spr2']
+
+                cont = cont+1
+                num = num+1
+
+        nombre_archivo = "DEIT_PASCO SEGUIMIENTO NOMINAL INMUNIZACIONES.xlsx"
+        response = HttpResponse(content_type="application/ms-excel")
+        contenido = "attachment; filename={0}".format(nombre_archivo)
+        response["Content-Disposition"] = contenido
+        ws.title = 'NOMINAL NIÑOS RN'
+        wb.save(response)
+        return response

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static  %}
+
+{% block title %}
+	Inmunizaciones - G
+{% endblock title %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block content %}
+
+<div id="appInmunization">
+    <div class="page-title">
+        <div class="col-md-11 mb-2">
+            <b class="font-18">Seguimiento Nominal Inmunizaciones </b>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-12 mb-2">
+        <div class="col-md-6 p-0">
+            <form method="GET" @submit.prevent="form">
+                <div class="col-sm-7 pl-0">
+                    <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
+                        {% for eess in establecimiento %}
+                            <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
+                        {% endfor %}
+                        <option value="TODOS" selected>TODOS</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 pl-0">
+                    <select class="form-control-sm w-100" name="edad" id="edad" v-model="edad">
+                        <option value="0" selected>Seleccione Edad</option>
+                        <option value="1">1 AÑO</option>
+                        <option value="2">2 AÑOS</option>
+                        <option value="3">3 AÑOS</option>
+                        <option value="TODOS">TODOS</option>
+                    </select>
+                </div>
+                <div class="col-md-1 pl-0">
+                    <button class="btn btn-primary btn-block btn-sm" id="search" type="submit"><i class="fa fa-search"></i> </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 text-right p-0">
+            <button type="button" @click="PrintExcel" class="btn btn-success btn-sm"><i class="fa fa-download"></i></button>
+        </div>
+    </div>
+    <div class="carga text-center"></div>
+    <div class="col-md-12" v-show="data">
+        <div class="x_panel p-2">
+            <div class="table-responsive nominalTable" id="tableNominal">
+                <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                    <thead>
+                        <tr class="font-10 text-center">
+                            <th class="align-middle p-1">#</th>
+                            <th class="align-middle p-1">Centro Asistencial</th>
+                            <th class="align-middle p-1">Doc Paciente</th>
+                            <th class="align-middle p-1">Paciente</th>
+                            <th class="align-middle p-1">Fecha Nacido</th>
+                            <th class="align-middle p-1">Edad</th>
+                            <th class="align-middle p-1" style="background: #C7ECF0 !important;">HVB</th>
+                            <th class="align-middle p-1" style="background: #C7ECF0 !important;">BCG</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">ROTA 2M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">APO 2M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 2M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">NEUMO 2M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">ROTA 4M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">APO 4M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 4M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">NEUMO 4M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">APO 6M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 6M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">NEUMO 6M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">INFL 6M</th>
+                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">INFL 7 8M</th>
+                            <th class="align-middle p-1" style="background: #ece3fb !important;">SPR1</th>
+                            <th class="align-middle p-1" style="background: #ece3fb !important;">VARICELA</th>
+                            <th class="align-middle p-1" style="background: #ece3fb !important;">HIV</th>
+                            <th class="align-middle p-1" style="background: #ece3fb !important;">AMA</th>
+                            <th class="align-middle p-1" style="background: #ece3fb !important;">SPR2</th>
+                        </tr>
+                    </thead>
+                    <div class="float-right col-md-3 p-0">
+                        <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                            <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                            <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <tbody>
+                        <tr class="text-center font-9" v-for="item, key in lists">
+                            <td class="align-middle p-1">[[ key+1 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                            <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                            <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.hvb ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.bcg ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.rota2m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.apo2m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.penta2m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.neumo2m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.rota4m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.apo4m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.penta4m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.neumo4m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.apo6m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.penta6m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.neumo6m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.infl6m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.infl7m ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.spr1 ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.varicela ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.hiv ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.ama ]]</td>
+                            <td class="align-middle p-1">[[ item.fields.spr2 ]]</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <div class="">
+                                    <ul class="pagination"></ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static 'vue/inmunization.js' %}"></script>
+<script src="{% static 'js/inmunization.js' %}"></script>
+
+{% endblock scripts %}

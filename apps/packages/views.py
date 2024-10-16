@@ -49,7 +49,7 @@ class ListKidsFollow(View):
             if self.request.session['sytem']['typeca'] == 'CA':
                 total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
                 cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -62,7 +62,7 @@ class ListKidsFollow(View):
             elif self.request.session['sytem']['typeca'] == 'DS':
                 total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
                 cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -75,7 +75,7 @@ class ListKidsFollow(View):
             elif self.request.session['sytem']['typeca'] == 'PR':
                 total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
                 cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -88,7 +88,7 @@ class ListKidsFollow(View):
             elif self.request.session['sytem']['typeca'] == 'DP':
                 total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(total=Sum('den'))['total']
                 cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).aggregate(cumplen=Sum('num'))['cumplen']
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -101,7 +101,7 @@ class ListKidsFollow(View):
         else:
             total = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(total=Sum('den'))['total']
             cumplen = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).aggregate(cumplen=Sum('num'))['cumplen']
-            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+            dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
             dataProv = PackChildFollow.objects.filter(fec_nac__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('provincia').annotate(denominador=Sum('den'),
                         numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                         output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -645,7 +645,7 @@ class ListPregnantFollow(View):
                 if cumplen==0 or cumplen==None:
                     cumplen=0
 
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -665,7 +665,7 @@ class ListPregnantFollow(View):
                 if cumplen==0 or cumplen==None:
                     cumplen=0
 
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dist=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -683,7 +683,7 @@ class ListPregnantFollow(View):
                 if cumplen==0 or cumplen==None:
                     cumplen=0
 
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_prov=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -701,7 +701,7 @@ class ListPregnantFollow(View):
                 if cumplen==0 or cumplen==None:
                     cumplen=0
 
-                dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+                dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
                 dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_dep=self.request.session['sytem']['codeca']).values('provincia').annotate(denominador=Sum('den'),
                             numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                             output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
@@ -719,7 +719,7 @@ class ListPregnantFollow(View):
             if cumplen==0 or cumplen==None:
                 cumplen=0
 
-            dataTotal = { 'total': total, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if total != 0 else 0 }
+            dataTotal = { 'total': total if total is not None else 0, 'cumple': cumplen, 'avance': round((cumplen/total)*100, 1) if (total != 0) and (total is not None) else 0 }
             dataProv = PregnantFollow.objects.filter(ctrl1__gte=request.POST['anio']+'-'+mes+'-01', cod_eess=request.POST['eess']).values('provincia').annotate(denominador=Sum('den'),
                         numerador=Sum('num'), avance=(ExpressionWrapper( Cast(Sum('num'), FloatField()) / Cast(Sum('den'), FloatField()) * 100,
                         output_field=FloatField()))).order_by('-avance', '-denominador', '-numerador')
