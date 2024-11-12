@@ -1667,14 +1667,14 @@ class PrintInmunization(View):
                 for cell in row:
                     cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
-        set_border(self, ws, "A2:Q2", "medium", "57267C")
-        set_border(self, ws, "A4:Q4", "medium", "366092")
-        set_border(self, ws, "A6:Q6", "medium", "D9D9D9")
+        set_border(self, ws, "A2:AB2", "medium", "57267C")
+        set_border(self, ws, "A4:AB4", "medium", "366092")
+        set_border(self, ws, "A6:AB6", "medium", "D9D9D9")
 
         img = Image('static/img/logoPrint.png')
         ws.add_image(img, 'A2')
 
-        ws.merge_cells('B2:Z2')
+        ws.merge_cells('B2:AB2')
         ws.row_dimensions[2].height = 23
 
         ws.column_dimensions['A'].width = 6
@@ -1683,16 +1683,38 @@ class PrintInmunization(View):
         ws.column_dimensions['D'].width = 33
         ws.column_dimensions['E'].width = 11
         ws.column_dimensions['F'].width = 5
+        ws.column_dimensions['G'].width = 12
+        ws.column_dimensions['H'].width = 12
+        ws.column_dimensions['I'].width = 12
+        ws.column_dimensions['J'].width = 12
+        ws.column_dimensions['K'].width = 12
+        ws.column_dimensions['L'].width = 12
+        ws.column_dimensions['M'].width = 12
+        ws.column_dimensions['N'].width = 12
+        ws.column_dimensions['O'].width = 12
+        ws.column_dimensions['P'].width = 12
+        ws.column_dimensions['Q'].width = 12
+        ws.column_dimensions['R'].width = 12
+        ws.column_dimensions['S'].width = 12
+        ws.column_dimensions['T'].width = 12
+        ws.column_dimensions['U'].width = 12
+        ws.column_dimensions['V'].width = 12
+        ws.column_dimensions['W'].width = 12
+        ws.column_dimensions['X'].width = 12
+        ws.column_dimensions['Y'].width = 12
+        ws.column_dimensions['Z'].width = 12
+        ws.column_dimensions['AA'].width = 12
+        ws.column_dimensions['AB'].width = 12
 
         ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
         ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
         ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES'
 
-        ws.merge_cells('A4:Z4')
+        ws.merge_cells('A4:AB4')
         ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
         ws['A4'] = 'CODIFICACION: '
 
-        ws.merge_cells('A6:Z6')
+        ws.merge_cells('A6:AB6')
         ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
         ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
@@ -1750,7 +1772,7 @@ class PrintInmunization(View):
         ws['I8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['J8'] = 'Apo 2m'
+        ws['J8'] = 'Ipv 2m'
         ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['J8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
@@ -1774,7 +1796,7 @@ class PrintInmunization(View):
         ws['M8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['N8'] = 'Apo 4m'
+        ws['N8'] = 'Ipv 4m'
         ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['N8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
@@ -1792,7 +1814,7 @@ class PrintInmunization(View):
         ws['P8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['Q8'] = 'Apo 6m'
+        ws['Q8'] = 'Ipv 6m'
         ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['Q8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
@@ -1804,25 +1826,25 @@ class PrintInmunization(View):
         ws['R8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['R8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['S8'] = 'Neumo 6m'
+        ws['S8'] = 'Infl 6m'
         ws['S8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['S8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['S8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['S8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['T8'] = 'Infl 6m'
+        ws['T8'] = 'Infl 7m'
         ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['T8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
         ws['T8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['U8'] = 'Infl 7m'
+        ws['U8'] = 'SPR1'
         ws['U8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['U8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['U8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+        ws['U8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
         ws['U8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['V8'] = 'SPR1'
+        ws['V8'] = 'Neumo 12m'
         ws['V8'].font = Font(name='Aptos Narrow', size=10, bold=True)
         ws['V8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['V8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
@@ -1851,6 +1873,18 @@ class PrintInmunization(View):
         ws['Z8'].alignment = Alignment(horizontal="center", vertical="center")
         ws['Z8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
         ws['Z8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['AA8'] = 'DPT1'
+        ws['AA8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AA8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AA8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['AA8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+        ws['AB8'] = 'IPV 18M'
+        ws['AB8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+        ws['AB8'].alignment = Alignment(horizontal="center", vertical="center")
+        ws['AB8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
+        ws['AB8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
         if request.GET['eess'] == 'TODOS':
             if request.GET['edad'] == 'TODOS':
@@ -1886,108 +1920,88 @@ class PrintInmunization(View):
         if cant > 0:
             for nom in totNominal:
                 ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=1).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=1).value = num
 
                 ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
-                ws.cell(row=cont, column=2).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=2).value = nom['fields']['eess']
 
                 ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=3).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=3).value = nom['fields']['documento']
 
                 ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
-                ws.cell(row=cont, column=4).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=4).value = nom['fields']['paciente']
 
                 ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=5).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
 
                 ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=6).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=6).value = nom['fields']['edad']
 
                 ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=7).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=7).value = nom['fields']['hvb']
 
                 ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=8).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=8).value = nom['fields']['bcg']
 
                 ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=9).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=9).value = nom['fields']['rota2m']
 
                 ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=10).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=10).value = nom['fields']['apo2m']
 
                 ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=11).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=11).value = nom['fields']['penta2m']
 
                 ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=12).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=12).value = nom['fields']['neumo2m']
 
                 ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=13).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=13).value = nom['fields']['rota4m']
 
                 ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=14).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=14).value = nom['fields']['apo4m']
 
                 ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=15).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=15).value = nom['fields']['penta4m']
 
                 ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=16).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=16).value = nom['fields']['neumo4m']
 
                 ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=17).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=17).value = nom['fields']['apo6m']
 
                 ws.cell(row=cont, column=18).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=18).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=18).value = nom['fields']['penta6m']
 
                 ws.cell(row=cont, column=19).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=19).font = Font(name='Calibri', size=9)
-                ws.cell(row=cont, column=19).value = nom['fields']['neumo6m']
+                ws.cell(row=cont, column=19).value = nom['fields']['infl6m']
 
                 ws.cell(row=cont, column=20).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=20).font = Font(name='Calibri', size=9)
-                ws.cell(row=cont, column=20).value = nom['fields']['infl6m']
+                ws.cell(row=cont, column=20).value = nom['fields']['infl7m']
 
                 ws.cell(row=cont, column=21).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=21).font = Font(name='Calibri', size=9)
-                ws.cell(row=cont, column=21).value = nom['fields']['infl7m']
+                ws.cell(row=cont, column=21).value = nom['fields']['spr1']
 
                 ws.cell(row=cont, column=22).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=22).font = Font(name='Calibri', size=9)
-                ws.cell(row=cont, column=22).value = nom['fields']['spr1']
+                ws.cell(row=cont, column=22).value = nom['fields']['neumo6m']
 
                 ws.cell(row=cont, column=23).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=23).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=23).value = nom['fields']['varicela']
 
                 ws.cell(row=cont, column=24).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=24).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=24).value = nom['fields']['hiv']
 
                 ws.cell(row=cont, column=25).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=25).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=25).value = nom['fields']['ama']
 
                 ws.cell(row=cont, column=26).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=26).font = Font(name='Calibri', size=9)
                 ws.cell(row=cont, column=26).value = nom['fields']['spr2']
+
+                ws.cell(row=cont, column=27).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=27).value = nom['fields']['dpt1_ref']
+
+                ws.cell(row=cont, column=28).alignment = Alignment(horizontal="center")
+                ws.cell(row=cont, column=28).value = nom['fields']['apo1_ref']
 
                 cont = cont+1
                 num = num+1
@@ -1996,6 +2010,6 @@ class PrintInmunization(View):
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={0}".format(nombre_archivo)
         response["Content-Disposition"] = contenido
-        ws.title = 'NOMINAL NIÑOS RN'
+        ws.title = 'NOMINAL NIÑOS'
         wb.save(response)
         return response

@@ -79,7 +79,7 @@ class Inmunization(models.Model):
     cod_eess = models.IntegerField(blank=True, null=True)
     eess = models.CharField(max_length=200, blank=True, null=True)
     autogenerado = models.CharField(max_length=50, blank=True, null=True)
-    documento = models.CharField(max_length=25, blank=True, null=True)
+    documento = models.CharField(max_length=15, blank=True, null=True)
     paciente = models.CharField(max_length=300, blank=True, null=True)
     edad = models.IntegerField(blank=True, null=True)
     fec_nac = models.DateField(blank=True, null=True)
@@ -103,9 +103,11 @@ class Inmunization(models.Model):
     hiv = models.DateField(blank=True, null=True)
     ama = models.DateField(blank=True, null=True)
     spr2 = models.DateField(blank=True, null=True)
+    dpt1_ref = models.DateField(blank=True, null=True)
+    apo1_ref = models.DateField(blank=True, null=True)
 
     def natural_key(self):
         return self.pk, self.cod_dep, self.departamento, self.cod_prov, self.provincia, self.cod_dist, self.distrito, self.cod_eess, self.eess, \
                 self.autogenerado, self.documento, self.paciente, self.edad, self.fec_nac, self.hvb, self.bcg, self.rota2m, self.apo2m, self.penta2m, \
                 self.neumo2m, self.rota4m, self.apo4m, self.penta4m, self.neumo4m, self.apo6m, self.penta6m, self.neumo6m, self.infl6m, self.infl7m, \
-                self.spr1, self.varicela, self.hiv, self.ama, self.spr2
+                self.spr1, self.varicela, self.hiv, self.ama, self.spr2, self.dpt1_ref, self.apo1_ref
