@@ -14,7 +14,7 @@ from django.db import connection
 
 from apps.packages.models import PackChildFollow, PregnantFollow
 from apps.main.models import Provincia, Distrito, Establecimiento
-from apps.follow_up.models import Anemia, VaccinexPat, Inmunization
+from apps.follow_up.models import Anemia, VaccinexPat, Inmunization, Inmunization_C, InmunizationMinsa
 
 # library excel
 from openpyxl import Workbook
@@ -1626,30 +1626,62 @@ class InmunizationView(TemplateView):
 
 class NominalInmunization(View):
     def get(self, request, *args, **kwargs):
-        if request.GET['eess'] == 'TODOS':
-            if request.GET['edad'] == 'TODOS':
-                if self.request.session['sytem']['typeca'] == 'CA':
-                    nominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DS':
-                    nominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'PR':
-                    nominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DP':
-                    nominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
-            else:
-                if self.request.session['sytem']['typeca'] == 'CA':
-                    nominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DS':
-                    nominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'PR':
-                    nominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DP':
-                    nominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+        if request.GET['edad'] == '2':
+            medad = [2,3]
+        elif request.GET['edad'] == '5':
+            medad = [9,10,11,12,13,14,15,16,17]
+        elif request.GET['edad'] == '6':
+            medad = [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+                     41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]
+        elif request.GET['edad'] == '7':
+            medad = [60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100]
         else:
-            if request.GET['edad'] == 'TODOS':
-                nominal = Inmunization.objects.filter(cod_eess=request.GET['eess']).order_by('cod_eess')
-            else:
-                nominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad=request.GET['edad']).order_by('cod_eess')
+            medad = request.GET['edad']
+
+        if request.GET['eess'] == 'TODOS':
+            if request.GET['tipo'] == 'MINSA':
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    nominal = InmunizationMinsa.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    nominal = InmunizationMinsa.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    nominal = InmunizationMinsa.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    nominal = InmunizationMinsa.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+
+            elif request.GET['tipo'] == 'ESSALUD':
+                if self.request.session['sytem']['typeca'] == 'CA':
+                    nominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DS':
+                    nominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'PR':
+                    nominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+                elif self.request.session['sytem']['typeca'] == 'DP':
+                    nominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+        else:
+            if request.GET['tipo'] == 'MINSA':
+                nominal = InmunizationMinsa.objects.filter(cod_eess=request.GET['eess'], edad__in=medad).order_by('cod_eess')
+            elif request.GET['tipo'] == 'ESSALUD':
+                nominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad__in=medad).order_by('cod_eess')
+
+        nominal = serializers.serialize('json', nominal, indent=2, use_natural_foreign_keys=True)
+
+        return HttpResponse(nominal, content_type='application/json')
+
+
+class ConteoInmunization(View):
+    def get(self, request, *args, **kwargs):
+        if request.GET['eess'] == 'TODOS':
+            if self.request.session['sytem']['typeca'] == 'CA':
+                nominal = Inmunization_C.objects.filter(cod_eess=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                nominal = Inmunization_C.objects.filter(cod_dist=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                nominal = Inmunization_C.objects.filter(cod_prov=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                nominal = Inmunization_C.objects.filter(cod_dep=self.request.session['sytem']['codeca'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
+        else:
+            nominal = Inmunization_C.objects.filter(cod_eess=request.GET['eess'], anio=request.GET['anio'], mes=request.GET['mes']).order_by('cod_eess')
 
         nominal = serializers.serialize('json', nominal, indent=2, use_natural_foreign_keys=True)
 
@@ -1667,56 +1699,36 @@ class PrintInmunization(View):
                 for cell in row:
                     cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
-        set_border(self, ws, "A2:AB2", "medium", "57267C")
-        set_border(self, ws, "A4:AB4", "medium", "366092")
-        set_border(self, ws, "A6:AB6", "medium", "D9D9D9")
+        if request.GET['edad'] == '2':
+            medad = [2,3]
+        elif request.GET['edad'] == '5':
+            medad = [9,10,11,12,13,14,15,16,17]
+        elif request.GET['edad'] == '6':
+            medad = [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+                     41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59]
+        elif request.GET['edad'] == '7':
+            medad = [60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,
+                     99,100]
+        else:
+            medad = request.GET['edad']
+
+        if request.GET['eess'] == 'TODOS':
+            if self.request.session['sytem']['typeca'] == 'CA':
+                totNominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DS':
+                totNominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'PR':
+                totNominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+            elif self.request.session['sytem']['typeca'] == 'DP':
+                totNominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad__in=medad).order_by('cod_eess')
+
+        elif request.GET['eess'] != 'TODOS':
+            totNominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad__in=medad).order_by('cod_eess')
+
+        totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
 
         img = Image('static/img/logoPrint.png')
         ws.add_image(img, 'A2')
-
-        ws.merge_cells('B2:AB2')
-        ws.row_dimensions[2].height = 23
-
-        ws.column_dimensions['A'].width = 6
-        ws.column_dimensions['B'].width = 30
-        ws.column_dimensions['C'].width = 10
-        ws.column_dimensions['D'].width = 33
-        ws.column_dimensions['E'].width = 11
-        ws.column_dimensions['F'].width = 5
-        ws.column_dimensions['G'].width = 12
-        ws.column_dimensions['H'].width = 12
-        ws.column_dimensions['I'].width = 12
-        ws.column_dimensions['J'].width = 12
-        ws.column_dimensions['K'].width = 12
-        ws.column_dimensions['L'].width = 12
-        ws.column_dimensions['M'].width = 12
-        ws.column_dimensions['N'].width = 12
-        ws.column_dimensions['O'].width = 12
-        ws.column_dimensions['P'].width = 12
-        ws.column_dimensions['Q'].width = 12
-        ws.column_dimensions['R'].width = 12
-        ws.column_dimensions['S'].width = 12
-        ws.column_dimensions['T'].width = 12
-        ws.column_dimensions['U'].width = 12
-        ws.column_dimensions['V'].width = 12
-        ws.column_dimensions['W'].width = 12
-        ws.column_dimensions['X'].width = 12
-        ws.column_dimensions['Y'].width = 12
-        ws.column_dimensions['Z'].width = 12
-        ws.column_dimensions['AA'].width = 12
-        ws.column_dimensions['AB'].width = 12
-
-        ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
-        ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-        ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES'
-
-        ws.merge_cells('A4:AB4')
-        ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
-        ws['A4'] = 'CODIFICACION: '
-
-        ws.merge_cells('A6:AB6')
-        ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
-        ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
         ws['A8'] = '#'
         ws['A8'].font = Font(name='Aptos Narrow', size=10, bold=True)
@@ -1754,259 +1766,802 @@ class PrintInmunization(View):
         ws['F8'].fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
         ws['F8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['G8'] = 'HVB'
-        ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['G8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
-        ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+        if request.GET['edad'] == '0':
+            set_border(self, ws, "A2:T2", "medium", "57267C")
+            set_border(self, ws, "A4:T4", "medium", "366092")
+            set_border(self, ws, "A6:T6", "medium", "D9D9D9")
 
-        ws['H8'] = 'BCG'
-        ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['H8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
-        ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+            ws.column_dimensions['J'].width = 12
+            ws.column_dimensions['K'].width = 12
+            ws.column_dimensions['L'].width = 12
+            ws.column_dimensions['M'].width = 12
+            ws.column_dimensions['N'].width = 12
+            ws.column_dimensions['O'].width = 12
+            ws.column_dimensions['P'].width = 12
+            ws.column_dimensions['Q'].width = 12
+            ws.column_dimensions['R'].width = 12
+            ws.column_dimensions['S'].width = 12
+            ws.column_dimensions['T'].width = 12
 
-        ws['I8'] = 'Rota 2m'
-        ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['I8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws.merge_cells('B2:T2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES RECIEN NACIDO Y MENORES DE 1 AÑO'
 
-        ws['J8'] = 'Ipv 2m'
-        ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['J8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['J8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws.merge_cells('A4:T4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
 
-        ws['K8'] = 'Penta 2m'
-        ws['K8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['K8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['K8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws.merge_cells('A6:T6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
-        ws['L8'] = 'Neumo 2m'
-        ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['L8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['G8'] = 'BCG'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['M8'] = 'Rota 4m'
-        ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['M8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['H8'] = 'HVB'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['N8'] = 'Ipv 4m'
-        ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['N8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['N8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['I8'] = 'IPV 2M'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['O8'] = 'Penta 4m'
-        ws['O8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['O8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['O8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['O8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['J8'] = 'ROTA 2M'
+            ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['J8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['J8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['P8'] = 'Neumo 4m'
-        ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['P8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['K8'] = 'PENTA 2M'
+            ws['K8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['K8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['K8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['Q8'] = 'Ipv 6m'
-        ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['Q8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['Q8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['L8'] = 'NEUMO 2M'
+            ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['L8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['R8'] = 'Penta 6m'
-        ws['R8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['R8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['R8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['R8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['M8'] = 'ROTA 4M'
+            ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['M8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['S8'] = 'Infl 6m'
-        ws['S8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['S8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['S8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['S8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['N8'] = 'IPV 4M'
+            ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['N8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['N8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['T8'] = 'Infl 7m'
-        ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['T8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
-        ws['T8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['O8'] = 'PENTA 4M'
+            ws['O8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['O8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['O8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['O8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['U8'] = 'SPR1'
-        ws['U8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['U8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['U8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['U8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['P8'] = 'NEUMO 4M'
+            ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['P8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['V8'] = 'Neumo 12m'
-        ws['V8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['V8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['V8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['V8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['Q8'] = 'IPV 6M'
+            ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['Q8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['Q8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['W8'] = 'Varicela'
-        ws['W8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['W8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['W8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['W8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['R8'] = 'PENTA 6M'
+            ws['R8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['R8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['R8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['R8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['X8'] = 'HIV'
-        ws['X8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['X8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['X8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['X8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['S8'] = 'INFL 6M'
+            ws['S8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['S8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['S8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['S8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['Y8'] = 'AMA'
-        ws['Y8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['Y8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['Y8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['Y8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            ws['T8'] = 'INFL 7M'
+            ws['T8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['T8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['T8'].fill = PatternFill(start_color='dff0c7', end_color='dff0c7', fill_type='solid')
+            ws['T8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        ws['Z8'] = 'SPR2'
-        ws['Z8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['Z8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['Z8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['Z8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
 
-        ws['AA8'] = 'DPT1'
-        ws['AA8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['AA8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AA8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['AA8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
 
-        ws['AB8'] = 'IPV 18M'
-        ws['AB8'].font = Font(name='Aptos Narrow', size=10, bold=True)
-        ws['AB8'].alignment = Alignment(horizontal="center", vertical="center")
-        ws['AB8'].fill = PatternFill(start_color='ece3fb', end_color='ece3fb', fill_type='solid')
-        ws['AB8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
 
-        if request.GET['eess'] == 'TODOS':
-            if request.GET['edad'] == 'TODOS':
-                if self.request.session['sytem']['typeca'] == 'CA':
-                    totNominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DS':
-                    totNominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'PR':
-                    totNominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DP':
-                    totNominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca']).order_by('cod_eess')
-            else:
-                if self.request.session['sytem']['typeca'] == 'CA':
-                    totNominal = Inmunization.objects.filter(cod_eess=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DS':
-                    totNominal = Inmunization.objects.filter(cod_dist=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'PR':
-                    totNominal = Inmunization.objects.filter(cod_prov=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
-                elif self.request.session['sytem']['typeca'] == 'DP':
-                    totNominal = Inmunization.objects.filter(cod_dep=self.request.session['sytem']['codeca'], edad=request.GET['edad']).order_by('cod_eess')
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
 
-        elif request.GET['eess'] != 'TODOS':
-            if request.GET['edad'] == 'TODOS':
-                totNominal = Inmunization.objects.filter(cod_eess=request.GET['eess']).order_by('cod_eess')
-            else:
-                totNominal = Inmunization.objects.filter(cod_eess=request.GET['eess'], edad=request.GET['edad']).order_by('cod_eess')
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
 
-        totNominal = json.loads(serializers.serialize('json', totNominal, indent=2, use_natural_foreign_keys=True))
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
 
-        cont = 9
-        cant = len(totNominal)
-        num = 1
-        if cant > 0:
-            for nom in totNominal:
-                ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=1).value = num
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['bcg']
 
-                ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
-                ws.cell(row=cont, column=2).value = nom['fields']['eess']
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['hvb']
 
-                ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=3).value = nom['fields']['documento']
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['apo2m']
 
-                ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
-                ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+                    ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=10).value = nom['fields']['rota2m']
 
-                ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+                    ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=11).value = nom['fields']['penta2m']
 
-                ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=6).value = nom['fields']['edad']
+                    ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=12).value = nom['fields']['neumo2m']
 
-                ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=7).value = nom['fields']['hvb']
+                    ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=13).value = nom['fields']['rota4m']
 
-                ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=8).value = nom['fields']['bcg']
+                    ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=14).value = nom['fields']['apo4m']
 
-                ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=9).value = nom['fields']['rota2m']
+                    ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=15).value = nom['fields']['penta4m']
 
-                ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=10).value = nom['fields']['apo2m']
+                    ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=16).value = nom['fields']['neumo4m']
 
-                ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=11).value = nom['fields']['penta2m']
+                    ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=17).value = nom['fields']['apo6m']
 
-                ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=12).value = nom['fields']['neumo2m']
+                    ws.cell(row=cont, column=18).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=18).value = nom['fields']['penta6m']
 
-                ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=13).value = nom['fields']['rota4m']
+                    ws.cell(row=cont, column=19).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=19).value = nom['fields']['infl6m']
 
-                ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=14).value = nom['fields']['apo4m']
+                    ws.cell(row=cont, column=20).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=20).value = nom['fields']['infl7m']
 
-                ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=15).value = nom['fields']['penta4m']
+                    cont = cont+1
+                    num = num+1
 
-                ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=16).value = nom['fields']['neumo4m']
+        elif request.GET['edad'] == '1':
+            set_border(self, ws, "A2:Q2", "medium", "57267C")
+            set_border(self, ws, "A4:Q4", "medium", "366092")
+            set_border(self, ws, "A6:Q6", "medium", "D9D9D9")
 
-                ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=17).value = nom['fields']['apo6m']
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+            ws.column_dimensions['J'].width = 12
+            ws.column_dimensions['K'].width = 12
+            ws.column_dimensions['L'].width = 12
+            ws.column_dimensions['M'].width = 12
+            ws.column_dimensions['N'].width = 12
+            ws.column_dimensions['O'].width = 12
+            ws.column_dimensions['P'].width = 12
+            ws.column_dimensions['Q'].width = 12
 
-                ws.cell(row=cont, column=18).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=18).value = nom['fields']['penta6m']
+            ws.merge_cells('B2:Q2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES 1 AÑO'
 
-                ws.cell(row=cont, column=19).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=19).value = nom['fields']['infl6m']
+            ws.merge_cells('A4:Q4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
 
-                ws.cell(row=cont, column=20).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=20).value = nom['fields']['infl7m']
+            ws.merge_cells('A6:Q6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
 
-                ws.cell(row=cont, column=21).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=21).value = nom['fields']['spr1']
+            ws['G8'] = 'SPR1'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=22).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=22).value = nom['fields']['neumo6m']
+            ws['H8'] = 'NEUMO 12M'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=23).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=23).value = nom['fields']['varicela']
+            ws['I8'] = 'VARICELA'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=24).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=24).value = nom['fields']['hiv']
+            ws['J8'] = 'INFL 1A'
+            ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['J8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['J8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=25).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=25).value = nom['fields']['ama']
+            ws['K8'] = 'INFL B'
+            ws['K8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['K8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['K8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=26).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=26).value = nom['fields']['spr2']
+            ws['L8'] = 'HIB'
+            ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['L8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=27).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=27).value = nom['fields']['dpt1_ref']
+            ws['M8'] = 'AMA'
+            ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['M8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                ws.cell(row=cont, column=28).alignment = Alignment(horizontal="center")
-                ws.cell(row=cont, column=28).value = nom['fields']['apo1_ref']
+            ws['N8'] = 'SPR2'
+            ws['N8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['N8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['N8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['N8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-                cont = cont+1
-                num = num+1
+            ws['O8'] = 'REF DPT'
+            ws['O8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['O8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['O8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['O8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
 
-        nombre_archivo = "DEIT_PASCO SEGUIMIENTO NOMINAL INMUNIZACIONES.xlsx"
+            ws['P8'] = 'REF IPV'
+            ws['P8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['P8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['P8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['P8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['Q8'] = 'HEPATITIS'
+            ws['Q8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['Q8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['Q8'].fill = PatternFill(start_color='dfd2f4', end_color='dfd2f4', fill_type='solid')
+            ws['Q8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['spr1']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['neumo6m']
+
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['varicela']
+
+                    ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=10).value = nom['fields']['infl1a']
+
+                    ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=11).value = nom['fields']['inflb']
+
+                    ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=12).value = nom['fields']['hib']
+
+                    ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=13).value = nom['fields']['ama']
+
+                    ws.cell(row=cont, column=14).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=14).value = nom['fields']['spr2']
+
+                    ws.cell(row=cont, column=15).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=15).value = nom['fields']['ref_dpt']
+
+                    ws.cell(row=cont, column=16).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=16).value = nom['fields']['ref_ipv']
+
+                    ws.cell(row=cont, column=17).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=17).value = nom['fields']['hepatitis']
+
+                    cont = cont+1
+                    num = num+1
+
+        elif request.GET['edad'] == '2':
+            set_border(self, ws, "A2:I2", "medium", "57267C")
+            set_border(self, ws, "A4:I4", "medium", "366092")
+            set_border(self, ws, "A6:I6", "medium", "D9D9D9")
+
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+
+            ws.merge_cells('B2:I2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES 2 y 3 AÑOs'
+
+            ws.merge_cells('A4:I4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
+
+            ws.merge_cells('A6:I6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+            ws['G8'] = 'VARICELA'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='d6eaec', end_color='d6eaec', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['H8'] = 'INFLUENZA 2A'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='d6eaec', end_color='d6eaec', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['I8'] = 'INFLUENZA 3A'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='d6eaec', end_color='d6eaec', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['varicela2']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['infl2a']
+
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['infl3a']
+
+                    cont = cont+1
+                    num = num+1
+
+        elif request.GET['edad'] == '4':
+            set_border(self, ws, "A2:I2", "medium", "57267C")
+            set_border(self, ws, "A4:I4", "medium", "366092")
+            set_border(self, ws, "A6:I6", "medium", "D9D9D9")
+
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+
+            ws.merge_cells('B2:I2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES 4 AÑOS'
+
+            ws.merge_cells('A4:I4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
+
+            ws.merge_cells('A6:I6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+            ws['G8'] = 'INFLUENZA'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['H8'] = 'REF APO'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['I8'] = 'REF DPT'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='c7ecf0', end_color='c7ecf0', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['infl4a']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['ref_apo2']
+
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['ref_dpt2']
+
+                    cont = cont+1
+                    num = num+1
+
+        elif request.GET['edad'] == '5':
+            set_border(self, ws, "A2:I2", "medium", "57267C")
+            set_border(self, ws, "A4:I4", "medium", "366092")
+            set_border(self, ws, "A6:I6", "medium", "D9D9D9")
+
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+
+            ws.merge_cells('B2:I2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES ADOLESCENTES'
+
+            ws.merge_cells('A4:I4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
+
+            ws.merge_cells('A6:I6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+            ws['G8'] = 'VPH 1'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='d1d1d1', end_color='d1d1d1', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['H8'] = 'VPH 2'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='d1d1d1', end_color='d1d1d1', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['I8'] = 'VPH DU'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='d1d1d1', end_color='d1d1d1', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['vph1']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['vph2']
+
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['vph_du']
+
+                    cont = cont+1
+                    num = num+1
+
+        elif request.GET['edad'] == '6':
+            set_border(self, ws, "A2:M2", "medium", "57267C")
+            set_border(self, ws, "A4:M4", "medium", "366092")
+            set_border(self, ws, "A6:M6", "medium", "D9D9D9")
+
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+            ws.column_dimensions['I'].width = 12
+            ws.column_dimensions['J'].width = 12
+            ws.column_dimensions['K'].width = 12
+            ws.column_dimensions['L'].width = 12
+            ws.column_dimensions['M'].width = 12
+
+            ws.merge_cells('B2:M2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES GESTANTES'
+
+            ws.merge_cells('A4:M4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
+
+            ws.merge_cells('A6:M6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+            ws['G8'] = 'DT 1'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['H8'] = 'DT 2'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['I8'] = 'DTPA'
+            ws['I8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['I8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['I8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['I8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['J8'] = 'INFLUENZA'
+            ws['J8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['J8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['J8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['J8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['K8'] = 'HEPATITISB 1'
+            ws['K8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['K8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['K8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['K8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['L8'] = 'HEPATITISB 2'
+            ws['L8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['L8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['L8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['L8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['M8'] = 'HEPATITISB 3'
+            ws['M8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['M8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['M8'].fill = PatternFill(start_color='e7b6d0', end_color='e7b6d0', fill_type='solid')
+            ws['M8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['gest_dt1']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['gest_dt2']
+
+                    ws.cell(row=cont, column=9).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=9).value = nom['fields']['gest_tdap']
+
+                    ws.cell(row=cont, column=10).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=10).value = nom['fields']['gest_infl']
+
+                    ws.cell(row=cont, column=11).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=11).value = nom['fields']['hepatitisb1']
+
+                    ws.cell(row=cont, column=12).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=12).value = nom['fields']['hepatitisb2']
+
+                    ws.cell(row=cont, column=13).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=13).value = nom['fields']['hepatitisb3']
+
+                    cont = cont+1
+                    num = num+1
+
+        elif request.GET['edad'] == '7':
+            set_border(self, ws, "A2:H2", "medium", "57267C")
+            set_border(self, ws, "A4:H4", "medium", "366092")
+            set_border(self, ws, "A6:H6", "medium", "D9D9D9")
+
+            ws.row_dimensions[2].height = 23
+            ws.column_dimensions['A'].width = 6
+            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['C'].width = 10
+            ws.column_dimensions['D'].width = 33
+            ws.column_dimensions['E'].width = 11
+            ws.column_dimensions['F'].width = 5
+            ws.column_dimensions['G'].width = 12
+            ws.column_dimensions['H'].width = 12
+
+            ws.merge_cells('B2:H2')
+            ws['B2'].font = Font(name='Aptos Narrow', size=11, bold=True, color='57267C')
+            ws['B2'].alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws['B2'] = 'ESSALUD PASCO: SEGUIMIENTO NOMINAL DE INMUNIZACIONES ADULTO MAYOR'
+
+            ws.merge_cells('A4:H4')
+            ws['A4'].font = Font(name='Aptos Narrow', size=9, bold=True, color='305496')
+            ws['A4'] = 'CODIFICACION: '
+
+            ws.merge_cells('A6:H6')
+            ws['A6'].font = Font(name='Aptos Narrow', size=9, bold=True, color='757171')
+            ws['A6'] = 'Fuente: ESSALUD con Fecha: ' + date.today().strftime('%Y-%m-%d') + ' a las 08:30 horas'
+
+            ws['G8'] = 'INLUENZA'
+            ws['G8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['G8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['G8'].fill = PatternFill(start_color='f2f2c1', end_color='f2f2c1', fill_type='solid')
+            ws['G8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            ws['H8'] = 'NEUMOCOCO'
+            ws['H8'].font = Font(name='Aptos Narrow', size=10, bold=True)
+            ws['H8'].alignment = Alignment(horizontal="center", vertical="center")
+            ws['H8'].fill = PatternFill(start_color='f2f2c1', end_color='f2f2c1', fill_type='solid')
+            ws['H8'].border = Border(left=Side(border_style="thin", color="808080"), right=Side(border_style="thin", color="808080"), top=Side(border_style="thin", color="808080"), bottom=Side(border_style="thin", color="808080"))
+
+            cont = 9
+            cant = len(totNominal)
+            num = 1
+            if cant > 0:
+                for nom in totNominal:
+                    ws.cell(row=cont, column=1).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=1).value = num
+
+                    ws.cell(row=cont, column=2).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=2).value = nom['fields']['eess']
+
+                    ws.cell(row=cont, column=3).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=3).value = nom['fields']['documento']
+
+                    ws.cell(row=cont, column=4).alignment = Alignment(horizontal="left")
+                    ws.cell(row=cont, column=4).value = nom['fields']['paciente']
+
+                    ws.cell(row=cont, column=5).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=5).value = nom['fields']['fec_nac']
+
+                    ws.cell(row=cont, column=6).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=6).value = nom['fields']['edad']
+
+                    ws.cell(row=cont, column=7).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=7).value = nom['fields']['infl_adult']
+
+                    ws.cell(row=cont, column=8).alignment = Alignment(horizontal="center")
+                    ws.cell(row=cont, column=8).value = nom['fields']['neumo_adult']
+
+                    cont = cont+1
+                    num = num+1
+
+
+        nombre_archivo = "DEIT_PASCO NOMINAL INMUNIZACIONES.xlsx"
         response = HttpResponse(content_type="application/ms-excel")
         contenido = "attachment; filename={0}".format(nombre_archivo)
         response["Content-Disposition"] = contenido

@@ -16,5 +16,6 @@ urlpatterns = [
     path('goals/printExcel/', PrintGoals.as_view(), name='goals_print'),
     path('inmunization/', login_required(InmunizationView.as_view()), name='index_inmunization'),
     path('inmunization/list/', NominalInmunization.as_view(), name='list_inmunization'),
+    path('inmunization/listCant/', ConteoInmunization.as_view(), name='list_inmunization'),
     path('inmunization/print/', PrintInmunization.as_view(), name='print_inmunization'),
 ]

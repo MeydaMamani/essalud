@@ -18,9 +18,9 @@
     </div>
     <div class="clearfix"></div>
     <div class="col-md-12 mb-2">
-        <div class="col-md-6 p-0">
+        <div class="col-md-8 p-0">
             <form method="GET" @submit.prevent="form">
-                <div class="col-sm-7 pl-0">
+                <div class="col-sm-5 pl-0">
                     <select class="form-control-sm w-100" name="eess" id="eess" v-select2="''">
                         {% for eess in establecimiento %}
                             <option value="{{ eess.codigo }}">{{ eess.nombre }}</option>
@@ -28,13 +28,21 @@
                         <option value="TODOS" selected>TODOS</option>
                     </select>
                 </div>
-                <div class="col-sm-4 pl-0">
-                    <select class="form-control-sm w-100" name="edad" id="edad" v-model="edad">
-                        <option value="0" selected>Seleccione Edad</option>
+                <div class="col-sm-3 pl-0">
+                    <select class="form-control-sm w-100" name="edad" id="edad" v-model="edad" v-select2="''">
+                        <option value="0" selected>RN - MENOR 1A</option>
                         <option value="1">1 AÑO</option>
-                        <option value="2">2 AÑOS</option>
-                        <option value="3">3 AÑOS</option>
-                        <option value="TODOS">TODOS</option>
+                        <option value="2">2 Y 3 AÑOS</option>
+                        <option value="4">4 AÑOS</option>
+                        <option value="5">ADOLESCENTE</option>
+                        <option value="6">GESTANTE</option>
+                        <option value="7">ADULTO MAYOR</option>
+                    </select>
+                </div>
+                <div class="col-sm-3 pl-0">
+                    <select class="form-control-sm w-100" name="tipo" id="tipo">
+                        <option value="MINSA" selected>CRUCE MINSA</option>
+                        <option value="ESSALUD">ESSALUD</option>
                     </select>
                 </div>
                 <div class="col-md-1 pl-0">
@@ -42,95 +50,635 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-6 text-right p-0">
+        <div class="col-md-4 text-right p-0">
+            <button class="btn btn-sm btn-outline-danger font-13" data-toggle="modal" data-target=".ModalInformacion" @click="contInmuni"> Resumen</button>
             <button type="button" @click="PrintExcel" class="btn btn-success btn-sm"><i class="fa fa-download"></i></button>
         </div>
     </div>
     <div class="carga text-center"></div>
-    <div class="col-md-12" v-show="data">
-        <div class="x_panel p-2">
-            <div class="table-responsive nominalTable" id="tableNominal">
-                <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
-                    <thead>
-                        <tr class="font-10 text-center">
-                            <th class="align-middle p-1">#</th>
-                            <th class="align-middle p-1">Centro Asistencial</th>
-                            <th class="align-middle p-1">Doc Paciente</th>
-                            <th class="align-middle p-1">Paciente</th>
-                            <th class="align-middle p-1">Fecha Nacido</th>
-                            <th class="align-middle p-1">Edad</th>
-                            <th class="align-middle p-1" style="background: #C7ECF0 !important;">HVB</th>
-                            <th class="align-middle p-1" style="background: #C7ECF0 !important;">BCG</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">ROTA 2M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">IPV 2M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 2M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">NEUMO 2M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">ROTA 4M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">IPV 4M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 4M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">NEUMO 4M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">IPV 6M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">PENTA 6M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">INFL 6M</th>
-                            <th class="align-middle p-1" style="background: #DFF0C7 !important;">INFL 7 8M</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">SPR1</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">NEUMO 12M</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">VARICELA</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">HIV</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">AMA</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">SPR2</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">DPT1</th>
-                            <th class="align-middle p-1" style="background: #ece3fb !important;">IPV 18M</th>
-                        </tr>
-                    </thead>
-                    <div class="float-right col-md-3 p-0">
-                        <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
-                            <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
-                            <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+    <div class="col-md-12">
+        <div v-show="listRn == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #C7ECF0 !important;">BCG</th>
+                                <th class="align-middle p-1" style="background: #C7ECF0 !important;">HVB</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">IPV 2M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">ROTA 2M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">PENTA 2M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">NEUMO 2M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">ROTA 4M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">IPV 4M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">PENTA 4M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">NEUMO 4M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">IPV 6M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">PENTA 6M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">INFL 6M</th>
+                                <th class="align-middle p-1" style="background: #b9eecf !important;">INFL 7 8M</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.bcg ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hvb ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.apo2m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.rota2m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta2m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo2m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.rota4m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.apo4m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta4m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo4m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.apo6m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.penta6m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl6m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl7m ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="20">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="list1anio == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow2" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">SPR1</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">NEUMO 12M</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">VARICELA</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">INFL 1A</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">INFL B</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">HIB</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">AMA</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">SPR2</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">REF DPT</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">REF IPV</th>
+                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">HEPATITIS</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search2" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.spr1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo6m ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.varicela ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl1a ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.inflb ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hib ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ama ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.spr2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ref_dpt ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ref_ipv ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hepatitis ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="20">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="list23anio == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow3" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #d6eaec !important;">Varicela</th>
+                                <th class="align-middle p-1" style="background: #d6eaec !important;">Influenza 2A</th>
+                                <th class="align-middle p-1" style="background: #d6eaec !important;">Influenza 3A</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search3" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.varicela2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl2a ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl3a ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="list4anio == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow4" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Influenza</th>
+                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Ref APO</th>
+                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Ref DPT</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search4" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl4a ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ref_apo2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.ref_dpt2 ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="listAdoles == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow5" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #d1d1d1 !important;">VPH 1</th>
+                                <th class="align-middle p-1" style="background: #d1d1d1 !important;">VPH 2</th>
+                                <th class="align-middle p-1" style="background: #d1d1d1 !important;">VPH DU</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search5" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.vph1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.vph2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.vph_du ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="listGest == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow6" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DT 1</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DT 2</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DTPA</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Influenza</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 1</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 2</th>
+                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 3</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search6" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.gest_dt1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.gest_dt2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.gest_tdap ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.gest_infl ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hepatitisb1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hepatitisb2 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.hepatitisb3 ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="13">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div v-show="listAdult == true">
+            <div class="x_panel p-2">
+                <div class="table-responsive nominalTable" id="tableNominal">
+                    <table id="demo-foo-addrow7" class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                        <thead>
+                            <tr class="font-10 text-center">
+                                <th class="align-middle p-1">#</th>
+                                <th class="align-middle p-1">Centro Asistencial</th>
+                                <th class="align-middle p-1">Doc Paciente</th>
+                                <th class="align-middle p-1">Paciente</th>
+                                <th class="align-middle p-1">Fecha Nacido</th>
+                                <th class="align-middle p-1">Edad</th>
+                                <th class="align-middle p-1" style="background: #f2f2c1 !important;">Influenza</th>
+                                <th class="align-middle p-1" style="background: #f2f2c1 !important;">Neumococo</th>
+                            </tr>
+                        </thead>
+                        <div class="float-right col-md-3 p-0">
+                            <div class="col-md-12 col-sm-12 form-group has-feedback pr-0">
+                                <input id="demo-input-search7" class="form-control has-feedback-left" type="search" placeholder="Buscar...">
+                                <span class="glyphicon glyphicon-search form-control-feedback left mt-1" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <tbody>
+                            <tr class="text-center font-9" v-for="item, key in lists">
+                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.eess ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.documento]]</td>
+                                <td class="align-middle p-1">[[ item.fields.paciente]]</td>
+                                <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.edad ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.infl_adult ]]</td>
+                                <td class="align-middle p-1">[[ item.fields.neumo_adult ]]</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="8">
+                                    <div class="">
+                                        <ul class="pagination"></ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- modal de resumen -->
+        <div class="modal fade ModalInformacion" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="table-responsive nominalTable p-3">
+                            <div class="col-md-8 mb-3">
+                                <form method="POST" @submit.prevent="contInmuni">
+                                    {% csrf_token %}
+                                    <div class="col-sm-4 pt-1 pl-0">
+                                        <select class="form-control-sm w-100" name="anio" id="anio" v-model="anio"></select>
+                                    </div>
+                                    <div class="col-sm-5 pt-1 pl-0">
+                                        <select class="form-control-sm w-100" name="mes" id="mes" v-model="mes" v-select2="''" style="width: 100%;"></select>
+                                    </div>
+                                    <div class="col-md-1 pt-1 pl-0">
+                                        <button class="btn btn-primary btn-block btn-sm" id="search" type="submit"><i class="fa fa-search"></i> </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div v-show="listRn == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #C7ECF0;">BCG</th>
+                                                <th class="align-middle p-1" style="background: #C7ECF0;">HVB</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">IPV 2M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">ROTA 2M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">PENTA 2M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">NEUMO 2M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">ROTA 4M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">IPV 4M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">PENTA 4M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">NEUMO 4M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">IPV 6M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">PENTA 6M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">INFL 6M</th>
+                                                <th class="align-middle p-1" style="background: #b9eecf;">INFL 7 8M</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.bcg ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hvb ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.apo2m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.rota2m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.penta2m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.neumo2m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.rota4m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.apo4m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.penta4m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.neumo4m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.apo6m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.penta6m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl6m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl7m ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="list1anio == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">SPR1</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">NEUMO 12M</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">VARICELA</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">INFL 1A</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">INFL B</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">HIB</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">AMA</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">SPR2</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">REF DPT</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">REF IPV</th>
+                                                <th class="align-middle p-1" style="background: #dfd2f4 !important;">HEPATITIS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.spr1 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.neumo6m ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.varicela ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl1a ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.inflb ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hib ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.ama ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.spr2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.ref_dpt ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.ref_ipv ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hepatitis ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="list23anio == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #d6eaec !important;">Varicela</th>
+                                                <th class="align-middle p-1" style="background: #d6eaec !important;">Influenza 2A</th>
+                                                <th class="align-middle p-1" style="background: #d6eaec !important;">Influenza 3A</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.varicela2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl2a ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl3a ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="list4anio == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Influenza</th>
+                                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Ref APO</th>
+                                                <th class="align-middle p-1" style="background: #d9ecffab !important;">Ref DPT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left" >[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl4a ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.ref_apo2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.ref_dpt2 ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="listAdoles == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #d1d1d1;">VPH 1</th>
+                                                <th class="align-middle p-1" style="background: #d1d1d1;">VPH 2</th>
+                                                <th class="align-middle p-1" style="background: #d1d1d1;">VPH DU</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.vph1 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.vph2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.vph_du ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="listGest == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DT 1</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DT 2</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">DTPA</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Influenza</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 1</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 2</th>
+                                                <th class="align-middle p-1" style="background: #e7b6d0 !important;">Hepatitisb 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.gest_dt1 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.gest_dt2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.gest_tdap ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.gest_infl ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hepatitisb1 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hepatitisb2 ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.hepatitisb3 ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-show="listAdult == true">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" data-page-size="20" data-limit-navigation="10">
+                                        <thead>
+                                            <tr class="font-10 text-center">
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">#</th>
+                                                <th class="align-middle p-1" style="background: #C7D2F0;">Centro Asistencial</th>
+                                                <th class="align-middle p-1" style="background: #f2f2c1 !important;">Influenza</th>
+                                                <th class="align-middle p-1" style="background: #f2f2c1 !important;">Neumococo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center font-9" v-for="item, key in lists_cant">
+                                                <td class="align-middle p-1">[[ key+1 ]]</td>
+                                                <td class="align-middle p-1 text-left">[[ item.fields.eess ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.infl_adult ]]</td>
+                                                <td class="align-middle p-1">[[ item.fields.neumo_adult ]]</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <tbody>
-                        <tr class="text-center font-9" v-for="item, key in lists">
-                            <td class="align-middle p-1">[[ key+1 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.eess ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.documento]]</td>
-                            <td class="align-middle p-1">[[ item.fields.paciente]]</td>
-                            <td class="align-middle p-1">[[ item.fields.fec_nac ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.edad ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.hvb ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.bcg ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.rota2m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.apo2m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.penta2m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.neumo2m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.rota4m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.apo4m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.penta4m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.neumo4m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.apo6m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.penta6m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.infl6m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.infl7m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.spr1 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.neumo6m ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.varicela ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.hiv ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.ama ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.spr2 ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.dpt1_ref ]]</td>
-                            <td class="align-middle p-1">[[ item.fields.apo1_ref ]]</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="6">
-                                <div class="">
-                                    <ul class="pagination"></ul>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                </div>
             </div>
         </div>
     </div>
